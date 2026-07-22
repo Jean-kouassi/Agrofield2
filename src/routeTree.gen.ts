@@ -25,6 +25,7 @@ import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDiagnoseRouteImport } from './routes/_authenticated/diagnose'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedFinancesCreditRouteImport } from './routes/_authenticated/finances.credit'
 import { Route as ApiPublicSensorsIngestRouteImport } from './routes/api/public/sensors/ingest'
 import { Route as ApiPublicSensorsCommandsRouteImport } from './routes/api/public/sensors/commands'
 
@@ -107,6 +108,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFinancesCreditRoute =
+  AuthenticatedFinancesCreditRouteImport.update({
+    id: '/finances/credit',
+    path: '/finances/credit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicSensorsIngestRoute = ApiPublicSensorsIngestRouteImport.update({
   id: '/api/public/sensors/ingest',
   path: '/api/public/sensors/ingest',
@@ -135,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/sensors': typeof AuthenticatedSensorsRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace/create': typeof MarketplaceCreateRoute
+  '/finances/credit': typeof AuthenticatedFinancesCreditRoute
   '/api/public/sensors/commands': typeof ApiPublicSensorsCommandsRoute
   '/api/public/sensors/ingest': typeof ApiPublicSensorsIngestRoute
 }
@@ -154,6 +162,7 @@ export interface FileRoutesByTo {
   '/sensors': typeof AuthenticatedSensorsRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace/create': typeof MarketplaceCreateRoute
+  '/finances/credit': typeof AuthenticatedFinancesCreditRoute
   '/api/public/sensors/commands': typeof ApiPublicSensorsCommandsRoute
   '/api/public/sensors/ingest': typeof ApiPublicSensorsIngestRoute
 }
@@ -175,6 +184,7 @@ export interface FileRoutesById {
   '/_authenticated/sensors': typeof AuthenticatedSensorsRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace/create': typeof MarketplaceCreateRoute
+  '/_authenticated/finances/credit': typeof AuthenticatedFinancesCreditRoute
   '/api/public/sensors/commands': typeof ApiPublicSensorsCommandsRoute
   '/api/public/sensors/ingest': typeof ApiPublicSensorsIngestRoute
 }
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/sensors'
     | '/marketplace/$id'
     | '/marketplace/create'
+    | '/finances/credit'
     | '/api/public/sensors/commands'
     | '/api/public/sensors/ingest'
   fileRoutesByTo: FileRoutesByTo
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/sensors'
     | '/marketplace/$id'
     | '/marketplace/create'
+    | '/finances/credit'
     | '/api/public/sensors/commands'
     | '/api/public/sensors/ingest'
   id:
@@ -235,6 +247,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sensors'
     | '/marketplace/$id'
     | '/marketplace/create'
+    | '/_authenticated/finances/credit'
     | '/api/public/sensors/commands'
     | '/api/public/sensors/ingest'
   fileRoutesById: FileRoutesById
@@ -365,6 +378,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/finances/credit': {
+      id: '/_authenticated/finances/credit'
+      path: '/finances/credit'
+      fullPath: '/finances/credit'
+      preLoaderRoute: typeof AuthenticatedFinancesCreditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/sensors/ingest': {
       id: '/api/public/sensors/ingest'
       path: '/api/public/sensors/ingest'
@@ -390,6 +410,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedParcelsRoute: typeof AuthenticatedParcelsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSensorsRoute: typeof AuthenticatedSensorsRoute
+  AuthenticatedFinancesCreditRoute: typeof AuthenticatedFinancesCreditRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -400,6 +421,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedParcelsRoute: AuthenticatedParcelsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSensorsRoute: AuthenticatedSensorsRoute,
+  AuthenticatedFinancesCreditRoute: AuthenticatedFinancesCreditRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
