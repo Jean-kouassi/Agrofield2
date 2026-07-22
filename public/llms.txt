@@ -1,0 +1,11 @@
+# AgroField
+
+> Assistant agricole intelligent pour l'Afrique de l'Ouest : gestion de parcelles, diagnostic IA des maladies des cultures, suivi financier en FCFA et pilotage de capteurs connectés.
+
+AgroField accompagne les agriculteurs individuels et les coopératives dans la centralisation de leurs données agricoles, la détection précoce des maladies via l'IA, et l'accès facilité au crédit agricole grâce à un registre financier certifié.
+
+## Pages
+
+- [Accueil](/): Présentation d'AgroField et de ses fonctionnalités.
+- [Politique de confidentialité](/privacy): Traitement des données personnelles.
+- [Conditions d'utilisation](/terms): Conditions générales du service.

@@ -1,0 +1,23 @@
+name = "agrofield"
+main = ".output/server/index.mjs"
+compatibility_date = "2025-01-15"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[build]
+command = "bun run build"
+
+# Assets statiques SPA/SSR TanStack Start
+[assets]
+directory = ".output/public"
+binding = "ASSETS"
+
+# ⚠️ NE PAS mettre les secrets ici. Utilise :
+#   wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+#   wrangler secret put GEMINI_API_KEY
+# Variables publiques (non secrètes) uniquement :
+[vars]
+AI_PROVIDER = "gemini"
+GEMINI_MODEL = "gemini-2.5-flash"

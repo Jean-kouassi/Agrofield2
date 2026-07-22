@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /diagnose
+Disallow: /finance
+Disallow: /parcels
+Disallow: /profile
+Disallow: /sensors
+Disallow: /auth
+Disallow: /api/
+
+Sitemap: https://field-bloom-wise.lovable.app/sitemap.xml
