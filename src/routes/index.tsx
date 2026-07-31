@@ -5,8 +5,9 @@ import { formatFcfa, harvestAlert } from "@/lib/agrofield";
 import {
   Leaf, Sprout, LineChart, Camera, ShoppingCart, CheckCircle, ArrowRight,
   Play, Users, TrendingUp, TrendingDown, Award, MapPin, Smartphone, Shield,
-  Wheat, Wifi, LogOut, AlertTriangle, Plus, LayoutDashboard
+  Wheat, Wifi, LogOut, AlertTriangle, Plus, LayoutDashboard, ArrowUp
 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -15,6 +16,20 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   const qc = useQueryClient();
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const sessionQ = useQuery({
     queryKey: ["session"],
@@ -455,6 +470,17 @@ function Landing() {
           </div>
         </div>
       </footer>
+
+      {/* Bouton retour en haut */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl hover:bg-primary/90 transition-all animate-in fade-in zoom-in"
+          aria-label="Retour en haut"
+        >
+          <ArrowUp className="h-6 w-6" />
+        </button>
+      )}
     </div>
   );
 }
