@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Leaf, LayoutDashboard, Sprout, Camera, Wallet, User, LogOut, Radio, Shield } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { OfflineBadge } from "@/components/ui/offline-badge";
+import { useState, useRef, useCallback } from "react";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -18,6 +19,64 @@ export const Route = createFileRoute("/_authenticated")({
 function AuthedLayout() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [isSwiping, setIsSwiping] = useState(false);
+  const touchStartX = useRef<number>(0);
+  const touchEndX = useRef<number>(0);
+
+  const routes = [
+    { path: "/", label: "Accueil" },
+    { path: "/parcels", label: "Parcelles" },
+    { path: "/diagnose", label: "Diagnostic" },
+    { path: "/sensors", label: "Capteurs" },
+    { path: "/finance", label: "Finances" },
+  ];
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    setIsSwiping(true);
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isSwiping) return;
+    touchEndX.current = e.touches[0].clientX;
+  }, [isSwiping]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isSwiping) return;
+    
+    const swipeDistance = touchEndX.current - touchStartX.current;
+    const threshold = 50; // Minimum swipe distance in px
+    
+    if (Math.abs(swipeDistance) < threshold) {
+      setIsSwiping(false);
+      return;
+    }
+
+    const currentPath = router.state.location.pathname;
+    const currentIndex = routes.findIndex(r => {
+      const routePath = r.path === "/" ? "/dashboard" : r.path;
+      return currentPath.startsWith(routePath);
+    });
+
+    if (currentIndex === -1) {
+      setIsSwiping(false);
+      return;
+    }
+
+    // Swipe left (next page)
+    if (swipeDistance < -threshold && currentIndex < routes.length - 1) {
+      const nextRoute = routes[currentIndex + 1];
+      router.navigate({ to: nextRoute.path === "/" ? "/dashboard" : nextRoute.path });
+    }
+    
+    // Swipe right (previous page)
+    if (swipeDistance > threshold && currentIndex > 0) {
+      const prevRoute = routes[currentIndex - 1];
+      router.navigate({ to: prevRoute.path === "/" ? "/dashboard" : prevRoute.path });
+    }
+
+    setIsSwiping(false);
+  }, [isSwiping, router, routes]);
 
   const isSuperAdmin = useQuery({
     queryKey: ["is-super-admin"],
@@ -45,7 +104,12 @@ function AuthedLayout() {
   const cols = isSuperAdmin ? "grid-cols-6" : "grid-cols-5";
 
   return (
-    <div className="flex min-h-screen flex-col bg-background pb-20">
+    <div 
+      className="flex min-h-screen flex-col bg-background pb-20"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/90 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
           <Link to="/dashboard" className="flex items-center gap-2 font-bold text-primary">

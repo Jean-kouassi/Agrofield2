@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { formatFcfa, harvestAlert } from "@/lib/agrofield";
 import { Sprout, TrendingUp, TrendingDown, AlertTriangle, Camera, Plus, ShoppingCart, Calendar, Droplets, SprayCan, Pickaxe, Wheat, Paperclip } from "lucide-react";
-import { MarketplaceFab } from "@/components/ui/marketplace-fab";
 import { ActivityTimeline } from "@/components/ui/activity-timeline";
 import { WeatherMiniCard } from "@/components/ui/weather-mini-card";
 
@@ -34,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { name: "description", content: "Vue d'ensemble de vos parcelles, alertes IA et performance financière agricole." },
       { property: "og:title", content: "Tableau de bord — AgroField" },
       { property: "og:description", content: "Vue d'ensemble de vos parcelles, alertes IA et performance financière agricole." },
-      { property: "og:url", content: "https://field-bloom-wise.lovable.app/dashboard" },
+      { property: "og:url", content: "https://agrofield2.vercel.app/dashboard" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -241,12 +240,26 @@ function Dashboard() {
 
   return (
     <div className="space-y-5">
-      {/* En-tête avec salutation */}
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Bonjour</p>
-        <h1 className="text-2xl font-black tracking-tight">
-          {profileQ.data?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || "Agriculteur"}
-        </h1>
+      {/* En-tête avec salutation + Marketplace */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Bonjour</p>
+          <h1 className="text-2xl font-black tracking-tight">
+            {profileQ.data?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || "Agriculteur"}
+          </h1>
+        </div>
+        <Link
+          to="/marketplace"
+          className="relative flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/20"
+        >
+          <ShoppingCart className="h-4 w-4" />
+          Marché
+          {activeOffersCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+              {activeOffersCount}
+            </span>
+          )}
+        </Link>
       </div>
 
       {/* Weather Mini Card - Météo locale */}
@@ -330,8 +343,7 @@ function Dashboard() {
         </Link>
       </section>
 
-      {/* Bouton flottant Marketplace */}
-      <MarketplaceFab />
+
     </div>
   );
 }
