@@ -2,9 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { formatFcfa, harvestAlert } from "@/lib/agrofield";
-import { Sprout, TrendingUp, TrendingDown, AlertTriangle, Camera, Plus, ShoppingCart, Calendar, Droplets, SprayCan, Pickaxe, Wheat, Paperclip } from "lucide-react";
+import { Sprout, TrendingUp, TrendingDown, AlertTriangle, Camera, Plus, ShoppingCart, Calendar, Droplets, SprayCan, Pickaxe, Wheat, Paperclip, ArrowUp } from "lucide-react";
 import { ActivityTimeline } from "@/components/ui/activity-timeline";
 import { WeatherMiniCard } from "@/components/ui/weather-mini-card";
+
+import { useState, useEffect } from "react";
 
 // Formater un timestamp en texte lisible
 function formatTimestamp(dateString: string | null): string {
@@ -42,6 +44,20 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function Dashboard() {
   const { user } = Route.useRouteContext();
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const parcelsQ = useQuery({
     queryKey: ["parcels"],
@@ -343,7 +359,16 @@ function Dashboard() {
         </Link>
       </section>
 
-
+      {/* Bouton retour en haut */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-24 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all animate-in fade-in zoom-in"
+          aria-label="Retour en haut"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </button>
+      )}
     </div>
   );
 }
