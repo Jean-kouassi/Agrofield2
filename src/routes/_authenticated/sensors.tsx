@@ -472,10 +472,28 @@ function SensorsPage() {
 
       <details className="rounded-2xl border border-primary/30 bg-primary/5 p-3 text-xs">
         <summary className="flex cursor-pointer items-center gap-2 font-semibold text-primary">
-          <HelpCircle className="h-4 w-4" /> Comment ça marche sans WiFi ?
+          <HelpCircle className="h-4 w-4" /> Comment connecter un vrai capteur ?
         </summary>
-        <div className="mt-3 space-y-2 text-muted-foreground">
-          <div className="flex gap-2">
+        <div className="mt-3 space-y-3 text-muted-foreground">
+          <div className="rounded-lg bg-background p-2 text-[11px]">
+            <b className="text-foreground">Étape 1: Créer l'appareil</b>
+            <p className="mt-1">Cliquez sur « + Appareil », donnez-lui un nom et choisissez le mode de connexion. Une fois créé, copiez la <b>Clé</b> affichée (64 caractères).</p>
+          </div>
+          
+          <div className="rounded-lg bg-background p-2 text-[11px]">
+            <b className="text-foreground">Étape 2: Configurer le hardware</b>
+            <p className="mt-1">Utilisez cette clé dans votre firmware ESP32/Arduino. Voir le guide complet : <code className="text-primary">docs/CAPTEURS_GUIDE_COMPLET.md</code></p>
+          </div>
+          
+          <div className="rounded-lg bg-background p-2 text-[11px]">
+            <b className="text-foreground">Étape 3: Tester avec le simulateur</b>
+            <p className="mt-1">Lancez le script Node.js inclus :</p>
+            <code className="mt-1 block bg-muted px-2 py-1 text-[10px]">
+              node scripts/test-sensor-simulator.mjs --device-key VOTRE_CLE
+            </code>
+          </div>
+          
+          <div className="flex gap-2 pt-2">
             <Signal className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <div>
               <b className="text-foreground">GSM / SIM (recommandé)</b> — La station embarque une carte SIM (Orange, MTN, Moov…) et pousse les mesures via le réseau mobile 2G/4G. Fonctionne partout où il y a du signal, sans installation supplémentaire.

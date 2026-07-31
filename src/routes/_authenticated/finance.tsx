@@ -3,11 +3,12 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CROP_TYPES, EXPENSE_CATEGORIES, formatFcfa } from "@/lib/agrofield";
+import { exportFinanceToPDF } from "@/lib/pdf-export";
 import { toast } from "sonner";
 import {
   Plus, ShieldCheck, TrendingDown, TrendingUp, Wallet, Lock,
   Receipt, Smartphone, Users, AlertTriangle, FileWarning, Camera,
-  Download, Eye,
+  Download, Eye, FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -232,6 +233,25 @@ function FinancePage() {
     toast.success(`${rows.length} écriture${rows.length > 1 ? "s" : ""} exportée${rows.length > 1 ? "s" : ""}`);
   }
 
+  async function exportPdf() {
+    if ((expensesQ.data ?? []).length === 0 && (salesQ.data ?? []).length === 0) {
+      toast.info("Aucune écriture à exporter.");
+      return;
+    }
+    
+    try {
+      await exportFinanceToPDF(
+        expensesQ.data ?? [],
+        salesQ.data ?? [],
+        parcels
+      );
+      toast.success("PDF généré avec succès !");
+    } catch (error) {
+      console.error("Erreur export PDF:", error);
+      toast.error("Échec de la génération du PDF");
+    }
+  }
+
   return (
     <div className="space-y-5">
       <div>
@@ -244,9 +264,14 @@ function FinancePage() {
           </p>
         </div>
         {allRecords.length > 0 && (
-          <Button variant="outline" size="sm" className="mt-3 w-full" onClick={exportCsv}>
-            <Download className="h-4 w-4" /> Télécharger l'historique (CSV)
-          </Button>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Button variant="outline" size="sm" onClick={exportCsv}>
+              <Download className="h-4 w-4" /> CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportPdf}>
+              <FileText className="h-4 w-4" /> PDF
+            </Button>
+          </div>
         )}
       </div>
 

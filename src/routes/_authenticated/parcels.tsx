@@ -15,6 +15,8 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { CropProgressCard } from "@/components/ui/crop-progress-card";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export const Route = createFileRoute("/_authenticated/parcels")({
   head: () => ({
@@ -29,6 +31,37 @@ export const Route = createFileRoute("/_authenticated/parcels")({
   }),
   component: ParcelsPage,
 });
+
+// Durée estimée des cycles culturaux (jours)
+function getCropCycleDays(cropType: string): number {
+  const cycles: Record<string, number> = {
+    'Mil': 90,
+    'Sorgho': 120,
+    'Maïs': 100,
+    'Riz': 130,
+    'Niébé': 75,
+    'Arachide': 120,
+    'Sésame': 90,
+    'Coton': 160,
+    'Tomate': 80,
+    'Oignon': 120,
+    'Manioc': 180,
+    'Igname': 200,
+  };
+  return cycles[cropType] || 100; // Défaut 100 jours
+}
+
+// Stade de croissance actuel
+function getCurrentGrowthStage(cropType: string, age: number, totalDays: number): string {
+  const progress = (age / totalDays) * 100;
+  
+  if (progress < 15) return 'Germination';
+  if (progress < 35) return 'Croissance végétative';
+  if (progress < 60) return 'Floraison';
+  if (progress < 85) return 'Fructification';
+  if (progress < 100) return 'Maturation';
+  return 'Prêt à récolter';
+}
 
 function ParcelsPage() {
   const { user } = Route.useRouteContext();
@@ -125,56 +158,78 @@ function ParcelsPage() {
       {parcelsQ.isLoading ? (
         <div className="text-sm text-muted-foreground">Chargement…</div>
       ) : (parcelsQ.data ?? []).length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-          <Sprout className="mx-auto h-10 w-10 text-primary/60" />
-          <p className="mt-3 text-sm text-muted-foreground">
-            Aucune parcelle. Ajoutez votre première parcelle pour démarrer.
-          </p>
-        </div>
+        <EmptyState
+          icon={<Sprout className="h-12 w-12 text-primary/60" />}
+          title="Aucune parcelle encore"
+          description="Créez votre première parcelle pour commencer le suivi cultural et les alertes de récolte."
+          action={
+            <Button onClick={() => setOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Nouvelle parcelle
+            </Button>
+          }
+        />
       ) : (
         <div className="space-y-3">
           {parcelsQ.data!.map((p) => {
             const alert = harvestAlert(p.crop_type, p.sowing_date);
-            const age = daysSince(p.sowing_date);
+            const age = daysSince(p.sowing_date) ?? 0;
+            
+            // Calculer la durée totale du cycle (estimation)
+            const cropCycleDays = getCropCycleDays(p.crop_type);
+            
+            // Déterminer le stade actuel
+            const stage = getCurrentGrowthStage(p.crop_type, age, cropCycleDays);
+            
             return (
-              <div key={p.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="text-base font-bold">{p.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {p.crop_type} • {Number(p.area_ha)} ha
+              <div key={p.id} className="space-y-3">
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-base font-bold">{p.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {p.crop_type} • {Number(p.area_ha)} ha
+                      </div>
                     </div>
-                  </div>
-                  <button
-                    onClick={() => remove(p.id)}
-                    className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-destructive"
-                    aria-label="Supprimer"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-                  {p.sowing_date && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-muted-foreground">
-                      <Calendar className="h-3 w-3" /> Semis {p.sowing_date}
-                      {age != null && ` • J+${age}`}
-                    </span>
-                  )}
-                  {alert && (
-                    <span
-                      className={`rounded-full px-2 py-1 font-medium ${
-                        alert.level === "critical"
-                          ? "bg-destructive/10 text-destructive"
-                          : alert.level === "warn"
-                            ? "bg-accent/20 text-accent-foreground"
-                            : "bg-secondary text-secondary-foreground"
-                      }`}
+                    <button
+                      onClick={() => remove(p.id)}
+                      className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-destructive"
+                      aria-label="Supprimer"
                     >
-                      {alert.label}
-                    </span>
-                  )}
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                    {p.sowing_date && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-muted-foreground">
+                        <Calendar className="h-3 w-3" /> Semis {p.sowing_date}
+                        {age != null && ` • J+${age}`}
+                      </span>
+                    )}
+                    {alert && (
+                      <span
+                        className={`rounded-full px-2 py-1 font-medium ${
+                          alert.level === "critical"
+                            ? "bg-destructive/10 text-destructive"
+                            : alert.level === "warn"
+                              ? "bg-accent/20 text-accent-foreground"
+                              : "bg-secondary text-secondary-foreground"
+                        }`}
+                      >
+                        {alert.label}
+                      </span>
+                    )}
+                  </div>
+                  {p.notes && <p className="mt-2 text-xs text-muted-foreground">{p.notes}</p>}
                 </div>
-                {p.notes && <p className="mt-2 text-xs text-muted-foreground">{p.notes}</p>}
+                
+                {/* Carte de progression culturale */}
+                <CropProgressCard
+                  cropName={p.crop_type}
+                  currentDay={age}
+                  totalDays={cropCycleDays}
+                  stage={stage}
+                />
               </div>
             );
           })}

@@ -1,5 +1,5 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { useState } from 'react'
+import { createFileRoute, useRouter, Link } from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,53 +8,135 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowLeft, Upload, Leaf, CheckCircle } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
-import type { ProductCategory } from '@/types/marketplace'
 import { toast } from 'sonner'
+import type { ProductCategory, UnitType } from '@/types/marketplace'
 
 export const Route = createFileRoute('/marketplace/create')({
+  ssr: false,
   component: CreateOfferPage,
 })
 
 function CreateOfferPage() {
   const router = useRouter()
-  const { user } = Route.useRouteContext()
   const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [checkingAuth, setCheckingAuth] = useState(true)
+  
+  // DEBUG + Auth check
+  useEffect(() => {
+    console.log('🔍 CreateOfferPage MOUNTED')
+    supabase.auth.getUser().then(({ data }) => {
+      console.log('👤 User:', data.user)
+      setUser(data.user)
+      setCheckingAuth(false)
+    })
+  }, [])
+  
+  // Si en train de vérifier l'auth ou pas connecté
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    )
+  }
+  
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+        <Card className="max-w-md w-full mx-4">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Leaf className="h-6 w-6 text-green-600" />
+              Connexion requise
+            </CardTitle>
+            <CardDescription>
+              Vous devez être connecté pour créer une offre sur le marketplace.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button 
+              className="w-full" 
+              onClick={() => router.navigate({ to: '/auth' })}
+            >
+              Se connecter
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => router.navigate({ to: '/' })}
+            >
+              Retour à l'accueil
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+  
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: '' as ProductCategory,
+    category: '' as ProductCategory | '',
     quantity: '',
-    unit: 'kg',
+    unit: 'kg' as UnitType,
     price: '',
     location: '',
     region: '',
   })
 
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user))
+  }, [])
+
   const categories: ProductCategory[] = [
-    'tomates', 'oignons', 'mil', 'sorgho', 'mais', 
-    'niebe', 'arachide', 'coton', 'mangue', 'autre'
+    'tomates',
+    'oignons',
+    'mil',
+    'sorgho',
+    'mais',
+    'niebe',
+    'arachide',
+    'coton',
+    'mangue',
+    'autre'
   ]
 
-  const units = ['kg', 'sac', 'panier', 'caisse', 'unite']
+  const units: UnitType[] = ['kg', 'sac', 'panier', 'caisse', 'unite']
 
   const regions = [
-    'Centre', 'Boucle du Mouhoun', 'Cascades', 'Centre-Est',
-    'Centre-Nord', 'Centre-Ouest', 'Centre-Sud', 'Est',
-    'Hauts-Bassins', 'Nord', 'Plateau-Central', 'Sahel', 'Sud-Ouest'
+    'Centre',
+    'Boucle du Mouhoun',
+    'Cascades',
+    'Centre-Est',
+    'Centre-Nord',
+    'Centre-Ouest',
+    'Centre-Sud',
+    'Est',
+    'Hauts-Bassins',
+    'Nord',
+    'Plateau-Central',
+    'Sahel',
+    'Sud-Ouest'
   ]
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!user) {
-      toast.error('Veuillez vous connecter')
-      router.navigate({ to: '/auth' })
-      return
-    }
-
     setLoading(true)
+
     try {
+      if (!user) {
+        toast.error('Vous devez etre connecte pour publier une offre')
+        return
+      }
+
       const offerData = {
         seller_id: user.id,
+        seller_name: user.email || 'Agriculteur',
         title: formData.title,
         description: formData.description,
         category: formData.category,
@@ -63,113 +145,158 @@ function CreateOfferPage() {
         price: parseFloat(formData.price),
         location: formData.location,
         region: formData.region,
-        payment_methods: ['cash', 'orange_money', 'moov_money'],
-        status: 'active' as const,
+        images: [],
+        available_from: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'available',
+        views: 0,
+        contacts: 0
       }
 
-      const { error } = await supabase.from('offers').insert([offerData])
-      
+      const { data, error } = await supabase
+        .from('offers')
+        .insert([offerData])
+        .select()
+
       if (error) throw error
-      
-      toast.success('Offre publiée avec succès!')
-      router.navigate({ to: '/marketplace' })
-    } catch (error) {
-      console.error('Erreur publication:', error)
-      toast.error('Erreur lors de la publication')
+
+      setSuccess(true)
+      setTimeout(() => { router.navigate({ to: '/marketplace' }) }, 2000)
+
+    } catch (error: any) {
+      toast.error('Erreur: ' + error.message)
     } finally {
       setLoading(false)
     }
   }
 
+  function handleChange(field: string, value: string) {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
+        <Card className="max-w-md w-full text-center">
+          <CardContent className="pt-6">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-10 h-10 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Offre publiée avec succès ! 🎉</h2>
+            <p className="text-gray-600 mb-4">
+              Votre produit sera bientôt visible sur le marketplace.
+            </p>
+            <p className="text-sm text-gray-500">
+              Redirection vers le marketplace...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
       {/* Header */}
-      <header className="mb-8 bg-white shadow-sm border-b">
+      <header className="bg-white border-b border-green-200 shadow-sm">
         <div className="container mx-auto px-4 py-4">
-          <Button variant="ghost" onClick={() => router.navigate({ to: '/marketplace' })}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+          <Link 
+            to="/marketplace"
+            className="inline-flex items-center gap-2 text-green-600 hover:text-green-700 font-medium"
+          >
+            <ArrowLeft className="w-4 h-4" />
             Retour au marketplace
-          </Button>
+          </Link>
         </div>
       </header>
 
-      <main className="container mx-auto max-w-2xl">
-        <div className="text-center mb-8">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-            <Leaf className="h-8 w-8 text-primary" />
-          </div>
-          <h1 className="text-3xl font-bold text-foreground">Publier une offre</h1>
-          <p className="text-muted-foreground mt-2">
-            Vendez vos produits agricoles sur le marketplace
-          </p>
-        </div>
-
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle>Détails de l'offre</CardTitle>
-            <CardDescription>
-              Remplissez les informations pour publier votre produit
-            </CardDescription>
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8 max-w-3xl">
+        <Card className="shadow-xl border-2 border-green-200">
+          <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
+            <div className="flex items-center gap-3">
+              <Leaf className="w-8 h-8" />
+              <div>
+                <CardTitle className="text-2xl">Publier une nouvelle offre</CardTitle>
+                <CardDescription className="text-green-100">
+                  Remplissez le formulaire pour publier votre produit sur le marketplace
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
-          
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Titre *</Label>
+
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Titre */}
+              <div>
+                <Label htmlFor="title" className="font-semibold text-gray-700">
+                  Titre de l'offre *
+                </Label>
                 <Input
                   id="title"
-                  required
                   placeholder="Ex: Tomates fraîches - Récolte du jour"
                   value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e) => handleChange('title', e.target.value)}
+                  required
+                  className="mt-1 border-2 border-gray-300 focus:border-green-500"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Description *</Label>
+              {/* Description */}
+              <div>
+                <Label htmlFor="description" className="font-semibold text-gray-700">
+                  Description *
+                </Label>
                 <Textarea
                   id="description"
+                  placeholder="Décrivez votre produit (qualité, mode de culture, disponibilité...)"
+                  value={formData.description}
+                  onChange={(e) => handleChange('description', e.target.value)}
                   required
                   rows={4}
-                  placeholder="Décrivez votre produit (qualité, variété, conditions de vente...)"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="mt-1 border-2 border-gray-300 focus:border-green-500 resize-none"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Catégorie *</Label>
+              {/* Catégorie et Unité */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="category" className="font-semibold text-gray-700">
+                    Catégorie *
+                  </Label>
                   <Select
                     value={formData.category}
-                    onValueChange={(value) => setFormData({ ...formData, category: value as ProductCategory })}
+                    onValueChange={(value) => handleChange('category', value)}
+                    required
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner" />
+                    <SelectTrigger className="mt-1 border-2 border-gray-300 focus:border-green-500">
+                      <SelectValue placeholder="Sélectionner une catégorie" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                        <SelectItem key={cat} value={cat} className="capitalize">
+                          {cat}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Unité *</Label>
+                <div>
+                  <Label htmlFor="unit" className="font-semibold text-gray-700">
+                    Unité de mesure *
+                  </Label>
                   <Select
                     value={formData.unit}
-                    onValueChange={(value) => setFormData({ ...formData, unit: value })}
+                    onValueChange={(value) => handleChange('unit', value)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="mt-1 border-2 border-gray-300 focus:border-green-500">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {units.map((unit) => (
-                        <SelectItem key={unit} value={unit}>
-                          {unit}
+                      {units.map((u) => (
+                        <SelectItem key={u} value={u}>
+                          {u}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -177,59 +304,75 @@ function CreateOfferPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="quantity">Quantité *</Label>
+              {/* Quantité et Prix */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="quantity" className="font-semibold text-gray-700">
+                    Quantité disponible *
+                  </Label>
                   <Input
                     id="quantity"
                     type="number"
                     step="0.01"
                     min="0"
-                    required
-                    placeholder="0"
+                    placeholder="100"
                     value={formData.quantity}
-                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                    onChange={(e) => handleChange('quantity', e.target.value)}
+                    required
+                    className="mt-1 border-2 border-gray-300 focus:border-green-500"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="price">Prix (FCFA) *</Label>
+                <div>
+                  <Label htmlFor="price" className="font-semibold text-gray-700">
+                    Prix unitaire (FCFA) *
+                  </Label>
                   <Input
                     id="price"
                     type="number"
+                    step="1"
                     min="0"
-                    required
-                    placeholder="0"
+                    placeholder="500"
                     value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    onChange={(e) => handleChange('price', e.target.value)}
+                    required
+                    className="mt-1 border-2 border-gray-300 focus:border-green-500"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="location">Localité</Label>
+              {/* Localisation */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="location" className="font-semibold text-gray-700">
+                    Ville / Localité *
+                  </Label>
                   <Input
                     id="location"
-                    placeholder="Ville/village"
+                    placeholder="Ex: Ouagadougou"
                     value={formData.location}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    onChange={(e) => handleChange('location', e.target.value)}
+                    required
+                    className="mt-1 border-2 border-gray-300 focus:border-green-500"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="region">Région</Label>
+                <div>
+                  <Label htmlFor="region" className="font-semibold text-gray-700">
+                    Région *
+                  </Label>
                   <Select
                     value={formData.region}
-                    onValueChange={(value) => setFormData({ ...formData, region: value })}
+                    onValueChange={(value) => handleChange('region', value)}
+                    required
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner" />
+                    <SelectTrigger className="mt-1 border-2 border-gray-300 focus:border-green-500">
+                      <SelectValue placeholder="Sélectionner une région" />
                     </SelectTrigger>
                     <SelectContent>
-                      {regions.map((region) => (
-                        <SelectItem key={region} value={region}>
-                          {region}
+                      {regions.map((reg) => (
+                        <SelectItem key={reg} value={reg}>
+                          {reg}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -237,41 +380,48 @@ function CreateOfferPage() {
                 </div>
               </div>
 
-              <div className="pt-4 flex gap-3">
+              {/* Submit Button */}
+              <div className="flex gap-3 pt-6">
                 <Button
                   type="button"
                   variant="outline"
-                  className="flex-1"
-                  onClick={() => router.navigate({ to: '/marketplace' })}
+                  onClick={() => router.back()}
+                  disabled={loading}
+                  className="flex-1 border-2"
                 >
                   Annuler
                 </Button>
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-primary hover:bg-primary/90"
+                  className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold shadow-lg"
                 >
-                  {loading ? 'Publication...' : 'Publier l\'offre'}
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Publication en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-5 h-5 mr-2" />
+                      Publier l'offre
+                    </>
+                  )}
                 </Button>
               </div>
             </form>
           </CardContent>
         </Card>
 
-        {/* Info box */}
-        <div className="mt-6 rounded-lg bg-blue-50 border border-blue-200 p-4">
-          <div className="flex items-start gap-3">
-            <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5" />
-            <div className="text-sm text-blue-800">
-              <p className="font-semibold mb-1">Bon à savoir :</p>
-              <ul className="list-disc list-inside space-y-1 text-blue-700">
-                <li>Publication gratuite pendant la période de lancement</li>
-                <li>Votre offre sera visible immédiatement</li>
-                <li>Les acheteurs peuvent vous contacter directement</li>
-                <li>Vous pouvez modifier ou supprimer votre offre à tout moment</li>
-              </ul>
-            </div>
-          </div>
+        {/* Info Box */}
+        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 className="font-semibold text-blue-900 mb-2">💡 Le saviez-vous ?</h4>
+          <ul className="text-sm text-blue-800 space-y-1">
+            <li>• Les offres avec photos ont 3x plus de chances d'être vendues</li>
+            <li>• Un prix compétitif attire plus d'acheteurs</li>
+            <li>• Soyez précis sur la qualité et la disponibilité</li>
+            <li>• La commission est de 0% pendant la période de lancement !</li>
+          </ul>
         </div>
       </main>
     </div>

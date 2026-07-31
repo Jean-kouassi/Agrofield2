@@ -22,7 +22,7 @@ export const Route = createFileRoute("/auth")({
   }),
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: "/dashboard" });
+    if (data.session) throw redirect({ to: "/" });
   },
   component: AuthPage,
 });
@@ -38,10 +38,16 @@ function AuthPage() {
   async function handleGoogle() {
     try {
       setLoading(true);
+      
+      // Déterminer l'URL de redirection selon l'environnement
+      const redirectUrl = window.location.hostname === 'localhost'
+        ? 'http://localhost:8080/auth/callback'
+        : window.location.origin + '/auth/callback';
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -68,7 +74,7 @@ function AuthPage() {
       
       if (error) throw error;
       toast.success('Bienvenue !');
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/" });
     } catch (error: any) {
       toast.error(error.message || 'Email ou mot de passe incorrect');
     } finally {
@@ -85,14 +91,14 @@ function AuthPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/`,
           data: { full_name: fullName },
         },
       });
 
       if (error) throw error;
       toast.success('Compte créé ! Vérifiez votre email.');
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/" });
     } catch (error: any) {
       toast.error(error.message || 'Erreur lors de l\'inscription');
     } finally {

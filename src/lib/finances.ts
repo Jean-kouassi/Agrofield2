@@ -3,7 +3,7 @@
  * Gestion des dépenses et revenus pour les agriculteurs
  */
 
-import { supabase } from '../integrations/auth';
+import { supabase } from '@/integrations/supabase/client';
 
 // ============================================
 // TYPES

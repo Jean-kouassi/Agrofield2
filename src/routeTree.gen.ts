@@ -18,14 +18,17 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MarketplaceCreateRouteImport } from './routes/marketplace.create'
 import { Route as MarketplaceIdRouteImport } from './routes/marketplace.$id'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedSensorsRouteImport } from './routes/_authenticated/sensors'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedParcelsRouteImport } from './routes/_authenticated/parcels'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedDiagnoseRouteImport } from './routes/_authenticated/diagnose'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCropEventsRouteImport } from './routes/_authenticated/crop-events'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedFinancesCreditRouteImport } from './routes/_authenticated/finances.credit'
+import { Route as AuthenticatedFinancesAddRouteImport } from './routes/_authenticated/finances.add'
 import { Route as ApiPublicSensorsIngestRouteImport } from './routes/api/public/sensors/ingest'
 import { Route as ApiPublicSensorsCommandsRouteImport } from './routes/api/public/sensors/commands'
 
@@ -73,6 +76,11 @@ const MarketplaceIdRoute = MarketplaceIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => MarketplaceRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthenticatedSensorsRoute = AuthenticatedSensorsRouteImport.update({
   id: '/sensors',
   path: '/sensors',
@@ -103,6 +111,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCropEventsRoute = AuthenticatedCropEventsRouteImport.update({
+  id: '/crop-events',
+  path: '/crop-events',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -112,6 +125,12 @@ const AuthenticatedFinancesCreditRoute =
   AuthenticatedFinancesCreditRouteImport.update({
     id: '/finances/credit',
     path: '/finances/credit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinancesAddRoute =
+  AuthenticatedFinancesAddRouteImport.update({
+    id: '/finances/add',
+    path: '/finances/add',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const ApiPublicSensorsIngestRoute = ApiPublicSensorsIngestRouteImport.update({
@@ -128,40 +147,46 @@ const ApiPublicSensorsCommandsRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/crop-events': typeof AuthenticatedCropEventsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/diagnose': typeof AuthenticatedDiagnoseRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/parcels': typeof AuthenticatedParcelsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/sensors': typeof AuthenticatedSensorsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace/create': typeof MarketplaceCreateRoute
+  '/finances/add': typeof AuthenticatedFinancesAddRoute
   '/finances/credit': typeof AuthenticatedFinancesCreditRoute
   '/api/public/sensors/commands': typeof ApiPublicSensorsCommandsRoute
   '/api/public/sensors/ingest': typeof ApiPublicSensorsIngestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/crop-events': typeof AuthenticatedCropEventsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/diagnose': typeof AuthenticatedDiagnoseRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/parcels': typeof AuthenticatedParcelsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/sensors': typeof AuthenticatedSensorsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace/create': typeof MarketplaceCreateRoute
+  '/finances/add': typeof AuthenticatedFinancesAddRoute
   '/finances/credit': typeof AuthenticatedFinancesCreditRoute
   '/api/public/sensors/commands': typeof ApiPublicSensorsCommandsRoute
   '/api/public/sensors/ingest': typeof ApiPublicSensorsIngestRoute
@@ -170,20 +195,23 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/crop-events': typeof AuthenticatedCropEventsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/diagnose': typeof AuthenticatedDiagnoseRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/parcels': typeof AuthenticatedParcelsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/sensors': typeof AuthenticatedSensorsRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
   '/marketplace/create': typeof MarketplaceCreateRoute
+  '/_authenticated/finances/add': typeof AuthenticatedFinancesAddRoute
   '/_authenticated/finances/credit': typeof AuthenticatedFinancesCreditRoute
   '/api/public/sensors/commands': typeof ApiPublicSensorsCommandsRoute
   '/api/public/sensors/ingest': typeof ApiPublicSensorsIngestRoute
@@ -198,14 +226,17 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/admin'
+    | '/crop-events'
     | '/dashboard'
     | '/diagnose'
     | '/finance'
     | '/parcels'
     | '/profile'
     | '/sensors'
+    | '/auth/callback'
     | '/marketplace/$id'
     | '/marketplace/create'
+    | '/finances/add'
     | '/finances/credit'
     | '/api/public/sensors/commands'
     | '/api/public/sensors/ingest'
@@ -218,14 +249,17 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/admin'
+    | '/crop-events'
     | '/dashboard'
     | '/diagnose'
     | '/finance'
     | '/parcels'
     | '/profile'
     | '/sensors'
+    | '/auth/callback'
     | '/marketplace/$id'
     | '/marketplace/create'
+    | '/finances/add'
     | '/finances/credit'
     | '/api/public/sensors/commands'
     | '/api/public/sensors/ingest'
@@ -239,14 +273,17 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/_authenticated/admin'
+    | '/_authenticated/crop-events'
     | '/_authenticated/dashboard'
     | '/_authenticated/diagnose'
     | '/_authenticated/finance'
     | '/_authenticated/parcels'
     | '/_authenticated/profile'
     | '/_authenticated/sensors'
+    | '/auth/callback'
     | '/marketplace/$id'
     | '/marketplace/create'
+    | '/_authenticated/finances/add'
     | '/_authenticated/finances/credit'
     | '/api/public/sensors/commands'
     | '/api/public/sensors/ingest'
@@ -255,7 +292,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -329,6 +366,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceIdRouteImport
       parentRoute: typeof MarketplaceRoute
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_authenticated/sensors': {
       id: '/_authenticated/sensors'
       path: '/sensors'
@@ -371,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/crop-events': {
+      id: '/_authenticated/crop-events'
+      path: '/crop-events'
+      fullPath: '/crop-events'
+      preLoaderRoute: typeof AuthenticatedCropEventsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -383,6 +434,13 @@ declare module '@tanstack/react-router' {
       path: '/finances/credit'
       fullPath: '/finances/credit'
       preLoaderRoute: typeof AuthenticatedFinancesCreditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finances/add': {
+      id: '/_authenticated/finances/add'
+      path: '/finances/add'
+      fullPath: '/finances/add'
+      preLoaderRoute: typeof AuthenticatedFinancesAddRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/sensors/ingest': {
@@ -404,28 +462,42 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedCropEventsRoute: typeof AuthenticatedCropEventsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiagnoseRoute: typeof AuthenticatedDiagnoseRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedParcelsRoute: typeof AuthenticatedParcelsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSensorsRoute: typeof AuthenticatedSensorsRoute
+  AuthenticatedFinancesAddRoute: typeof AuthenticatedFinancesAddRoute
   AuthenticatedFinancesCreditRoute: typeof AuthenticatedFinancesCreditRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedCropEventsRoute: AuthenticatedCropEventsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiagnoseRoute: AuthenticatedDiagnoseRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedParcelsRoute: AuthenticatedParcelsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSensorsRoute: AuthenticatedSensorsRoute,
+  AuthenticatedFinancesAddRoute: AuthenticatedFinancesAddRoute,
   AuthenticatedFinancesCreditRoute: AuthenticatedFinancesCreditRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface MarketplaceRouteChildren {
   MarketplaceIdRoute: typeof MarketplaceIdRoute
@@ -444,7 +516,7 @@ const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   MarketplaceRoute: MarketplaceRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

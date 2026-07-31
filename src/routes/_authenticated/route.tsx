@@ -3,6 +3,7 @@ import { createFileRoute, Outlet, redirect, Link, useRouter } from "@tanstack/re
 import { supabase } from "@/integrations/supabase/client";
 import { Leaf, LayoutDashboard, Sprout, Camera, Wallet, User, LogOut, Radio, Shield } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { OfflineBadge } from "@/components/ui/offline-badge";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -75,9 +76,10 @@ function AuthedLayout() {
         <Outlet />
       </main>
 
+      {/* Bottom nav avec Dashboard en premier onglet */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-background/95 backdrop-blur">
         <div className={`mx-auto grid max-w-3xl ${cols}`}>
-          <NavItem to="/dashboard" icon={<LayoutDashboard className="h-5 w-5" />} label="Accueil" />
+          <NavItem to="/" icon={<LayoutDashboard className="h-5 w-5" />} label="Accueil" />
           <NavItem to="/parcels" icon={<Sprout className="h-5 w-5" />} label="Parcelles" />
           <NavItem to="/diagnose" icon={<Camera className="h-5 w-5" />} label="Diagnostic" />
           <NavItem to="/sensors" icon={<Radio className="h-5 w-5" />} label="Capteurs" />
@@ -88,6 +90,9 @@ function AuthedLayout() {
         </div>
       </nav>
 
+      {/* Badge offline - Zones rurales */}
+      <OfflineBadge />
+
     </div>
   );
 }
@@ -96,11 +101,11 @@ function NavItem({ to, icon, label }: { to: string; icon: React.ReactNode; label
   return (
     <Link
       to={to}
-      className="flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium text-muted-foreground data-[status=active]:text-primary"
+      className="flex flex-col items-center justify-center gap-1 py-3 min-h-[48px] text-xs font-medium text-muted-foreground data-[status=active]:text-primary"
       activeProps={{ "data-status": "active" }}
     >
       {icon}
-      <span>{label}</span>
+      <span className="text-center">{label}</span>
     </Link>
   );
 }
