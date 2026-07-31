@@ -1,0 +1,51 @@
+{
+  "name": "AgroField - Assistant agricole intelligent",
+  "short_name": "AgroField",
+  "description": "Gérez vos parcelles, diagnostiquez les maladies et vendez vos récoltes au meilleur prix",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#16a34a",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Tableau de bord",
+      "url": "/dashboard",
+      "description": "Voir vos statistiques agricoles"
+    },
+    {
+      "name": "Parcelles",
+      "url": "/parcels",
+      "description": "Gérer vos parcelles"
+    },
+    {
+      "name": "Diagnostic IA",
+      "url": "/diagnose",
+      "description": "Diagnostiquer une maladie"
+    },
+    {
+      "name": "Marketplace",
+      "url": "/marketplace",
+      "description": "Vendre vos récoltes"
+    }
+  ]
+}

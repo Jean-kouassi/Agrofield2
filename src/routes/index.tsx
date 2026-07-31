@@ -8,6 +8,7 @@ import {
   Wheat, Wifi, LogOut, AlertTriangle, Plus, LayoutDashboard, ArrowUp
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { PWAInstallPrompt } from "@/components/ui/pwa-install-prompt";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -481,6 +482,9 @@ function Landing() {
           <ArrowUp className="h-6 w-6" />
         </button>
       )}
+
+      {/* Prompt d'installation PWA */}
+      <PWAInstallPrompt />
     </div>
   );
 }

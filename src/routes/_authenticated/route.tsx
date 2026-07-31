@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Leaf, LayoutDashboard, Sprout, Camera, Wallet, User, LogOut, Radio, Shield } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { OfflineBadge } from "@/components/ui/offline-badge";
+import { OfflineIndicator } from "@/components/ui/pwa-install-prompt";
 import { useState, useRef, useCallback } from "react";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -157,6 +158,8 @@ function AuthedLayout() {
       {/* Badge offline - Zones rurales */}
       <OfflineBadge />
 
+      {/* Indicateur offline */}
+      <OfflineIndicator />
     </div>
   );
 }
