@@ -10,7 +10,6 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -40,7 +39,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    console.error("[Root Error]", error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
@@ -108,13 +107,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             {
               "@type": "Organization",
               name: "AgroField",
-              url: "https://field-bloom-wise.lovable.app",
+              url: "https://agrofield2.vercel.app",
               description: "Plateforme d'assistance agricole intelligente pour l'Afrique de l'Ouest.",
             },
             {
               "@type": "WebSite",
               name: "AgroField",
-              url: "https://field-bloom-wise.lovable.app",
+              url: "https://agrofield2.vercel.app",
               inLanguage: "fr",
             },
           ],

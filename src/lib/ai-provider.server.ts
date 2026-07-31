@@ -1,5 +1,4 @@
-// Fournisseur IA — bascule Lovable Gateway ↔ Gemini direct.
-// Défini par la variable d'env `AI_PROVIDER` : "lovable" (défaut) | "gemini".
+// Fournisseur IA — Gemini direct uniquement (plus de Lovable Gateway).
 
 export type ChatMessage = {
   role: "system" | "user" | "assistant";
@@ -18,26 +17,7 @@ export type ChatRequest = {
 
 export type ChatResponse = { text: string };
 
-// --- Lovable Gateway (utilisé tant que le projet est hébergé sur Lovable) ---
-const LOVABLE_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const LOVABLE_MODEL = "google/gemini-2.5-flash";
-
-async function callLovable(req: ChatRequest): Promise<ChatResponse> {
-  const key = process.env.LOVABLE_API_KEY;
-  if (!key) throw new Error("LOVABLE_API_KEY manquant");
-  const res = await fetch(LOVABLE_URL, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: LOVABLE_MODEL, messages: req.messages, temperature: req.temperature }),
-  });
-  if (res.status === 429) throw new Error("Trop de requêtes — réessayez dans un instant.");
-  if (res.status === 402) throw new Error("Crédits IA épuisés.");
-  if (!res.ok) throw new Error(`Analyse IA indisponible: ${(await res.text()).slice(0, 200)}`);
-  const json = await res.json();
-  return { text: json.choices?.[0]?.message?.content ?? "" };
-}
-
-// --- Gemini direct (utilisé après export de Lovable) ---
+// --- Gemini direct ---
 // Doc: https://ai.google.dev/gemini-api/docs/text-generation
 async function callGemini(req: ChatRequest): Promise<ChatResponse> {
   const key = process.env.GEMINI_API_KEY;
@@ -97,7 +77,5 @@ function extractBase64(dataUrl: string): string {
 
 // --- API publique ---
 export async function callChatAI(req: ChatRequest): Promise<ChatResponse> {
-  const provider = (process.env.AI_PROVIDER || "lovable").toLowerCase();
-  if (provider === "gemini") return callGemini(req);
-  return callLovable(req);
+  return callGemini(req);
 }
