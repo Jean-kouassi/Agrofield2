@@ -12,6 +12,8 @@
  * - offline: < 0.5 Mbps ou hors ligne → Mode offline, file d'attente
  */
 
+import { useState, useEffect } from 'react'
+
 export type ConnectionQuality = 'excellent' | 'good' | 'poor' | 'offline';
 
 export interface NetworkStatus {

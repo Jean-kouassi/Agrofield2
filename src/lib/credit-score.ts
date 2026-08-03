@@ -250,7 +250,7 @@ export async function saveCreditScore(userId: string, result: CreditScoreResult)
     user_id: userId,
     score: result.score,
     score_date: new Date().toISOString(),
-    factors: result.factors,
+    factors: result.factors as any, // Cast to Json
     recommendation: result.recommendation,
     expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 jours
   }, {

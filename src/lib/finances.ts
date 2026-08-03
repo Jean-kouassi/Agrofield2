@@ -42,13 +42,13 @@ export type PaymentMethod = 'cash' | 'orange_money' | 'moov_money' | 'virement';
 export interface FinanceTransaction {
   id: string;
   user_id: string;
-  type: FinanceType;
+  kind: 'expense' | 'sale' | 'transfer';  // Changed from type
   category: string;
-  amount_xof: number;
+  amount_fcfa: number;  // Changed from amount_xof
   description?: string;
-  date: string;
+  transaction_date: string;  // Changed from date
   receipt_image?: string;
-  plot_id?: string;
+  parcel_id?: string;  // Changed from plot_id
   payment_method?: PaymentMethod;
   reference?: string;
   created_at: string;
@@ -56,11 +56,11 @@ export interface FinanceTransaction {
 }
 
 export interface FinanceFilters {
-  type?: FinanceType;
+  kind?: 'expense' | 'sale' | 'transfer';  // Changed from type
   category?: string;
   startDate?: string;
   endDate?: string;
-  plotId?: string;
+  parcelId?: string;  // Changed from plotId
   paymentMethod?: PaymentMethod;
 }
 
@@ -140,11 +140,11 @@ export async function fetchFinances(filters?: FinanceFilters): Promise<FinanceTr
   let query = supabase
     .from('user_finances')
     .select('*')
-    .order('date', { ascending: false });
+    .order('transaction_date', { ascending: false });
 
   // Appliquer les filtres
-  if (filters?.type) {
-    query = query.eq('type', filters.type);
+  if (filters?.kind) {
+    query = query.eq('kind', filters.kind);
   }
 
   if (filters?.category) {
@@ -152,15 +152,15 @@ export async function fetchFinances(filters?: FinanceFilters): Promise<FinanceTr
   }
 
   if (filters?.startDate) {
-    query = query.gte('date', filters.startDate);
+    query = query.gte('transaction_date', filters.startDate);
   }
 
   if (filters?.endDate) {
-    query = query.lte('date', filters.endDate);
+    query = query.lte('transaction_date', filters.endDate);
   }
 
-  if (filters?.plotId) {
-    query = query.eq('plot_id', filters.plotId);
+  if (filters?.parcelId) {
+    query = query.eq('parcel_id', filters.parcelId);
   }
 
   if (filters?.paymentMethod) {
@@ -184,7 +184,7 @@ export async function fetchFinanceSummary(userId: string): Promise<FinanceSummar
     .single();
 
   if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows
-  return data;
+  return data as unknown as FinanceSummary | null;
 }
 
 /**
@@ -195,10 +195,10 @@ export async function fetchExpensesByCategory(userId: string): Promise<CategoryB
     .from('expenses_by_category')
     .select('*')
     .eq('user_id', userId)
-    .order('total_amount', { ascending: false });
+    .order('totalAmount', { ascending: false });
 
   if (error) throw error;
-  return data || [];
+  return data as unknown as CategoryBreakdown[];
 }
 
 /**
@@ -209,10 +209,10 @@ export async function fetchIncomesByCategory(userId: string): Promise<CategoryBr
     .from('incomes_by_category')
     .select('*')
     .eq('user_id', userId)
-    .order('total_amount', { ascending: false });
+    .order('totalAmount', { ascending: false });
 
   if (error) throw error;
-  return data || [];
+  return data as unknown as CategoryBreakdown[];
 }
 
 /**
@@ -227,7 +227,7 @@ export async function fetchMonthlySummary(userId: string, months: number = 12): 
     .limit(months);
 
   if (error) throw error;
-  return data || [];
+  return data as unknown as MonthlySummary[];
 }
 
 /**

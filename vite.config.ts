@@ -3,7 +3,6 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { nitro } from "nitro/vite";
-import tsConfigPaths from "vite-tsconfig-paths";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
@@ -11,8 +10,7 @@ export default defineConfig({
     tanstackStart(),
     viteReact(),
     tailwindcss(),
-    nitro(),
-    tsConfigPaths(),
+    nitro({ preset: 'vercel' }),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
@@ -103,6 +101,9 @@ export default defineConfig({
       }
     }),
   ],
+  resolve: {
+    tsconfigPaths: true,
+  },
   server: {
     port: 8080,
     strictPort: true,

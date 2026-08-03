@@ -4,7 +4,57 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import type { Offer, Order, OfferFilters, OffersResponse, Cart } from '../types/marketplace';
+import type { Offer, Order, OfferFilters, OffersResponse, Cart, OfferStats, OrderStatus } from '../types/marketplace';
+
+// Mapping Supabase Row → Offer (snake_case → camelCase)
+function mapListingToOffer(row: any): Offer {
+  return {
+    id: row.id,
+    sellerId: row.seller_id,
+    sellerName: row.seller_name,
+    title: row.title,
+    description: row.description,
+    category: row.category,
+    quantity: Number(row.quantity),
+    unit: row.unit,
+    price: Number(row.price),
+    location: row.location,
+    region: row.region,
+    images: Array.isArray(row.images) ? row.images : [],
+    availableFrom: row.available_from,
+    expiresAt: row.expires_at,
+    status: row.status,
+    views: row.views || 0,
+    contacts: row.contacts || 0,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+// Mapping Supabase Row → Order (snake_case → camelCase)
+function mapOrderRowToOrder(row: any): Order {
+  return {
+    id: row.id,
+    offerId: row.offer_id,
+    buyerId: row.buyer_id,
+    buyerName: '', // Sera ajouté via join si besoin
+    sellerId: row.seller_id,
+    sellerName: '', // Sera ajouté via join si besoin
+    quantity: Number(row.quantity),
+    unit: 'kg', // Default, la table orders n'a pas cette colonne
+    unitPrice: 0, // Sera calculé
+    totalPrice: Number(row.total_price),
+    status: row.status,
+    paymentMethod: row.payment_method,
+    paymentStatus: 'pending' as const,
+    deliveryMethod: 'pickup' as const,
+    notes: row.notes || undefined,
+    createdAt: row.created_at,
+    confirmedAt: row.confirmed_at || undefined,
+    completedAt: row.completed_at || undefined,
+    cancelledAt: row.cancelled_at || undefined,
+  }
+}
 
 /**
  * Récupérer toutes les offres avec filtres
@@ -51,7 +101,7 @@ export async function fetchOffers(filters?: OfferFilters): Promise<OffersRespons
   if (error) throw error;
 
   return {
-    offers: data as Offer[],
+    offers: data.map(mapListingToOffer),
     total: count || 0,
     hasMore: (count || 0) > offset + limit,
   };
@@ -68,13 +118,28 @@ export async function getOffer(id: string): Promise<Offer | null> {
     .single();
 
   if (error) throw error;
-  return data as Offer;
+  return mapListingToOffer(data);
 }
 
 /**
- * Créer une nouvelle offre
+ * Créer une nouvelle offre (utilise snake_case pour l'insert DB)
  */
-export async function createOffer(offer: Omit<Offer, 'id' | 'createdAt' | 'updatedAt' | 'views' | 'contacts'>): Promise<Offer> {
+export async function createOffer(offer: {
+  seller_id: string;
+  seller_name: string;
+  title: string;
+  description: string;
+  category: string;
+  quantity: number;
+  unit: string;
+  price: number;
+  location: string;
+  region: string;
+  images: string[];
+  available_from: string;
+  expires_at: string;
+  status: string;
+}): Promise<Offer> {
   const newOffer = {
     ...offer,
     views: 0,
@@ -88,22 +153,36 @@ export async function createOffer(offer: Omit<Offer, 'id' | 'createdAt' | 'updat
     .single();
 
   if (error) throw error;
-  return data as Offer;
+  return mapListingToOffer(data);
 }
 
 /**
- * Mettre à jour une offre
+ * Mettre à jour une offre (utilise snake_case)
  */
-export async function updateOffer(id: string, updates: Partial<Offer>): Promise<Offer> {
+export async function updateOffer(id: string, updates: {
+  title?: string;
+  description?: string;
+  category?: string;
+  quantity?: number;
+  unit?: string;
+  price?: number;
+  location?: string;
+  region?: string;
+  images?: string[];
+  status?: string;
+  updated_at?: string;
+}): Promise<Offer> {
+  const updateData = { ...updates, updated_at: new Date().toISOString() };
+  
   const { data, error } = await supabase
     .from('marketplace_listings')
-    .update({ ...updates, updatedAt: new Date().toISOString() })
+    .update(updateData)
     .eq('id', id)
     .select()
     .single();
 
   if (error) throw error;
-  return data as Offer;
+  return mapListingToOffer(data);
 }
 
 /**
@@ -119,9 +198,18 @@ export async function deleteOffer(id: string): Promise<void> {
 }
 
 /**
- * Créer une commande
+ * Créer une commande (utilise snake_case pour l'insert DB)
  */
-export async function createOrder(order: Omit<Order, 'id' | 'createdAt'>): Promise<Order> {
+export async function createOrder(order: {
+  offer_id: string;
+  buyer_id: string;
+  seller_id: string;
+  quantity: number;
+  total_price: number;
+  payment_method: string;
+  status?: string;
+  notes?: string;
+}): Promise<Order> {
   const { data, error } = await supabase
     .from('orders')
     .insert([order])
@@ -131,45 +219,45 @@ export async function createOrder(order: Omit<Order, 'id' | 'createdAt'>): Promi
   if (error) throw error;
 
   // Mettre à jour le statut de l'offre
-  await updateOffer(order.offerId, { status: 'reserved' });
+  await updateOffer(order.offer_id, { status: 'reserved' });
 
-  return data as Order;
+  return mapOrderRowToOrder(data);
 }
 
 /**
- * Récupérer les commandes d'un utilisateur
+ * Récupérer les commandes d'un utilisateur (utilise snake_case)
  */
 export async function getUserOrders(userId: string, role: 'buyer' | 'seller'): Promise<Order[]> {
-  const field = role === 'buyer' ? 'buyerId' : 'sellerId';
+  const field = role === 'buyer' ? 'buyer_id' : 'seller_id';
   
   const { data, error } = await supabase
     .from('orders')
     .select('*')
     .eq(field, userId)
-    .order('createdAt', { ascending: false });
+    .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data as Order[];
+  return data.map(mapOrderRowToOrder);
 }
 
 /**
- * Mettre à jour le statut d'une commande
+ * Mettre à jour le statut d'une commande (utilise snake_case)
  */
-export async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<Order> {
-  const updates: Partial<Order> = { status };
+export async function updateOrderStatus(orderId: string, status: string): Promise<Order> {
+  const updates: Record<string, any> = { status };
 
   if (status === 'confirmed') {
-    updates.confirmedAt = new Date().toISOString();
+    updates.confirmed_at = new Date().toISOString();
   } else if (status === 'completed') {
-    updates.completedAt = new Date().toISOString();
+    updates.completed_at = new Date().toISOString();
     // Mettre à jour l'offre comme vendue
     const order = await getOrder(orderId);
-    await updateOffer(order.offerId, { status: 'sold' });
+    await updateOffer(order.offer_id, { status: 'sold' });
   } else if (status === 'cancelled') {
-    updates.cancelledAt = new Date().toISOString();
+    updates.cancelled_at = new Date().toISOString();
     // Libérer l'offre
     const order = await getOrder(orderId);
-    await updateOffer(order.offerId, { status: 'available' });
+    await updateOffer(order.offer_id, { status: 'available' });
   }
 
   const { data, error } = await supabase
@@ -180,13 +268,13 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus): P
     .single();
 
   if (error) throw error;
-  return data as Order;
+  return mapOrderRowToOrder(data);
 }
 
 /**
  * Récupérer une commande par ID
  */
-async function getOrder(orderId: string): Promise<Order> {
+async function getOrder(orderId: string): Promise<any> {
   const { data, error } = await supabase
     .from('orders')
     .select('*')
@@ -194,7 +282,7 @@ async function getOrder(orderId: string): Promise<Order> {
     .single();
 
   if (error) throw error;
-  return data as Order;
+  return data;
 }
 
 /**
@@ -225,7 +313,7 @@ export async function getMarketplaceStats(): Promise<OfferStats> {
     .eq('status', 'available');
 
   const categoryCount: Record<string, number> = {};
-  categoryData?.forEach(offer => {
+  categoryData?.forEach((offer: any) => {
     categoryCount[offer.category] = (categoryCount[offer.category] || 0) + 1;
   });
 
@@ -238,7 +326,7 @@ export async function getMarketplaceStats(): Promise<OfferStats> {
     .from('orders')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'completed')
-    .gte('completedAt', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+    .gte('completed_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
 
   return {
     totalOffers: totalOffers || 0,

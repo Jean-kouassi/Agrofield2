@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ArrowLeft, MapPin, Phone, ShoppingCart, Share2, Heart } from 'lucide-react'
 import { getOffer, createOrder } from '@/lib/marketplace'
+import { supabase } from '@/integrations/supabase/client'
+import { toast } from 'sonner'
 import type { Offer, Order } from '@/types/marketplace'
 
 export const Route = createFileRoute('/marketplace/$id')({
@@ -19,9 +21,12 @@ function OfferDetailPage() {
   const [loading, setLoading] = useState(true)
   const [ordering, setOrdering] = useState(false)
   const [quantity, setQuantity] = useState(1)
+  const [user, setUser] = useState<any>(null)
+  const [isFavorite, setIsFavorite] = useState(false)
 
   useEffect(() => {
     loadOffer()
+    supabase.auth.getUser().then(({ data }) => setUser(data.user))
   }, [id])
 
   async function loadOffer() {
@@ -38,35 +43,35 @@ function OfferDetailPage() {
 
   async function handleOrder() {
     if (!offer) return
-    
+
+    if (!user) {
+      toast.error('Vous devez être connecté pour commander')
+      router.navigate({ to: '/auth' })
+      return
+    }
+
     setOrdering(true)
     try {
-      // TODO: Get buyer info from auth
-      const buyerId = 'current-user-id'
-      const buyerName = 'Acheteur Local'
+      const buyerId = user.id
+      const buyerName = user.email || user.user_metadata?.full_name || 'Acheteur'
 
-      const order: Omit<Order, 'id' | 'createdAt'> = {
-        offerId: offer.id,
-        buyerId,
-        buyerName,
-        sellerId: offer.sellerId,
-        sellerName: offer.sellerName,
+      const orderData = {
+        offer_id: offer.id,
+        buyer_id: user.id,
+        seller_id: offer.sellerId,
         quantity,
-        unit: offer.unit,
-        unitPrice: offer.price,
-        totalPrice: offer.price * quantity,
+        total_price: offer.price * quantity,
+        payment_method: 'cash',
         status: 'pending',
-        paymentMethod: 'cash', // TODO: Let user choose
-        paymentStatus: 'pending',
-        deliveryMethod: 'pickup', // TODO: Let user choose
+        notes: undefined,
       }
 
-      await createOrder(order)
-      alert('✅ Commande créée avec succès ! Le vendeur vous contactera bientôt.')
+      await createOrder(orderData)
+      toast.success('✅ Commande créée avec succès ! Le vendeur vous contactera bientôt.')
       router.navigate({ to: '/marketplace/orders' })
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create order:', error)
-      alert('❌ Erreur lors de la commande. Vérifiez votre connexion.')
+      toast.error('❌ Erreur: ' + (error?.message || 'Vérifiez votre connexion.'))
     } finally {
       setOrdering(false)
     }
@@ -80,10 +85,14 @@ function OfferDetailPage() {
         url: window.location.href,
       })
     } else {
-      // Fallback: copy to clipboard
       await navigator.clipboard.writeText(window.location.href)
-      alert('Lien copié dans le presse-papier !')
+      toast.success('Lien copié dans le presse-papier !')
     }
+  }
+
+  function handleFavorite() {
+    setIsFavorite(!isFavorite)
+    toast.success(isFavorite ? 'Retiré des favoris' : 'Ajouté aux favoris ❤️')
   }
 
   if (loading) {
@@ -141,9 +150,10 @@ function OfferDetailPage() {
             <Button
               variant="ghost"
               size="icon"
+              onClick={handleFavorite}
               className="text-white hover:bg-green-700"
             >
-              <Heart className="w-5 h-5" />
+              <Heart className={`w-5 h-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
             </Button>
           </div>
         </div>
