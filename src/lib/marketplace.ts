@@ -262,7 +262,7 @@ export async function updateOrderStatus(orderId: string, status: string): Promis
 
   const { data, error } = await supabase
     .from('orders')
-    .update(updates)
+    .update(updates as any)
     .eq('id', orderId)
     .select()
     .single();

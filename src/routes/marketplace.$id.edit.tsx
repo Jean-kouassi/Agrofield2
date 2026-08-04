@@ -91,7 +91,7 @@ function EditOfferPage() {
         location: offer.location,
         region: offer.region,
       })
-      setExistingImages(Array.isArray(offer.images) ? offer.images : [])
+      setExistingImages(Array.isArray(offer.images) ? (offer.images as string[]) : [])
       setFetching(false)
     }
 

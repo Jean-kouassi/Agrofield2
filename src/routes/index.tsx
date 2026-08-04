@@ -94,7 +94,7 @@ function Landing() {
   const myOffersQ = useQuery({
     queryKey: ["my-offers-home", userId],
     queryFn: async () => {
-      const { data } = await supabase.from("market_offers").select("*").eq("user_id", userId).eq("status", "active").order("created_at", { ascending: false });
+      const { data } = await supabase.from("marketplace_listings").select("*").eq("seller_id", userId).eq("status", "available").order("created_at", { ascending: false });
       return data ?? [];
     },
     enabled: isConnected,
@@ -249,7 +249,7 @@ function Landing() {
                     </div>
                   </div>
 
-                  <Link to="/marketplace" className="block rounded-2xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-all">
+                  <Link to="/marketplace/my-offers" className="block rounded-2xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md transition-all">
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="text-sm font-semibold">🛒 Mes offres marketplace</div>

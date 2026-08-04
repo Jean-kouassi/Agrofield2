@@ -86,7 +86,7 @@ export interface OfferFilters {
   region?: string;
   status?: OfferStatus;
   search?: string;
-  sortBy?: 'createdAt' | 'price' | 'distance' | 'popularity';
+  sortBy?: 'createdAt' | 'price' | 'distance' | 'popularity' | 'created_at';
   sortOrder?: 'asc' | 'desc';
   limit?: number;
   offset?: number;

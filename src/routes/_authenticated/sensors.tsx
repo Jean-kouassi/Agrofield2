@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useMemo, useState } from "react";
-import { Radio, Plus, Trash2, Droplets, Thermometer, Beaker, Sprout, Battery, Copy, Check, Timer, Wifi, WifiOff, AlertTriangle, CloudRain, X, Signal, Bluetooth, Satellite, HelpCircle } from "lucide-react";
+import { Radio, Plus, Trash2, Droplets, Thermometer, Beaker, Sprout, Battery, Copy, Check, Timer, Wifi, WifiOff, AlertTriangle, CloudRain, X, Signal, Bluetooth, Satellite, HelpCircle, Zap, BookOpen, Play, Server } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 
@@ -470,52 +470,155 @@ function SensorsPage() {
         Endpoint d'ingestion : <code className="font-mono">{ingestUrl}</code> · Rafraîchissement 15 s · Historique 12 mois.
       </div>
 
-      <details className="rounded-2xl border border-primary/30 bg-primary/5 p-3 text-xs">
-        <summary className="flex cursor-pointer items-center gap-2 font-semibold text-primary">
-          <HelpCircle className="h-4 w-4" /> Comment connecter un vrai capteur ?
+      {/* 🎯 Fonctionnalités clés - Mise en avant */}
+      {(devicesQ.data ?? []).length === 0 && (
+        <div className="rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 p-4">
+          <div className="flex items-start gap-3 mb-3">
+            <Zap className="h-5 w-5 text-primary mt-0.5" />
+            <div>
+              <h3 className="text-sm font-bold text-foreground">🚀 Fonctionnalités disponibles</h3>
+              <p className="text-xs text-muted-foreground mt-1">Tout est prêt pour connecter tes capteurs IoT !</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+            <div className="flex gap-2 items-start p-2 rounded-lg bg-background/50">
+              <Droplets className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-foreground">Surveillance en temps réel</span>
+                <p className="text-muted-foreground text-[11px] mt-0.5">Humidité du sol, pH, température, batterie</p>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 items-start p-2 rounded-lg bg-background/50">
+              <CloudRain className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-foreground">Alertes automatiques</span>
+                <p className="text-muted-foreground text-[11px] mt-0.5">Notifications si humidité trop basse</p>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 items-start p-2 rounded-lg bg-background/50">
+              <Timer className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-foreground">Irrigation à distance</span>
+                <p className="text-muted-foreground text-[11px] mt-0.5">Contrôle manuel depuis le dashboard</p>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 items-start p-2 rounded-lg bg-background/50">
+              <Bluetooth className="h-4 w-4 text-sky-500 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-foreground">Sync Bluetooth</span>
+                <p className="text-muted-foreground text-[11px] mt-0.5">Fonctionne hors ligne en zone rurale</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 📖 Guide rapide - Toujours visible */}
+      <details className="rounded-2xl border border-dashed border-border bg-muted/30 p-3 text-xs open:border-primary/30 open:bg-primary/5">
+        <summary className="flex cursor-pointer items-center gap-2 font-semibold text-muted-foreground open:text-primary">
+          <BookOpen className="h-4 w-4" /> 
+          <span>Guide : Comment connecter un capteur ?</span>
+          <span className="ml-auto text-[10px] font-normal text-muted-foreground">3 étapes simples</span>
         </summary>
-        <div className="mt-3 space-y-3 text-muted-foreground">
-          <div className="rounded-lg bg-background p-2 text-[11px]">
-            <b className="text-foreground">Étape 1: Créer l'appareil</b>
-            <p className="mt-1">Cliquez sur « + Appareil », donnez-lui un nom et choisissez le mode de connexion. Une fois créé, copiez la <b>Clé</b> affichée (64 caractères).</p>
+        <div className="mt-3 space-y-3">
+          {/* Étape 1 */}
+          <div className="rounded-lg bg-background p-3 border border-border">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">1</div>
+              <b className="text-foreground text-sm">Créer l'appareil</b>
+            </div>
+            <p className="text-muted-foreground text-[11px] pl-8">
+              Clique sur <b>« + Appareil »</b> ci-dessus, donne-lui un nom et choisis le mode de connexion. 
+              Une fois créé, <b>copie la Clé</b> affichée (64 caractères hex).
+            </p>
           </div>
           
-          <div className="rounded-lg bg-background p-2 text-[11px]">
-            <b className="text-foreground">Étape 2: Configurer le hardware</b>
-            <p className="mt-1">Utilisez cette clé dans votre firmware ESP32/Arduino. Voir le guide complet : <code className="text-primary">docs/CAPTEURS_GUIDE_COMPLET.md</code></p>
+          {/* Étape 2 */}
+          <div className="rounded-lg bg-background p-3 border border-border">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">2</div>
+              <b className="text-foreground text-sm">Choisir ton mode de connexion</b>
+            </div>
+            <div className="pl-8 space-y-2 text-[11px]">
+              <div className="flex gap-2">
+                <Signal className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                <div>
+                  <span className="font-semibold text-foreground">GSM / SIM (Recommandé ⭐)</span>
+                  <p className="text-muted-foreground">Carte SIM Orange/Moov/MTN. Partout où il y a du réseau. ~1000-2000 FCFA/mois.</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Satellite className="h-3.5 w-3.5 text-violet-600 shrink-0" />
+                <div>
+                  <span className="font-semibold text-foreground">LoRa (Village)</span>
+                  <p className="text-muted-foreground">Radio longue portée (10km) vers passerelle village. Une SIM pour plusieurs capteurs.</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Bluetooth className="h-3.5 w-3.5 text-sky-600 shrink-0" />
+                <div>
+                  <span className="font-semibold text-foreground">Bluetooth (Hors ligne)</span>
+                  <p className="text-muted-foreground">Stockage local + sync manuelle avec ton téléphone. Gratuit, idéal sans couverture.</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Wifi className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+                <div>
+                  <span className="font-semibold text-foreground">Wi-Fi</span>
+                  <p className="text-muted-foreground">Uniquement si box/hotspot à proximité. Peu adapté aux champs isolés.</p>
+                </div>
+              </div>
+            </div>
           </div>
           
-          <div className="rounded-lg bg-background p-2 text-[11px]">
-            <b className="text-foreground">Étape 3: Tester avec le simulateur</b>
-            <p className="mt-1">Lancez le script Node.js inclus :</p>
-            <code className="mt-1 block bg-muted px-2 py-1 text-[10px]">
-              node scripts/test-sensor-simulator.mjs --device-key VOTRE_CLE
-            </code>
+          {/* Étape 3 */}
+          <div className="rounded-lg bg-background p-3 border border-border">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">3</div>
+              <b className="text-foreground text-sm">Configurer et tester</b>
+            </div>
+            <div className="pl-8 space-y-2 text-[11px]">
+              <p className="text-muted-foreground">
+                <b className="text-foreground">Avec hardware ESP32 :</b> Utilise la clé dans ton firmware. 
+                Guide complet : <code className="bg-muted px-1.5 py-0.5 rounded text-primary">docs/CAPTEURS_GUIDE_COMPLET.md</code>
+              </p>
+              <p className="text-muted-foreground">
+                <b className="text-foreground">Pour tester maintenant :</b> Lance le simulateur Node.js :
+              </p>
+              <div className="bg-muted/50 rounded-lg p-2 mt-1">
+                <code className="text-[10px] block break-all font-mono">
+                  node scripts/test-sensor-simulator.mjs --device-key VOTRE_CLE --interval 5 --count 10
+                </code>
+              </div>
+            </div>
           </div>
           
-          <div className="flex gap-2 pt-2">
-            <Signal className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <div>
-              <b className="text-foreground">GSM / SIM (recommandé)</b> — La station embarque une carte SIM (Orange, MTN, Moov…) et pousse les mesures via le réseau mobile 2G/4G. Fonctionne partout où il y a du signal, sans installation supplémentaire.
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Satellite className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <div>
-              <b className="text-foreground">LoRa (village)</b> — Les stations parlent en radio longue portée (jusqu'à 10 km) à une passerelle installée au village, qui relaie via une seule SIM. Idéal pour couvrir plusieurs parcelles éloignées à moindre coût.
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Bluetooth className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <div>
-              <b className="text-foreground">Bluetooth (hors ligne)</b> — La station stocke localement jusqu'à 30 jours de mesures. Quand vous passez à côté avec votre téléphone, appuyez sur <i>« Synchroniser via Bluetooth »</i> sur la fiche capteur : les données sont téléchargées puis envoyées au serveur dès que vous retrouvez du réseau.
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Wifi className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <div>
-              <b className="text-foreground">Wi-Fi</b> — Uniquement si vous avez un routeur ou un hotspot à portée. Peu adapté aux champs isolés.
-            </div>
+          {/* Boutons d'action rapide */}
+          <div className="flex flex-wrap gap-2 pt-2">
+            <a
+              href="https://docs.openclaw.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10 transition"
+            >
+              <Server className="h-3.5 w-3.5" />
+              Documentation API
+            </a>
+            <button
+              type="button"
+              onClick={() => {
+                setShowForm(true);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10 transition"
+            >
+              <Play className="h-3.5 w-3.5" />
+              Commencer maintenant
+            </button>
           </div>
         </div>
       </details>

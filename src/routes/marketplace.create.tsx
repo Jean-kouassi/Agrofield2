@@ -281,7 +281,7 @@ function CreateOfferPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="font-semibold text-gray-700">Catégorie *</Label>
-                  <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
+                  <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v as ProductCategory })}>
                     <SelectTrigger><SelectValue placeholder="Choisir" /></SelectTrigger>
                     <SelectContent>
                       {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
@@ -291,7 +291,7 @@ function CreateOfferPage() {
 
                 <div>
                   <Label className="font-semibold text-gray-700">Unité *</Label>
-                  <Select value={formData.unit} onValueChange={(v) => setFormData({ ...formData, unit: v })}>
+                  <Select value={formData.unit} onValueChange={(v) => setFormData({ ...formData, unit: v as UnitType })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {units.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}
