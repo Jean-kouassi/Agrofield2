@@ -1,23 +1,6 @@
-name = "agrofield"
-main = ".output/server/index.mjs"
-compatibility_date = "2025-01-15"
-compatibility_flags = ["nodejs_compat"]
+name = "agrofield2"
+compatibility_date = "2026-08-05"
+pages_build_output_dir = ".output/public"
 
-[observability]
-enabled = true
-
-[build]
-command = "bun run build"
-
-# Assets statiques SPA/SSR TanStack Start
-[assets]
-directory = ".output/public"
-binding = "ASSETS"
-
-# ⚠️ NE PAS mettre les secrets ici. Utilise :
-#   wrangler secret put SUPABASE_SERVICE_ROLE_KEY
-#   wrangler secret put GEMINI_API_KEY
-# Variables publiques (non secrètes) uniquement :
 [vars]
-AI_PROVIDER = "gemini"
-GEMINI_MODEL = "gemini-2.5-flash"
+VITE_APP_URL = "https://agrofield2.pages.dev"

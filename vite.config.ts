@@ -10,7 +10,7 @@ export default defineConfig({
     tanstackStart(),
     viteReact(),
     tailwindcss(),
-    nitro({ preset: 'vercel' }),
+    nitro({ preset: 'cloudflare-pages' }),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
