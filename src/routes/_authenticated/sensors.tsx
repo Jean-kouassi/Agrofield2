@@ -599,15 +599,27 @@ function SensorsPage() {
           
           {/* Boutons d'action rapide */}
           <div className="flex flex-wrap gap-2 pt-2">
-            <a
-              href="https://docs.openclaw.ai"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10 transition"
-            >
-              <Server className="h-3.5 w-3.5" />
-              Documentation API
-            </a>
+            <details className="flex-1">
+              <summary className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10 transition">
+                <Server className="h-3.5 w-3.5" />
+                Voir l'endpoint API
+              </summary>
+              <div className="mt-2 space-y-2 rounded-lg border border-border bg-background p-3 text-[11px]">
+                <div>
+                  <b className="text-foreground">Envoyer des mesures :</b>
+                  <code className="mt-1 block bg-muted px-2 py-1.5 rounded text-[10px] break-all font-mono">
+                    POST {ingestUrl}
+                  </code>
+                </div>
+                <div>
+                  <b className="text-foreground">Format (batch) :</b>
+                  <code className="mt-1 block bg-muted px-2 py-1.5 rounded text-[10px] break-all font-mono">
+                    {`{"device_key": "VOTRE_CLE", "readings": [{"soil_moisture_pct": 45, "temperature_c": 28.5}]}`}
+                  </code>
+                </div>
+                <p className="text-muted-foreground">Pas besoin de compte — la clé du capteur suffit pour l'authentification.</p>
+              </div>
+            </details>
             <button
               type="button"
               onClick={() => {
