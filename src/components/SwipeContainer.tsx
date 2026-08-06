@@ -181,6 +181,12 @@ export function SwipeContainer({
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    // IMPORTANT: Ne pas intercepter si on touche un élément interactif (bouton, lien, input)
+    const target = e.target as HTMLElement;
+    if (target.closest('button, a, input, select, textarea, [role="button"], .no-swipe')) {
+      return; // Laisser l'événement passer normalement
+    }
+    
     if (!enabled) return;
     
     const touch = e.targetTouches[0];
@@ -203,6 +209,12 @@ export function SwipeContainer({
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    // Si on touche un élément interactif, ne pas intercepter
+    const target = e.target as HTMLElement;
+    if (target.closest('button, a, input, select, textarea, [role="button"], .no-swipe')) {
+      return;
+    }
+    
     if (!enabled || !isSwiping) return;
     
     const touch = e.targetTouches[0];
@@ -223,6 +235,14 @@ export function SwipeContainer({
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    // Si on touche un élément interactif, ne pas intercepter
+    const target = e.target as HTMLElement;
+    if (target.closest('button, a, input, select, textarea, [role="button"], .no-swipe')) {
+      resetStyles();
+      setIsSwiping(false);
+      return;
+    }
+    
     if (!enabled || !isSwiping) {
       resetStyles();
       setIsSwiping(false);

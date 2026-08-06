@@ -396,7 +396,7 @@ function Row({ title, subtitle, amount, tone, hash, record }: {
             <button
               type="button"
               onClick={viewReceipt}
-              className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary hover:bg-primary/20"
+              className="no-swipe inline-flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-semibold text-primary hover:bg-primary/20"
             >
               <Eye className="h-2.5 w-2.5" /> Voir le reçu
             </button>
