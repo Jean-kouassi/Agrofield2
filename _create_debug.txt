@@ -1,0 +1,50 @@
+1: import { createFileRoute, useRouter } from '@tanstack/react-router'
+2: import { useState } from 'react'
+3: import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+4: import { Button } from '@/components/ui/button'
+5: import { Input } from '@/components/ui/input'
+6: import { Label } from '@/components/ui/label'
+7: import { Textarea } from '@/components/ui/textarea'
+8: import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+9: import { ArrowLeft, Leaf, CheckCircle, Upload, Trash2, X } from 'lucide-react'
+10: import { supabase } from '@/integrations/supabase/client'
+11: import { toast } from 'sonner'
+12: import type { ProductCategory, UnitType } from '@/types/marketplace'
+13: 
+14: export const Route = createFileRoute('/marketplace/create')({
+15:   ssr: false,
+16:   component: CreateOfferPage,
+17: })
+18: 
+19: const categories: ProductCategory[] = [
+20:   'tomates', 'oignons', 'mil', 'sorgho', 'mais', 'niebe', 'arachide', 'coton', 'mangue', 'autre'
+21: ]
+22: 
+23: const units: UnitType[] = ['kg', 'sac', 'panier', 'caisse', 'unite']
+24: 
+25: const regions = [
+26:   'Centre', 'Boucle du Mouhoun', 'Cascades', 'Centre-Est', 'Centre-Nord', 'Centre-Ouest',
+27:   'Centre-Sud', 'Est', 'Hauts-Bassins', 'Nord', 'Plateau-Central', 'Sahel', 'Sud-Ouest'
+28: ]
+29: 
+30: function CreateOfferPage() {
+31:   const router = useRouter()
+32:   const [loading, setLoading] = useState(false)
+33:   const [success, setSuccess] = useState(false)
+34:   const [user, setUser] = useState<any>(null)
+35:   const [selectedImages, setSelectedImages] = useState<File[]>([])
+36:   const [imagePreviews, setImagePreviews] = useState<string[]>([])
+37: 
+38:   useState(() => {
+39:     supabase.auth.getUser().then(({ data }) => setUser(data.user))
+40:   })
+41: 
+42:   if (!user) {
+43:     return (
+44:       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+45:         <Card className="max-w-md w-full mx-4">
+46:           <CardHeader>
+47:             <CardTitle className="flex items-center gap-2">
+48:               <Leaf className="h-6 w-6 text-green-600" />
+49:               Connexion requise
+50:             </CardTitle>

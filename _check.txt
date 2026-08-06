@@ -1,0 +1,30 @@
+1: import { createFileRoute, useRouter } from '@tanstack/react-router'
+2: import { useState, useEffect } from 'react'
+3: import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+4: import { Button } from '@/components/ui/button'
+5: import { Badge } from '@/components/ui/badge'
+6: import { Skeleton } from '@/components/ui/skeleton'
+7: import { ArrowLeft, ShoppingBag, Package, CheckCircle, XCircle, Clock } from 'lucide-react'
+8: import { supabase } from '@/integrations/supabase/client'
+9: import { toast } from 'sonner'
+10: import type { Order } from '@/types/marketplace'
+11: 
+12: export const Route = createFileRoute('/marketplace/orders')({
+13:   ssr: false,
+14:   component: OrdersPage,
+15: })
+16: 
+17: const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+18:   pending: { label: 'En attente', color: 'bg-yellow-500', icon: <Clock className="w-4 h-4" /> },
+19:   confirmed: { label: 'Confirmée', color: 'bg-blue-500', icon: <CheckCircle className="w-4 h-4" /> },
+20:   processing: { label: 'En cours', color: 'bg-purple-500', icon: <Clock className="w-4 h-4" /> },
+21:   completed: { label: 'Terminée', color: 'bg-green-600', icon: <CheckCircle className="w-4 h-4" /> },
+22:   cancelled: { label: 'Annulée', color: 'bg-red-500', icon: <XCircle className="w-4 h-4" /> },
+23: }
+24: 
+25: function OrdersPage() {
+26:   const router = useRouter()
+27:   const [orders, setOrders] = useState<Order[]>([])
+28:   const [loading, setLoading] = useState(true)
+29:   const [user, setUser] = useState<any>(null)
+30:   const [tab, setTab] = useState<'buyer' | 'seller'>('buyer')

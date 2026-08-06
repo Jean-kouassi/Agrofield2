@@ -35,9 +35,9 @@ function CreateOfferPage() {
   const [selectedImages, setSelectedImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
 
-  useState(() => {
+  useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user))
-  })
+  }, [])
 
   if (!user) {
     return (
