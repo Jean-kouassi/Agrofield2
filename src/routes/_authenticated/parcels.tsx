@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { CropProgressCard } from "@/components/ui/crop-progress-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { SwipeContainer } from "@/components/SwipeContainer";
 
 export const Route = createFileRoute("/_authenticated/parcels")({
   head: () => ({
@@ -66,6 +67,7 @@ function getCurrentGrowthStage(cropType: string, age: number, totalDays: number)
 function ParcelsPage() {
   const { user } = Route.useRouteContext();
   const qc = useQueryClient();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [area, setArea] = useState("");
@@ -110,7 +112,12 @@ function ParcelsPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <SwipeContainer
+      onSwipeLeft={() => router.navigate({ to: "/finance" })}
+      onSwipeRight={() => router.navigate({ to: "/dashboard" })}
+      thresholdPercent={30}
+      className="space-y-4"
+    >
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black tracking-tight">Mes parcelles</h1>
         <Dialog open={open} onOpenChange={setOpen}>
@@ -235,6 +242,6 @@ function ParcelsPage() {
           })}
         </div>
       )}
-    </div>
+    </SwipeContainer>
   );
 }
