@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,7 +20,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { SwipeContainer } from "@/components/SwipeContainer";
 
 export const Route = createFileRoute("/_authenticated/finance")({
   head: () => ({
@@ -53,7 +52,6 @@ function proofMeta(t: string | null | undefined) {
 function FinancePage() {
   const { user } = Route.useRouteContext();
   const qc = useQueryClient();
-  const router = useRouter();
 
   const parcelsQ = useQuery({
     queryKey: ["parcels"],
@@ -255,12 +253,7 @@ function FinancePage() {
   }
 
   return (
-    <SwipeContainer
-      onSwipeLeft={() => router.navigate({ to: "/diagnose" })}
-      onSwipeRight={() => router.navigate({ to: "/parcels" })}
-      thresholdPercent={30}
-      className="space-y-5"
-    >
+    <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-black tracking-tight">Finances</h1>
         <p className="text-sm text-muted-foreground">Suivez vos dépenses et vos ventes en FCFA.</p>
@@ -335,7 +328,7 @@ function FinancePage() {
           ))}
         </TabsContent>
       </Tabs>
-    </SwipeContainer>
+    </div>
   );
 }
 

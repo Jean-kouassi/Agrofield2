@@ -1,154 +1,286 @@
 /**
- * Composant SwipeContainer - Gesture style Facebook/Instagram
+ * SwipeContainer - Gesture physique style Facebook/iOS/Android
  * 
- * Usage:
- * <SwipeContainer
- *   onSwipeLeft={() => navigate('/page-suivante')}
- *   onSwipeRight={() => navigate('/page-precedente')}
- * >
- *   {/* Contenu de la page */}
- * </SwipeContainer>
+ * Basé sur:
+ * - Facebook Rebound (spring physics: tension/friction)
+ * - iOS interactivePopGestureRecognizer (critically-damped spring)
+ * - Android SpringForce (damping ratio + stiffness)
+ * 
+ * Caractéristiques:
+ * - Suivi doigt 1:1 pendant le gesture (aucune résistance)
+ * - Vélocité calculée en temps réel
+ * - Seuil double: distance (30%) + vélocité (700px/s)
+ * - Animation spring physique à la release
+ * - Feedback visuel: opacity + scale + shadow
  */
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface SwipeContainerProps {
   children: React.ReactNode;
   onSwipeLeft?: () => void;
   onSwipeRight?: () => void;
-  thresholdPercent?: number; // Défaut: 30% de l'écran
   enabled?: boolean;
   className?: string;
 }
+
+// Constantes physiques optimisées (basées sur iOS/Android/Facebook)
+const PHYSICS = {
+  // Seuil de distance: 30% de l'écran (standard iOS/Android)
+  DISTANCE_THRESHOLD_PERCENT: 0.3,
+  
+  // Seuil de vélocité: 700px/s (flick threshold)
+  VELOCITY_THRESHOLD: 700,
+  
+  // Résistance pendant le drag (1.0 = aucun, 0.8 = légère résistance)
+  DRAG_RESISTANCE: 1.0, // 1:1 mapping comme iOS
+  
+  // Feedback visuel max
+  MAX_OPACITY_REDUCTION: 0.2, // 1.0 → 0.8
+  MAX_SCALE_REDUCTION: 0.05,  // 1.0 → 0.95
+  MAX_ROTATION: 2,            // ±2 degrés
+  
+  // Spring parameters (critically-damped)
+  SPRING_TENSION: 300,        // iOS default ~300-400
+  SPRING_FRICTION: 15,        // iOS default ~12-18
+  
+  // Haptic feedback duration (ms)
+  HAPTIC_DURATION: 5,
+};
 
 export function SwipeContainer({
   children,
   onSwipeLeft,
   onSwipeRight,
-  thresholdPercent = 30,
   enabled = true,
   className = "",
 }: SwipeContainerProps) {
   const [isSwiping, setIsSwiping] = useState(false);
-  const touchStartRef = useRef<number | null>(null);
-  const touchCurrentRef = useRef<number>(0);
   const elementRef = useRef<HTMLDivElement>(null);
+  
+  // État du gesture
+  const gestureRef = useRef({
+    startX: 0,
+    currentX: 0,
+    lastX: 0,
+    lastTime: 0,
+    velocity: 0,
+  });
 
-  const screenWidth = typeof window !== "undefined" ? window.innerWidth : 375;
-  const minSwipeDistance = (screenWidth * thresholdPercent) / 100;
-  const maxDrag = screenWidth * 0.7;
+  // Calculer la vélocité en temps réel
+  const calculateVelocity = (currentX: number, currentTime: number) => {
+    const { lastX, lastTime } = gestureRef.current;
+    const deltaTime = currentTime - lastTime;
+    
+    if (deltaTime === 0) return 0;
+    
+    return (currentX - lastX) / (deltaTime / 1000); // px/s
+  };
+
+  // Appliquer les transformations CSS
+  const applyTransform = (translateX: number) => {
+    const elem = elementRef.current;
+    if (!elem) return;
+    
+    const screenWidth = window.innerWidth;
+    const absTranslate = Math.abs(translateX);
+    const maxDrag = screenWidth * 0.7;
+    
+    // Interpolation linéaire pour feedback visuel
+    const progress = Math.min(absTranslate / maxDrag, 1);
+    const opacity = 1 - progress * PHYSICS.MAX_OPACITY_REDUCTION;
+    const scale = 1 - progress * PHYSICS.MAX_SCALE_REDUCTION;
+    const rotate = (translateX / maxDrag) * PHYSICS.MAX_ROTATION;
+    
+    // Shadow portée progressive
+    const shadowOpacity = progress * 0.3;
+    const shadowBlur = progress * 40;
+    
+    elem.style.transform = `translateX(${translateX}px) scale(${scale}) rotate(${rotate}deg)`;
+    elem.style.opacity = opacity.toString();
+    elem.style.boxShadow = `0 ${10 + shadowBlur}px ${20 + shadowBlur}px rgba(0,0,0,${shadowOpacity})`;
+    elem.style.transition = 'none'; // Aucun lissage pendant le drag
+    elem.style.cursor = 'grabbing';
+    elem.style.willChange = 'transform, opacity, box-shadow';
+  };
+
+  // Reset styles
+  const resetStyles = () => {
+    const elem = elementRef.current;
+    if (!elem) return;
+    
+    elem.style.transform = '';
+    elem.style.opacity = '';
+    elem.style.boxShadow = '';
+    elem.style.transition = '';
+    elem.style.cursor = 'grab';
+    elem.style.willChange = 'auto';
+  };
+
+  // Animation spring à la release
+  const animateToTarget = (targetX: number, onComplete?: () => void) => {
+    const elem = elementRef.current;
+    if (!elem) return;
+    
+    // Simulation spring simple (Euler integration)
+    let position = parseFloat(elem.style.transform.match(/translateX\(([-\d.]+)px\)/)?.[1] || '0');
+    let velocity = gestureRef.current.velocity * PHYSICS.DRAG_RESISTANCE;
+    
+    const tension = PHYSICS.SPRING_TENSION;
+    const friction = PHYSICS.SPRING_FRICTION;
+    const mass = 1; // kg (arbitraire)
+    
+    let lastTime = performance.now();
+    
+    const animate = () => {
+      const now = performance.now();
+      const dt = Math.min((now - lastTime) / 1000, 0.05); // Clamp à 50ms max
+      lastTime = now;
+      
+      // Loi de Hooke: F = -kx - bv
+      const displacement = targetX - position;
+      const springForce = tension * displacement;
+      const dampingForce = friction * velocity;
+      const acceleration = (springForce - dampingForce) / mass;
+      
+      velocity += acceleration * dt;
+      position += velocity * dt;
+      
+      // Appliquer transformation
+      const progress = Math.abs(position / targetX);
+      const opacity = progress;
+      elem.style.transform = `translateX(${position}px) scale(${0.95 + 0.05 * progress}) rotate(${position / window.innerWidth * 2}deg)`;
+      elem.style.opacity = opacity.toString();
+      
+      // Check si proche de la cible (< 1px)
+      if (Math.abs(targetX - position) < 1 && Math.abs(velocity) < 10) {
+        elem.style.transform = `translateX(${targetX}px)`;
+        elem.style.opacity = '0';
+        onComplete?.();
+        return;
+      }
+      
+      requestAnimationFrame(animate);
+    };
+    
+    requestAnimationFrame(animate);
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!enabled) return;
+    
     const touch = e.targetTouches[0];
-    touchStartRef.current = touch.clientX;
-    touchCurrentRef.current = touch.clientX;
+    const now = performance.now();
+    
+    gestureRef.current = {
+      startX: touch.clientX,
+      currentX: touch.clientX,
+      lastX: touch.clientX,
+      lastTime: now,
+      velocity: 0,
+    };
+    
     setIsSwiping(true);
     
     // Haptic feedback (si supporté)
-    if (typeof navigator !== "undefined" && navigator.vibrate) {
-      navigator.vibrate(5);
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(PHYSICS.HAPTIC_DURATION);
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!enabled || touchStartRef.current === null || !elementRef.current) return;
+    if (!enabled || !isSwiping) return;
     
     const touch = e.targetTouches[0];
-    touchCurrentRef.current = touch.clientX;
+    const now = performance.now();
     
-    const diff = touchCurrentRef.current - touchStartRef.current;
-    const resistance = 0.8;
-    const translateX = diff * resistance;
-    const opacity = 1 - (Math.abs(diff) / maxDrag) * 0.3;
-    const scale = 1 - (Math.abs(diff) / maxDrag) * 0.05;
-    const rotate = (diff / maxDrag) * 2;
-
-    elementRef.current.style.transform = `translateX(${translateX}px) scale(${scale}) rotate(${rotate}deg)`;
-    elementRef.current.style.opacity = opacity.toString();
-    elementRef.current.style.transition = "none";
-    elementRef.current.style.cursor = "grabbing";
+    gestureRef.current.currentX = touch.clientX;
+    gestureRef.current.velocity = calculateVelocity(touch.clientX, now);
+    
+    // Mettre à jour pour prochain calcul vélocité
+    gestureRef.current.lastX = touch.clientX;
+    gestureRef.current.lastTime = now;
+    
+    // Calculer translation avec résistance
+    const diff = gestureRef.current.currentX - gestureRef.current.startX;
+    const translateX = diff * PHYSICS.DRAG_RESISTANCE;
+    
+    applyTransform(translateX);
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!enabled || touchStartRef.current === null || !elementRef.current) {
-      resetStyle();
+    if (!enabled || !isSwiping) {
+      resetStyles();
+      setIsSwiping(false);
       return;
     }
     
     const touch = e.changedTouches[0];
-    const diff = touchStartRef.current - touch.clientX;
+    const finalX = touch.clientX;
+    const diff = finalX - gestureRef.current.startX;
+    const screenWidth = window.innerWidth;
     
-    // Appliquer transition fluide pour la sortie
-    elementRef.current.style.transition = "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease";
-    elementRef.current.style.cursor = "grab";
+    const distanceThreshold = screenWidth * PHYSICS.DISTANCE_THRESHOLD_PERCENT;
+    const velocity = gestureRef.current.velocity;
     
-    if (Math.abs(diff) > minSwipeDistance) {
-      // Swipe validé - navigation
-      if (diff > 0 && onSwipeLeft) {
-        // Swipe vers la gauche → page suivante
-        elementRef.current.style.transform = "translateX(-100%) scale(0.95)";
-        elementRef.current.style.opacity = "0";
-        setTimeout(() => {
-          onSwipeLeft();
-          resetStyle();
-        }, 150);
-      } else if (diff < 0 && onSwipeRight) {
-        // Swipe vers la droite → page précédente
-        elementRef.current.style.transform = "translateX(100%) scale(0.95)";
-        elementRef.current.style.opacity = "0";
+    // Décision: navigation ou retour?
+    const shouldSwipeLeft = diff > distanceThreshold || velocity > PHYSICS.VELOCITY_THRESHOLD;
+    const shouldSwipeRight = diff < -distanceThreshold || velocity < -PHYSICS.VELOCITY_THRESHOLD;
+    
+    if (shouldSwipeLeft && onSwipeRight) {
+      // Swipe vers la droite → page précédente
+      animateToTarget(screenWidth * 0.8, () => {
         setTimeout(() => {
           onSwipeRight();
-          resetStyle();
-        }, 150);
-      } else {
-        resetStyle();
-      }
+          resetStyles();
+          setIsSwiping(false);
+        }, 100);
+      });
+    } else if (shouldSwipeRight && onSwipeLeft) {
+      // Swipe vers la gauche → page suivante
+      animateToTarget(-screenWidth * 0.8, () => {
+        setTimeout(() => {
+          onSwipeLeft();
+          resetStyles();
+          setIsSwiping(false);
+        }, 100);
+      });
     } else {
-      // Seuil non atteint → retour élastique
-      resetStyle();
+      // Retour élastique (spring back to center)
+      animateToTarget(0, () => {
+        resetStyles();
+        setIsSwiping(false);
+      });
     }
-    
-    setIsSwiping(false);
-  };
-
-  const resetStyle = () => {
-    if (elementRef.current) {
-      elementRef.current.style.transform = "";
-      elementRef.current.style.opacity = "";
-      elementRef.current.style.transition = "";
-      elementRef.current.style.cursor = "";
-    }
-    touchStartRef.current = null;
-    touchCurrentRef.current = 0;
   };
 
   // Support clavier
-  useState(() => {
+  useEffect(() => {
     if (!enabled) return;
     
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft" && onSwipeRight) {
+      if (e.key === 'ArrowLeft' && onSwipeRight) {
         onSwipeRight();
-      } else if (e.key === "ArrowRight" && onSwipeLeft) {
+      } else if (e.key === 'ArrowRight' && onSwipeLeft) {
         onSwipeLeft();
       }
     };
     
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  });
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [enabled, onSwipeLeft, onSwipeRight]);
 
   return (
     <div
       ref={elementRef}
-      className={`${className} ${isSwiping ? "swipe-active" : ""}`}
+      className={`${className} ${isSwiping ? 'swipe-active' : ''}`}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       style={{
-        willChange: isSwiping ? "transform, opacity" : "auto",
-        touchAction: "pan-y", // Permet scroll vertical mais bloque horizontal
+        touchAction: 'pan-y', // Permet scroll vertical, bloque horizontal
+        cursor: 'grab',
+        WebkitOverflowScrolling: 'touch', // Smooth scrolling iOS
       }}
     >
       {children}

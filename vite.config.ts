@@ -110,8 +110,5 @@ export default defineConfig({
   },
   tanstackStart: {
     server: { entry: "server" },
-    router: {
-      generateRouteTree: false,
-    },
   },
 } as any);
