@@ -90,34 +90,36 @@ function MarketplacePage() {
               <span>AgroField</span>
             </Link>
             
-            <nav className="flex items-center gap-2 md:gap-4 flex-wrap">
+            <nav className="flex items-center gap-3 md:gap-4 flex-wrap justify-center md:justify-start">
               <Link 
                 to="/"
-                className="text-sm hover:opacity-80 transition-opacity flex items-center gap-1"
+                className="text-xs md:text-sm hover:opacity-80 transition-opacity flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm"
               >
-                ← Accueil
+                <Leaf className="w-3 h-3" />
+                Accueil
               </Link>
               <Link 
                 to="/marketplace/my-offers"
-                className="text-sm hover:opacity-80 transition-opacity flex items-center gap-1"
+                className="text-xs md:text-sm hover:opacity-80 transition-opacity flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm"
               >
-                <Package className="w-4 h-4" />
+                <Package className="w-3 h-3" />
                 Mes offres
               </Link>
               <Link 
                 to="/marketplace/orders"
-                className="text-sm hover:opacity-80 transition-opacity flex items-center gap-1"
+                className="text-xs md:text-sm hover:opacity-80 transition-opacity flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm"
               >
-                <ShoppingBag className="w-4 h-4" />
+                <ShoppingBag className="w-3 h-3" />
                 Mes commandes
               </Link>
-              <Link to="/marketplace/create">
+              <Link to="/marketplace/create" className="ml-auto md:ml-0">
                 <Button 
-                  size="lg"
-                  className="bg-white text-green-600 hover:bg-green-50 gap-2 shadow-lg"
+                  size="sm"
+                  className="bg-white text-green-600 hover:bg-green-50 gap-2 shadow-lg text-xs md:text-sm px-4 py-2"
                 >
-                  <Plus className="w-5 h-5" />
-                  Publier une offre
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Publier une offre</span>
+                  <span className="sm:hidden">Publier</span>
                 </Button>
               </Link>
             </nav>

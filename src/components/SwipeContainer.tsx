@@ -117,7 +117,7 @@ export function SwipeContainer({
     elem.style.willChange = 'auto';
   };
 
-  // Animation spring à la release
+  // Animation spring à la release avec transition visible
   const animateToTarget = (targetX: number, onComplete?: () => void) => {
     const elem = elementRef.current;
     if (!elem) return;
@@ -146,17 +146,31 @@ export function SwipeContainer({
       velocity += acceleration * dt;
       position += velocity * dt;
       
-      // Appliquer transformation
+      // Appliquer transformation avec PLUS de visibilité
       const progress = Math.abs(position / targetX);
-      const opacity = progress;
-      elem.style.transform = `translateX(${position}px) scale(${0.95 + 0.05 * progress}) rotate(${position / window.innerWidth * 2}deg)`;
-      elem.style.opacity = opacity.toString();
+      const opacity = Math.max(0.3, progress); // Minimum 0.3 pour qu'on voit toujours la page
+      const scale = 0.85 + 0.15 * progress; // Scale de 0.85 à 1.0 (plus visible)
+      const rotate = (position / window.innerWidth) * 3; // ±3 degrés (plus visible)
       
-      // Check si proche de la cible (< 1px)
-      if (Math.abs(targetX - position) < 1 && Math.abs(velocity) < 10) {
-        elem.style.transform = `translateX(${targetX}px)`;
-        elem.style.opacity = '0';
-        onComplete?.();
+      // Shadow PLUS prononcée
+      const shadowOpacity = 0.2 + progress * 0.4;
+      const shadowBlur = 20 + progress * 60;
+      const shadowY = 10 + progress * 30;
+      
+      elem.style.transform = `translateX(${position}px) scale(${scale}) rotate(${rotate}deg)`;
+      elem.style.opacity = opacity.toString();
+      elem.style.boxShadow = `0 ${shadowY}px ${shadowBlur}px rgba(0,0,0,${shadowOpacity})`;
+      
+      // Check si proche de la cible (< 5px)
+      if (Math.abs(targetX - position) < 5 && Math.abs(velocity) < 50) {
+        elem.style.transform = `translateX(${targetX}px) scale(0.85) rotate(${targetX / window.innerWidth * 3}deg)`;
+        elem.style.opacity = '0.3';
+        elem.style.boxShadow = `0 40px 80px rgba(0,0,0,0.6)`;
+        
+        // Attendre que l'animation soit bien visible avant de naviguer
+        setTimeout(() => {
+          onComplete?.();
+        }, 200); // Délai pour voir la transition
         return;
       }
       
