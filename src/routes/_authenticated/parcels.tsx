@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -66,16 +66,6 @@ function getCurrentGrowthStage(cropType: string, age: number, totalDays: number)
 function ParcelsPage() {
   const { user } = Route.useRouteContext();
   const qc = useQueryClient();
-  const router = useRouter();
-
-  // Gesture swipe pour navigation rapide
-  const handleSwipeRight = () => {
-    router.navigate({ to: "/dashboard" });
-  };
-  const handleSwipeLeft = () => {
-    router.navigate({ to: "/finance" });
-  };
-
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [area, setArea] = useState("");
@@ -120,23 +110,7 @@ function ParcelsPage() {
   }
 
   return (
-    <div
-      className="space-y-4"
-      onTouchStart={(e) => {
-        const touch = e.targetTouches[0];
-        if (touch) window._swipeStartX = touch.clientX;
-      }}
-      onTouchEnd={(e) => {
-        const touch = e.changedTouches[0];
-        if (!touch || window._swipeStartX == null) return;
-        const diff = window._swipeStartX - touch.clientX;
-        if (Math.abs(diff) > 50) {
-          if (diff > 0) handleSwipeLeft();
-          else handleSwipeRight();
-        }
-        window._swipeStartX = null;
-      }}
-    >
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-black tracking-tight">Mes parcelles</h1>
         <Dialog open={open} onOpenChange={setOpen}>

@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -41,16 +41,6 @@ function DiagnosePage() {
   const analyze = useServerFn(analyzePlantImage);
   const inputRef = useRef<HTMLInputElement>(null);
   const qc = useQueryClient();
-  const router = useRouter();
-
-  // Gesture swipe pour navigation rapide
-  const handleSwipeRight = () => {
-    router.navigate({ to: "/finance" });
-  };
-  const handleSwipeLeft = () => {
-    router.navigate({ to: "/sensors" });
-  };
-
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
@@ -151,23 +141,6 @@ function DiagnosePage() {
       </div>
 
       {result && <ResultCard r={result} />}
-
-      <section
-        onTouchStart={(e) => {
-          const touch = e.targetTouches[0];
-          if (touch) window._swipeStartX = touch.clientX;
-        }}
-        onTouchEnd={(e) => {
-          const touch = e.changedTouches[0];
-          if (!touch || window._swipeStartX == null) return;
-          const diff = window._swipeStartX - touch.clientX;
-          if (Math.abs(diff) > 50) {
-            if (diff > 0) handleSwipeLeft();
-            else handleSwipeRight();
-          }
-          window._swipeStartX = null;
-        }}
-      >
 
       <section>
         <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted-foreground">

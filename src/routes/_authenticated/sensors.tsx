@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useMemo, useState } from "react";
-import { Radio, Plus, Trash2, Droplets, Thermometer, Beaker, Sprout, Battery, Copy, Check, Timer, Wifi, WifiOff, AlertTriangle, CloudRain, X, Signal, Bluetooth, Satellite, HelpCircle, Zap, BookOpen, Play } from "lucide-react";
+import { Radio, Plus, Trash2, Droplets, Thermometer, Beaker, Sprout, Battery, Copy, Check, Timer, Wifi, WifiOff, AlertTriangle, CloudRain, X, Signal, Bluetooth, Satellite, HelpCircle, Zap, BookOpen, Play, Server } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 
@@ -258,6 +258,9 @@ function SensorsPage() {
     return map;
   }, [commandsQ.data]);
 
+  const ingestUrl = typeof window !== "undefined" ? `${window.location.origin}/api/public/sensors/ingest` : "";
+  const commandsUrl = typeof window !== "undefined" ? `${window.location.origin}/api/public/sensors/commands` : "";
+
   async function copy(text: string, id: string) {
     await navigator.clipboard.writeText(text);
     setCopiedId(id);
@@ -463,6 +466,10 @@ function SensorsPage() {
         </form>
       )}
 
+      <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-3 text-[11px] text-muted-foreground">
+        Endpoint d'ingestion : <code className="font-mono">{ingestUrl}</code> · Rafraîchissement 15 s · Historique 12 mois.
+      </div>
+
       {/* 🎯 Fonctionnalités clés - Mise en avant */}
       {(devicesQ.data ?? []).length === 0 && (
         <div className="rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 p-4">
@@ -576,10 +583,11 @@ function SensorsPage() {
             </div>
             <div className="pl-8 space-y-2 text-[11px]">
               <p className="text-muted-foreground">
-                <b className="text-foreground">Installation :</b> Un technicien configure le boîtier ESP32 avec la clé du capteur. Le capteur se connecte automatiquement et envoie les données selon l'intervalle choisi.
+                <b className="text-foreground">Avec hardware ESP32 :</b> Utilise la clé dans ton firmware. 
+                Guide complet : <code className="bg-muted px-1.5 py-0.5 rounded text-primary">docs/CAPTEURS_GUIDE_COMPLET.md</code>
               </p>
               <p className="text-muted-foreground">
-                <b className="text-foreground">Test rapide :</b> Le technicien peut lancer le simulateur pour vérifier que tout fonctionne :
+                <b className="text-foreground">Pour tester maintenant :</b> Lance le simulateur Node.js :
               </p>
               <div className="bg-muted/50 rounded-lg p-2 mt-1">
                 <code className="text-[10px] block break-all font-mono">
@@ -589,8 +597,17 @@ function SensorsPage() {
             </div>
           </div>
           
-          {/* Bouton action rapide */}
+          {/* Boutons d'action rapide */}
           <div className="flex flex-wrap gap-2 pt-2">
+            <a
+              href="https://docs.openclaw.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/10 transition"
+            >
+              <Server className="h-3.5 w-3.5" />
+              Documentation API
+            </a>
             <button
               type="button"
               onClick={() => {

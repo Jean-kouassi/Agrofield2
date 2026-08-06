@@ -20,7 +20,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Link, useRouter } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/finance")({
   head: () => ({
@@ -53,17 +52,6 @@ function proofMeta(t: string | null | undefined) {
 function FinancePage() {
   const { user } = Route.useRouteContext();
   const qc = useQueryClient();
-  const router = useRouter();
-
-  // Gesture swipe pour navigation rapide
-  const handleSwipeRight = () => {
-    // Aller vers parcelles (page précédente dans la nav)
-    router.navigate({ to: "/parcels" });
-  };
-  const handleSwipeLeft = () => {
-    // Aller vers diagnostic (page suivante dans la nav)
-    router.navigate({ to: "/diagnose" });
-  };
 
   const parcelsQ = useQuery({
     queryKey: ["parcels"],
@@ -265,23 +253,7 @@ function FinancePage() {
   }
 
   return (
-    <div 
-      className="space-y-5"
-      onTouchStart={(e) => {
-        const touch = e.targetTouches[0];
-        if (touch) window._swipeStartX = touch.clientX;
-      }}
-      onTouchEnd={(e) => {
-        const touch = e.changedTouches[0];
-        if (!touch || window._swipeStartX == null) return;
-        const diff = window._swipeStartX - touch.clientX;
-        if (Math.abs(diff) > 50) {
-          if (diff > 0) handleSwipeLeft();
-          else handleSwipeRight();
-        }
-        window._swipeStartX = null;
-      }}
-    >
+    <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-black tracking-tight">Finances</h1>
         <p className="text-sm text-muted-foreground">Suivez vos dépenses et vos ventes en FCFA.</p>
@@ -392,34 +364,12 @@ function Row({ title, subtitle, amount, tone, hash, record }: {
   const score = credibilityScore(record);
 
   async function viewReceipt() {
-    if (!record.receipt_path) {
-      toast.error("Aucun reçu joint à cette transaction");
-      return;
-    }
-    console.log("[DEBUG] Tentative lecture reçu:", record.receipt_path);
-    try {
-      const { data, error } = await supabase.storage
-        .from("agrofield-media")
-        .createSignedUrl(record.receipt_path, 3600);
-      
-      if (error) {
-        console.error("[DEBUG] Erreur Supabase Storage:", error);
-        toast.error(`Erreur storage: ${error.message}`);
-        return;
-      }
-      
-      if (!data?.signedUrl) {
-        console.error("[DEBUG] URL signée vide");
-        toast.error("Reçu introuvable - URL vide");
-        return;
-      }
-      
-      console.log("[DEBUG] URL générée avec succès:", data.signedUrl.slice(0, 80) + "...");
-      window.open(data.signedUrl, "_blank", "noopener,noreferrer");
-    } catch (err) {
-      console.error("[DEBUG] Exception caught:", err);
-      toast.error("Erreur inattendue: " + (err as Error).message);
-    }
+    if (!record.receipt_path) return;
+    const { data, error } = await supabase.storage
+      .from("agrofield-media")
+      .createSignedUrl(record.receipt_path, 300);
+    if (error || !data?.signedUrl) { toast.error("Reçu introuvable"); return; }
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
   }
 
   return (
