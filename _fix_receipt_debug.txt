@@ -1,0 +1,64 @@
+// REMPLACER la fonction viewReceipt dans src/routes/_authenticated/finance.tsx
+
+async function viewReceipt() {
+  if (!record.receipt_path) {
+    console.error("[REÇU DEBUG] receipt_path is null/undefined", record);
+    toast.error("Aucun reçu joint à cette transaction");
+    return;
+  }
+  
+  console.log("[REÇU DEBUG] Tentative lecture reçu:", {
+    path: record.receipt_path,
+    userId: user.id,
+    recordId: record.id,
+    proofType: record.proof_type
+  });
+  
+  try {
+    const { data, error } = await supabase.storage
+      .from("agrofield-media")
+      .createSignedUrl(record.receipt_path, 3600); // 1 heure
+    
+    if (error) {
+      console.error("[REÇU DEBUG] ERREUR Supabase Storage:", {
+        message: error.message,
+        status: error.status,
+        name: error.name,
+        details: error.details
+      });
+      
+      if (error.message.includes('row-level security')) {
+        toast.error("❌ Erreur permissions RLS. Ouvre la console (F12) et copie les logs pour Jean.");
+      } else {
+        toast.error(`Erreur storage: ${error.message}`);
+      }
+      return;
+    }
+    
+    if (!data?.signedUrl) {
+      console.error("[REÇU DEBUG] URL signée vide - response data:", data);
+      toast.error("Reçu introuvable - données invalides");
+      return;
+    }
+    
+    console.log("[REÇU DEBUG] ✅ URL générée avec succès:", data.signedUrl.substring(0, 100) + "...");
+    
+    // TESTER si l'URL est accessible avant d'ouvrir
+    try {
+      const testResponse = await fetch(data.signedUrl, { 
+        method: 'HEAD',
+        mode: 'no-cors' // Important pour éviter erreurs CORS
+      });
+      console.log("[REÇU DEBUG] Test HTTP status:", testResponse.status, "(0 = no-cors, donc OK)");
+    } catch (fetchError) {
+      console.warn("[REÇU DEBUG] Fetch test failed (peut être CORS, ce n'est pas grave):", fetchError);
+    }
+    
+    console.log("[REÇU DEBUG] Ouverture du reçu dans un nouvel onglet...");
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+    
+  } catch (err) {
+    console.error("[REÇU DEBUG] EXCEPTION complète:", err);
+    toast.error("Erreur inattendue: " + (err as Error).message);
+  }
+}
