@@ -1,13 +1,14 @@
-import { createFileRoute, useRouter, Link } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Search, Plus, Filter, MapPin, ShoppingCart, Leaf, TrendingUp, Users, Zap, Package, ShoppingBag } from 'lucide-react'
+import { Search, ShoppingCart, Leaf, TrendingUp, Users, Zap } from 'lucide-react'
 import { fetchOffers } from '@/lib/marketplace'
 import { useNetworkStatus } from '@/lib/network-detection'
+import { BottomNav, PublishFab } from '@/components/ui/bottom-nav'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import type { Offer } from '@/types/marketplace'
@@ -72,148 +73,97 @@ function MarketplacePage() {
   const avgPrice = offers.length > 0 ? totalValue / offers.reduce((sum, o) => sum + o.quantity, 0) : 0
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-      {/* Header */}
-      <header className="relative bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-white shadow-xl overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
+      {/* Bottom Navigation - Mobile */}
+      <BottomNav />
+      <PublishFab />
+
+      {/* Header Simplifié */}
+      <header className="bg-primary text-primary-foreground shadow-md sticky top-0 z-40">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-center gap-3">
+            <ShoppingCart className="w-8 h-8" />
+            <h1 className="text-2xl md:text-3xl font-bold">Marketplace</h1>
+          </div>
+          <p className="text-center text-primary-foreground/90 text-sm md:text-base mt-1">
+            Achetez et vendez vos produits agricoles 🌾
+          </p>
         </div>
-        
-        <div className="container mx-auto px-4 py-6 relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <Link 
-              to="/"
-              className="flex items-center gap-2 font-bold text-lg hover:opacity-80 transition-opacity"
-            >
-              <Leaf className="w-6 h-6" />
-              <span>AgroField</span>
-            </Link>
-            
-            <nav className="flex items-center gap-3 md:gap-4 flex-wrap justify-center md:justify-start">
-              <Link 
-                to="/"
-                className="text-xs md:text-sm hover:opacity-80 transition-opacity flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm"
-              >
-                <Leaf className="w-3 h-3" />
-                Accueil
-              </Link>
-              <Link 
-                to="/marketplace/my-offers"
-                className="text-xs md:text-sm hover:opacity-80 transition-opacity flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm"
-              >
-                <Package className="w-3 h-3" />
-                Mes offres
-              </Link>
-              <Link 
-                to="/marketplace/orders"
-                className="text-xs md:text-sm hover:opacity-80 transition-opacity flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm"
-              >
-                <ShoppingBag className="w-3 h-3" />
-                Mes commandes
-              </Link>
-              <Link to="/marketplace/create" className="ml-auto md:ml-0">
-                <Button 
-                  size="sm"
-                  className="bg-white text-green-600 hover:bg-green-50 gap-2 shadow-lg text-xs md:text-sm px-4 py-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span className="hidden sm:inline">Publier une offre</span>
-                  <span className="sm:hidden">Publier</span>
-                </Button>
-              </Link>
-            </nav>
-          </div>
 
-          <div className="text-center mb-6">
-            <h1 className="text-4xl md:text-5xl font-black mb-3 flex items-center justify-center gap-3">
-              <ShoppingCart className="w-12 h-12" />
-              Marketplace AgroField
-            </h1>
-            <p className="text-green-100 text-lg max-w-2xl mx-auto">
-              La plateforme d'échange agricole nouvelle génération 🌾
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+        {/* Stats Carousel - Scrollable Horizontal */}
+        <div className="overflow-x-auto scrollbar-hide border-t border-primary-foreground/10">
+          <div className="flex gap-4 px-4 py-3 min-w-max">
             <StatCard 
-              icon={<Leaf className="w-5 h-5" />}
-              label="Offres Actives"
+              icon={<Leaf className="w-4 h-4" />}
+              label="Offres"
               value={offers.length.toString()}
-              color="bg-green-500/20"
             />
             <StatCard 
-              icon={<TrendingUp className="w-5 h-5" />}
-              label="Valeur Totale"
-              value={`${(totalValue / 1000).toFixed(1)}K FCFA`}
-              color="bg-blue-500/20"
+              icon={<TrendingUp className="w-4 h-4" />}
+              label="Valeur"
+              value={`${(totalValue / 1000).toFixed(0)}K`}
             />
             <StatCard 
-              icon={<Users className="w-5 h-5" />}
-              label="Prix Moyen"
-              value={`${Math.round(avgPrice)} FCFA`}
-              color="bg-purple-500/20"
+              icon={<Users className="w-4 h-4" />}
+              label="Prix moy."
+              value={`${Math.round(avgPrice)}`}
             />
             <StatCard 
-              icon={<Zap className="w-5 h-5" />}
+              icon={<Zap className="w-4 h-4" />}
               label="Catégories"
               value={new Set(offers.map(o => o.category)).size.toString()}
-              color="bg-yellow-500/20"
             />
           </div>
         </div>
       </header>
 
       {/* Barre de Recherche et Filtres */}
-      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                placeholder="Rechercher un produit, un vendeur, une région..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-12 text-base border-2 border-gray-200 focus:border-green-500 transition-colors"
-              />
-            </div>
+      <div className="sticky top-[110px] md:top-[73px] z-30 bg-background border-b shadow-sm">
+        <div className="container mx-auto px-4 py-3 space-y-3">
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+            <Input
+              placeholder="Rechercher un produit, vendeur, région..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-12 text-base border-2 focus:border-primary transition-colors"
+            />
+          </div>
 
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
-              <Filter className="w-5 h-5 text-gray-500 flex-shrink-0" />
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                  className={`whitespace-nowrap capitalize transition-all ${
-                    selectedCategory === category 
-                      ? 'bg-green-600 text-white shadow-md' 
-                      : 'hover:bg-green-50 hover:border-green-300'
-                  }`}
-                >
-                  {category === 'all' ? 'Tous' : category}
-                </Button>
-              ))}
-            </div>
+          {/* Filtres Catégories - Scrollable */}
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category)}
+                className={`whitespace-nowrap capitalize h-10 px-4 text-sm font-medium ${
+                  selectedCategory === category 
+                    ? 'bg-primary text-primary-foreground shadow-md' 
+                    : 'hover:bg-accent hover:text-accent-foreground'
+                }`}
+              >
+                {category === 'all' ? 'Tous' : category}
+              </Button>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Contenu Principal */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            {[...Array(6)].map((_, i) => (
               <Card key={i} className="overflow-hidden">
-                <CardHeader className="p-0">
-                  <Skeleton className="h-48 w-full" />
-                </CardHeader>
+                <Skeleton className="h-48 w-full" />
                 <CardContent className="p-4 space-y-3">
-                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-5 w-3/4" />
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-2/3" />
-                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-12 w-full" />
                 </CardContent>
               </Card>
             ))}
@@ -221,36 +171,25 @@ function MarketplacePage() {
         ) : filteredOffers.length === 0 ? (
           <EmptyState onReset={() => { setSearchTerm(''); setSelectedCategory('all'); }} />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {filteredOffers.map((offer) => (
               <OfferCard key={offer.id} offer={offer} onDelete={reloadOffers} />
             ))}
           </div>
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white mt-16 py-8">
-        <div className="container mx-auto px-4 text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Leaf className="w-6 h-6 text-green-400" />
-            <span className="text-xl font-bold">AgroField</span>
-          </div>
-          <p className="text-gray-400 text-sm">
-            © 2026 AgroField - Application pour agriculteurs du Burkina Faso 🇧🇫
-          </p>
-        </div>
-      </footer>
     </div>
   )
 }
 
-function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: string }) {
+function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className={`${color} backdrop-blur-sm rounded-xl p-4 text-center`}>
-      <div className="flex justify-center mb-2 text-white">{icon}</div>
-      <div className="text-2xl font-bold text-white">{value}</div>
-      <div className="text-xs text-white/80">{label}</div>
+    <div className="flex items-center gap-3 bg-primary-foreground/10 rounded-lg px-3 py-2 min-w-[120px]">
+      <div className="text-primary">{icon}</div>
+      <div>
+        <div className="text-lg font-bold text-primary-foreground">{value}</div>
+        <div className="text-xs text-primary-foreground/80">{label}</div>
+      </div>
     </div>
   )
 }
