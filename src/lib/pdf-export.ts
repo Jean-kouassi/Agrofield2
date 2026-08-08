@@ -196,27 +196,15 @@ export async function exportFinanceToPDF(
       head: [['DATE', 'TYPE', 'CATEGORIE', 'DETAILS', 'MONTANT']],
       body: tableRows,
       theme: 'grid',
-      headStyles: {
-        fillColor: [34, 139, 34], // Forest green
-        textColor: [255, 255, 255],
-        fontStyle: 'bold',
-        halign: 'center',
-        fontSize: 9,
-        cellPadding: 2,
-      },
-      bodyStyles: {
-        fontSize: 8,
-        cellPadding: 2,
-        textColor: [40, 40, 40],
-        lineColor: [200, 200, 200],
-        lineWidth: 0.1,
-      },
+      // Largeur totale du tableau = largeur de page - marges (0 pour coller aux bords)
+      tableWidth: pageWidth - margin,
+      // Distribution en pourcentages qui totalise 100%
       columnStyles: {
-        0: { cellWidth: 16, halign: 'center', fontStyle: 'bold' },
-        1: { cellWidth: 14, halign: 'center', fontStyle: 'bold' },
-        2: { cellWidth: 22, fontStyle: 'normal' },
-        3: { cellWidth: 68, fontStyle: 'normal', minCellWidth: 60 },
-        4: { cellWidth: 40, halign: 'right', fontStyle: 'bold' },
+        0: { cellWidth: (pageWidth - margin) * 0.09, halign: 'center', valign: 'middle', fontStyle: 'bold', cellPadding: 3 }, // DATE
+        1: { cellWidth: (pageWidth - margin) * 0.07, halign: 'center', valign: 'middle', fontStyle: 'bold', cellPadding: 3 }, // TYPE
+        2: { cellWidth: (pageWidth - margin) * 0.11, valign: 'middle', fontStyle: 'normal', cellPadding: 3 }, // CATEGORIE
+        3: { cellWidth: (pageWidth - margin) * 0.28, valign: 'middle', fontStyle: 'normal', cellPadding: 3 }, // DETAILS
+        4: { cellWidth: (pageWidth - margin) * 0.45, halign: 'right', valign: 'middle', fontStyle: 'bold', cellPadding: { top: 3, right: 0, bottom: 3, left: 3 } }, // MONTANT - padding right à 0
       },
       didParseCell: (data) => {
         // Colorer par type
@@ -263,10 +251,19 @@ export async function exportFinanceToPDF(
   // PIED DE PAGE PROFESSIONNEL
   // ============================================
   
-  const remainingSpace = pageHeight - yPos;
+  // Le pied de page se place directement apres le tableau
+  // Si le tableau est court, on ajoute une section de stats pour remplir l'espace
+  let footerStartY = yPos + 5;
+  const remainingSpace = pageHeight - footerStartY - 35; // 35mm reserve pour le pied de page
   
-  // Pied de page toujours affiche (meme si peu d'espace)
-  const footerStartY = Math.min(yPos, pageHeight - 50);
+  // Si il y a beaucoup d'espace vide (> 40mm), on remplit avec des stats supplementaires
+  if (remainingSpace > 40 && transactions.length > 0) {
+    // Section statistiques pour remplir l'espace
+    footerStartY = drawStatsSection(doc, footerStartY, margin, pageWidth, transactions, totalExp, totalSales, netto);
+  }
+  
+  // S'assurer que le pied de page ne depasse pas la page
+  footerStartY = Math.min(footerStartY, pageHeight - 35);
   
   // Ligne de separation decorative
   doc.setDrawColor(218, 165, 32);
