@@ -52,11 +52,11 @@ const SCORE_WEIGHTS = {
 };
 
 const SCORE_RATINGS = [
-  { min: 900, rating: 'Excellent', color: 'text-green-600', bg: 'bg-green-100' },
-  { min: 750, rating: 'Très bon', color: 'text-blue-600', bg: 'bg-blue-100' },
-  { min: 600, rating: 'Bon', color: 'text-yellow-600', bg: 'bg-yellow-100' },
-  { min: 400, rating: 'Moyen', color: 'text-orange-600', bg: 'bg-orange-100' },
-  { min: 0, rating: 'Faible', color: 'text-red-600', bg: 'bg-red-100' },
+  { min: 900, rating: 'Excellent' as const, color: 'text-green-600', bg: 'bg-green-100' },
+  { min: 750, rating: 'Très bon' as const, color: 'text-blue-600', bg: 'bg-blue-100' },
+  { min: 600, rating: 'Bon' as const, color: 'text-yellow-600', bg: 'bg-yellow-100' },
+  { min: 400, rating: 'Moyen' as const, color: 'text-orange-600', bg: 'bg-orange-100' },
+  { min: 0, rating: 'Faible' as const, color: 'text-red-600', bg: 'bg-red-100' },
 ];
 
 // ============================================
@@ -85,22 +85,27 @@ export function getScoreRating(score: number): typeof SCORE_RATINGS[0] {
 }
 
 /**
- * Générer une recommandation basée sur le score
+ * Générer une recommandation basée sur le score et les facteurs
  */
 export function getRecommendation(score: number, factors: CreditScoreFactors): string {
   if (score >= 900) {
-    return "Excellent profil ! Vous êtes éligible aux meilleurs taux de prêt.";
+    return "Excellent profil ! Vous êtes éligible aux meilleurs taux de prêt. Continuez à documenter vos transactions avec des preuves.";
   }
   
   if (score >= 750) {
-    return "Très bon profil. Continuez ainsi pour améliorer encore votre score.";
+    const tips: string[] = [];
+    if (factors.incomeStability < 80) tips.push(" régulariser vos ventes mensuelles");
+    if (factors.transactionHistory < 80) tips.push(" ajouter plus de transactions documentées");
+    return tips.length > 0
+      ? `Très bon profil. Pour atteindre l'excellence: ${tips.join(',')}.`
+      : "Très bon profil. Continuez ainsi pour maintenir votre score.";
   }
   
   if (score >= 600) {
-    const weakPoints = [];
-    if (factors.repaymentHistory < 70) weakPoints.push("retards de paiement");
-    if (factors.debtRatio < 60) weakPoints.push("taux d'endettement élevé");
-    if (factors.incomeStability < 60) weakPoints.push("revenus irréguliers");
+    const weakPoints: string[] = [];
+    if (factors.repaymentHistory < 70) weakPoints.push("documenter plus de transactions avec preuves");
+    if (factors.debtRatio < 60) weakPoints.push("réduire vos dépenses par rapport à vos revenus");
+    if (factors.incomeStability < 60) weakPoints.push("régulariser vos ventes (vendre chaque mois)");
     
     if (weakPoints.length > 0) {
       return `Bon profil. Pour améliorer: ${weakPoints.join(', ')}.`;
@@ -109,18 +114,33 @@ export function getRecommendation(score: number, factors: CreditScoreFactors): s
   }
   
   if (score >= 400) {
-    return "Profil moyen. Consultez un conseiller pour améliorer votre situation.";
+    const issues: string[] = [];
+    if (factors.transactionHistory < 40) issues.push("ajoutez plus de transactions dans l'application");
+    if (factors.incomeStability < 40) issues.push("essayez de vendre régulièrement chaque mois");
+    if (factors.debtRatio < 40) issues.push("réduisez vos dépenses");
+    return issues.length > 0
+      ? `Profil moyen. Actions recommandées: ${issues.join(', ')}.`
+      : "Profil moyen. Consultez un conseiller pour améliorer votre situation.";
   }
   
-  return "Profil fragile. Commencez par de petits crédits et remboursez à temps.";
+  return "Profil fragile. Commencez par enregistrer vos transactions avec des preuves (reçus, SMS) et remboursez à temps pour construire votre historique.";
 }
 
 /**
  * Calculer le montant maximum de prêt recommandé
  */
 export function calculateMaxLoan(score: number, monthlyIncome: number): number {
-  const baseMultiplier = score >= 750 ? 24 : score >= 600 ? 18 : score >= 400 ? 12 : 6;
-  return Math.round(monthlyIncome * baseMultiplier / 1000) * 1000; // Arrondi au millier
+  // Multiplicateur selon le score (mois de revenu)
+  let baseMultiplier: number;
+  if (score >= 900) baseMultiplier = 24;
+  else if (score >= 750) baseMultiplier = 18;
+  else if (score >= 600) baseMultiplier = 12;
+  else if (score >= 400) baseMultiplier = 6;
+  else baseMultiplier = 3;
+
+  // Plafonner à 10M FCFA pour éviter des montants irréalistes
+  const maxAmount = Math.min(monthlyIncome * baseMultiplier, 10_000_000);
+  return Math.max(50_000, Math.round(maxAmount / 1000) * 1000); // Arrondi au millier, min 50k FCFA
 }
 
 /**
@@ -130,18 +150,18 @@ export async function getUserFinancialHistory(userId: string, months: number = 1
   const twelveMonthsAgo = new Date();
   twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - months);
 
-  // Récupérer dépenses et ventes
+  // Récupérer dépenses et ventes avec preuves
   const [expenses, sales] = await Promise.all([
     supabase
       .from('expenses')
-      .select('amount_fcfa, spent_at')
+      .select('amount_fcfa, spent_at, proof_type, receipt_path, flagged_outlier')
       .eq('user_id', userId)
       .gte('spent_at', twelveMonthsAgo.toISOString())
       .order('spent_at', { ascending: true }),
     
     supabase
       .from('sales')
-      .select('quantity_kg, unit_price_fcfa, sold_at')
+      .select('quantity_kg, unit_price_fcfa, sold_at, proof_type, receipt_path, flagged_outlier')
       .eq('user_id', userId)
       .gte('sold_at', twelveMonthsAgo.toISOString())
       .order('sold_at', { ascending: true }),
@@ -159,20 +179,27 @@ export async function getUserFinancialHistory(userId: string, months: number = 1
 export async function analyzeCreditFactors(userId: string): Promise<CreditScoreFactors> {
   const history = await getUserFinancialHistory(userId);
   
-  // Facteur 1: Historique des transactions (nombre total)
+  // Facteur 1: Historique des transactions (volume + preuves)
   const totalTransactions = history.expenses.length + history.sales.length;
-  const transactionHistory = Math.min(100, Math.round((totalTransactions / 50) * 100));
+  const transactionsWithProof = [
+    ...history.expenses.filter(e => e.proof_type && e.proof_type !== 'none' && e.receipt_path),
+    ...history.sales.filter(s => s.proof_type && s.proof_type !== 'none' && s.receipt_path),
+  ].length;
+  const proofRatio = totalTransactions > 0 ? transactionsWithProof / totalTransactions : 0;
+  // Score base sur le volume + bonus pour preuves (max 100)
+  const transactionHistory = Math.min(100, Math.round((totalTransactions / 50) * 70 + proofRatio * 30));
 
-  // Facteur 2: Historique de remboursement (simulé - à améliorer avec données réelles)
-  const onTimePayments = history.expenses.filter(e => {
-    // Simulation: considérer comme "à temps" si payé en espèces ou mobile money
-    return true; // À remplacer par vraie logique
-  }).length;
-  const repaymentHistory = history.expenses.length > 0 
-    ? Math.round((onTimePayments / history.expenses.length) * 100)
-    : 50; // Défaut si aucune donnée
+  // Facteur 2: Historique de remboursement (basé sur preuves + pas d'outliers)
+  const flaggedOutliers = [
+    ...history.expenses.filter(e => e.flagged_outlier),
+    ...history.sales.filter(s => s.flagged_outlier),
+  ].length;
+  const cleanTransactions = totalTransactions - flaggedOutliers;
+  const repaymentHistory = totalTransactions > 0 
+    ? Math.round((cleanTransactions / totalTransactions) * 100)
+    : 50;
 
-  // Facteur 3: Stabilité des revenus (régularité des ventes)
+  // Facteur 3: Stabilité des revenus (régularité des ventes par mois)
   const monthlySales = new Array(12).fill(0);
   history.sales.forEach(sale => {
     const month = new Date(sale.sold_at).getMonth();
@@ -180,11 +207,15 @@ export async function analyzeCreditFactors(userId: string): Promise<CreditScoreF
     monthlySales[month] += amount;
   });
   
+  const activeMonths = monthlySales.filter(v => v > 0).length;
   const avgMonthly = monthlySales.reduce((a, b) => a + b, 0) / 12;
   const variance = monthlySales.reduce((sum, val) => sum + Math.pow(val - avgMonthly, 2), 0) / 12;
   const stdDev = Math.sqrt(variance);
-  const cv = avgMonthly > 0 ? (stdDev / avgMonthly) * 100 : 100; // Coefficient de variation
-  const incomeStability = Math.max(0, Math.min(100, Math.round(100 - cv)));
+  const cv = avgMonthly > 0 ? (stdDev / avgMonthly) * 100 : 100;
+  // Score: régularité (CV bas = bon) + continuité (mois actifs)
+  const regularityScore = Math.max(0, Math.min(70, Math.round(70 - cv * 0.7)));
+  const continuityScore = Math.round((activeMonths / 12) * 30);
+  const incomeStability = Math.min(100, regularityScore + continuityScore);
 
   // Facteur 4: Ratio d'endettement (dépenses / revenus)
   const totalExpenses = history.expenses.reduce((sum, e) => sum + (e.amount_fcfa || 0), 0);

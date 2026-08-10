@@ -171,7 +171,7 @@ function CreditScorePage() {
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-green-600 hover:bg-green-700 gap-2">
-                  <DollarSign className="w-4 h-4" />
+                  <Banknote className="w-4 h-4" />
                   Demander un prêt
                 </Button>
               </DialogTrigger>
@@ -321,6 +321,54 @@ function CreditScorePage() {
                   color="bg-yellow-500"
                 />
               </div>
+
+              {/* Conseils personnalisés */}
+              {creditScore && (
+                <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertTriangle className="w-5 h-5 text-blue-600" />
+                    <h4 className="font-semibold text-blue-900">Conseils pour améliorer votre score</h4>
+                  </div>
+                  <ul className="space-y-2 text-sm text-blue-800">
+                    {creditScore.factors.transactionHistory < 70 && (
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 mt-0.5 shrink-0 text-blue-500" />
+                        Enregistrez plus de transactions avec preuves (reçus, SMS Mobile Money) pour renforcer votre historique.
+                      </li>
+                    )}
+                    {creditScore.factors.repaymentHistory < 70 && (
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 mt-0.5 shrink-0 text-blue-500" />
+                        Évitez les transactions signalées comme anomalies pour améliorer votre fiabilité.
+                      </li>
+                    )}
+                    {creditScore.factors.incomeStability < 70 && (
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 mt-0.5 shrink-0 text-blue-500" />
+                        Vendez régulièrement chaque mois pour montrer une stabilité de revenus.
+                      </li>
+                    )}
+                    {creditScore.factors.debtRatio < 60 && (
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 mt-0.5 shrink-0 text-blue-500" />
+                        Réduisez vos dépenses par rapport à vos revenus pour améliorer votre ratio d'endettement.
+                      </li>
+                    )}
+                    {creditScore.factors.accountAge < 50 && (
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 mt-0.5 shrink-0 text-blue-500" />
+                        Continuez à utiliser AgroField régulièrement — l'ancienneté de votre compte renforce votre score.
+                      </li>
+                    )}
+                    {creditScore.factors.transactionHistory >= 70 && creditScore.factors.repaymentHistory >= 70 && creditScore.factors.incomeStability >= 70 && creditScore.factors.debtRatio >= 60 && (
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 mt-0.5 shrink-0 text-green-500" />
+                        Tous vos facteurs sont au vert ! Maintenez vos bonnes habitudes financières.
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
 
               {/* Montant maximum de prêt */}
               <div className="mt-8 p-6 bg-green-50 rounded-lg border border-green-200">

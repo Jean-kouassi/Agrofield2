@@ -11,7 +11,7 @@ interface UseSwipeGestureOptions {
   thresholdPercent?: number;   // % de l'écran pour valider (défaut: 30%)
   onSwipeLeft?: () => void;    // Callback quand on swipe vers la gauche
   onSwipeRight?: () => void;   // Callback quand on swipe vers la droite
-  enabled?: boolean;           // Activer/désactiver le gesture (défaut: true)
+  enabled?: boolean;           // Activer/désactuer le gesture (défaut: true)
 }
 
 export function useSwipeGesture({

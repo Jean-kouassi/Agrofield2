@@ -42,26 +42,29 @@ export type PaymentMethod = 'cash' | 'orange_money' | 'moov_money' | 'virement';
 export interface FinanceTransaction {
   id: string;
   user_id: string;
-  kind: 'expense' | 'sale' | 'transfer';  // Changed from type
-  category: string;
-  amount_fcfa: number;  // Changed from amount_xof
-  description?: string;
-  transaction_date: string;  // Changed from date
-  receipt_image?: string;
-  parcel_id?: string;  // Changed from plot_id
-  payment_method?: PaymentMethod;
-  reference?: string;
+  kind: 'expense' | 'sale' | 'transfer';
+  category: string | null;
+  amount_fcfa: number;
+  crop_type: string | null;
+  quantity_kg: number | null;
+  unit_price_fcfa: number | null;
+  buyer: string | null;
+  seller: string | null;
+  transaction_date: string;
+  proof_type: string;
+  proof_image_path: string | null;
+  proof_reference: string | null;
+  parcel_id: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export interface FinanceFilters {
-  kind?: 'expense' | 'sale' | 'transfer';  // Changed from type
+  kind?: 'expense' | 'sale' | 'transfer';
   category?: string;
   startDate?: string;
   endDate?: string;
-  parcelId?: string;  // Changed from plotId
-  paymentMethod?: PaymentMethod;
+  parcelId?: string;
 }
 
 export interface FinanceSummary {
@@ -81,7 +84,6 @@ export interface CategoryBreakdown {
   totalAmount: number;
   avgAmount: number;
 }
-
 export interface MonthlySummary {
   month: string;
   totalTransactions: number;
@@ -163,14 +165,10 @@ export async function fetchFinances(filters?: FinanceFilters): Promise<FinanceTr
     query = query.eq('parcel_id', filters.parcelId);
   }
 
-  if (filters?.paymentMethod) {
-    query = query.eq('payment_method', filters.paymentMethod);
-  }
-
   const { data, error } = await query;
 
   if (error) throw error;
-  return data || [];
+  return (data || []) as FinanceTransaction[];
 }
 
 /**
@@ -181,9 +179,9 @@ export async function fetchFinanceSummary(userId: string): Promise<FinanceSummar
     .from('user_finances_summary')
     .select('*')
     .eq('user_id', userId)
-    .single();
+    .maybeSingle();
 
-  if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows
+  if (error) throw error;
   return data as unknown as FinanceSummary | null;
 }
 
@@ -195,10 +193,10 @@ export async function fetchExpensesByCategory(userId: string): Promise<CategoryB
     .from('expenses_by_category')
     .select('*')
     .eq('user_id', userId)
-    .order('totalAmount', { ascending: false });
+    .order('total_amount', { ascending: false });
 
   if (error) throw error;
-  return data as unknown as CategoryBreakdown[];
+  return (data || []) as unknown as CategoryBreakdown[];
 }
 
 /**
@@ -209,10 +207,10 @@ export async function fetchIncomesByCategory(userId: string): Promise<CategoryBr
     .from('incomes_by_category')
     .select('*')
     .eq('user_id', userId)
-    .order('totalAmount', { ascending: false });
+    .order('total_amount', { ascending: false });
 
   if (error) throw error;
-  return data as unknown as CategoryBreakdown[];
+  return (data || []) as unknown as CategoryBreakdown[];
 }
 
 /**
@@ -227,7 +225,7 @@ export async function fetchMonthlySummary(userId: string, months: number = 12): 
     .limit(months);
 
   if (error) throw error;
-  return data as unknown as MonthlySummary[];
+  return (data || []) as unknown as MonthlySummary[];
 }
 
 /**
@@ -240,12 +238,12 @@ export async function createTransaction(transaction: Partial<FinanceTransaction>
       ...transaction,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    })
+    } as any)
     .select()
     .single();
 
   if (error) throw error;
-  return data;
+  return data as FinanceTransaction;
 }
 
 /**
@@ -260,13 +258,13 @@ export async function updateTransaction(
     .update({
       ...updates,
       updated_at: new Date().toISOString(),
-    })
+    } as any)
     .eq('id', id)
     .select()
     .single();
 
   if (error) throw error;
-  return data;
+  return data as FinanceTransaction;
 }
 
 /**
