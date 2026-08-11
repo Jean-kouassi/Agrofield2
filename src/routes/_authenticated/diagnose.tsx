@@ -86,13 +86,14 @@ function DiagnosePage() {
   }
 
   return (
-    <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-black tracking-tight">Diagnostic IA</h1>
-        <p className="text-sm text-muted-foreground">
-          Prenez une photo nette de la feuille malade. L'IA identifie la maladie en quelques secondes.
-        </p>
-      </div>
+    <div className="min-h-screen pb-20">
+      <div className="space-y-5 p-4 max-w-3xl mx-auto">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight">Diagnostic IA</h1>
+          <p className="text-sm text-muted-foreground">
+            Prenez une photo nette de la feuille malade. L'IA identifie la maladie en quelques secondes.
+          </p>
+        </div>
 
       <div className="space-y-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
         <div className="space-y-1.5">
@@ -166,6 +167,7 @@ function DiagnosePage() {
           </div>
         )}
       </section>
+      </div>
     </div>
   );
 }

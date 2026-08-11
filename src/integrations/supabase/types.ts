@@ -537,33 +537,54 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          bio: string | null
+          business_name: string | null
+          business_type: "individual" | "cooperative" | "company" | null
+          city: string | null
           created_at: string
           expense_alert_threshold: number | null
           full_name: string | null
           id: string
           phone: string | null
           region: string | null
+          role: Database["public"]["Enums"]["app_role"]
           updated_at: string
+          verified: boolean | null
           village: string | null
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          business_name?: string | null
+          business_type?: "individual" | "cooperative" | "company" | null
+          city?: string | null
           created_at?: string
           expense_alert_threshold?: number | null
           full_name?: string | null
           id: string
           phone?: string | null
           region?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
+          verified?: boolean | null
           village?: string | null
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          business_name?: string | null
+          business_type?: "individual" | "cooperative" | "company" | null
+          city?: string | null
           created_at?: string
           expense_alert_threshold?: number | null
           full_name?: string | null
           id?: string
           phone?: string | null
           region?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
+          verified?: boolean | null
           village?: string | null
         }
         Relationships: []
@@ -1088,7 +1109,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "super_admin" | "user"
+      app_role: "super_admin" | "user" | "producer" | "wholesaler" | "retailer" | "admin" | "cooperative_manager"
     }
     CompositeTypes: {
       [_ in never]: never

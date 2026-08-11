@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgroField2 — Maquette Navigation Unifiée</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0fdf4; color: #1a1a1a; padding: 20px; }
+  
+  h1 { text-align: center; color: #166534; font-size: 24px; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 30px; }
+  
+  .panels { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+  
+  .panel { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; width: 380px; }
+  
+  .panel-title { background: #166534; color: white; padding: 12px 16px; font-size: 14px; font-weight: 700; }
+  .panel-desc { padding: 8px 16px; font-size: 12px; color: #666; background: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+  
+  /* === DESKTOP BROWSER FRAME === */
+  .browser-frame { border: 1px solid #d1d5db; border-radius: 8px; margin: 12px; overflow: hidden; }
+  .browser-bar { background: #e5e7eb; padding: 6px 10px; display: flex; align-items: center; gap: 6px; }
+  .browser-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .browser-dot.r { background: #ef4444; } .browser-dot.y { background: #f59e0b; } .browser-dot.g { background: #22c55e; }
+  .browser-url { flex: 1; background: white; border-radius: 4px; padding: 2px 8px; font-size: 11px; color: #666; margin-left: 8px; }
+  
+  /* === MARKETPLACE HEADER (DESKTOP) === */
+  .mkt-header { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid #e5e7eb; background: white; }
+  .btn-accueil { display: flex; align-items: center; gap: 4px; color: #166534; font-size: 13px; font-weight: 600; text-decoration: none; padding: 6px 10px; border-radius: 8px; background: #f0fdf4; cursor: pointer; }
+  .btn-accueil:hover { background: #dcfce7; }
+  .divider { width: 1px; height: 24px; background: #e5e7eb; }
+  .logo-square { width: 32px; height: 32px; background: #166534; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
+  .mkt-title { font-size: 15px; font-weight: 800; color: #1a1a1a; }
+  .mkt-subtitle { font-size: 11px; color: #9ca3af; }
+  .desktop-nav { display: flex; gap: 4px; margin-left: auto; align-items: center; }
+  .nav-btn { padding: 6px 12px; font-size: 13px; font-weight: 600; border-radius: 8px; border: none; background: transparent; color: #4b5563; cursor: pointer; }
+  .nav-btn.active { background: #dcfce7; color: #166534; }
+  .btn-publish { background: #16a34a; color: white; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; margin-left: 8px; }
+  
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; }
+  .product-card { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+  .product-img { height: 60px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .product-info { padding: 6px 8px; }
+  .product-name { font-size: 11px; font-weight: 700; }
+  .product-price { font-size: 12px; color: #166534; font-weight: 800; }
+  .product-seller { font-size: 9px; color: #9ca3af; }
+  
+  /* === MOBILE FRAME === */
+  .mobile-frame { width: 280px; height: 520px; border: 3px solid #1a1a1a; border-radius: 28px; margin: 12px auto; overflow: hidden; position: relative; background: white; }
+  .mobile-notch { width: 80px; height: 16px; background: #1a1a1a; border-radius: 0 0 12px 12px; margin: 0 auto; }
+  .mobile-header { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-bottom: 1px solid #e5e7eb; }
+  .mobile-back { display: flex; align-items: center; gap: 2px; color: #166534; font-size: 11px; font-weight: 600; }
+  .mobile-logo { width: 24px; height: 24px; background: #166534; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; }
+  .mobile-title { font-size: 12px; font-weight: 800; }
+  
+  .mobile-content { padding: 10px; height: 380px; overflow: hidden; }
+  .mobile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .m-card { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+  .m-card-img { height: 50px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .m-card-info { padding: 4px 6px; }
+  .m-card-name { font-size: 9px; font-weight: 700; }
+  .m-card-price { font-size: 10px; color: #166534; font-weight: 800; }
+  
+  /* === BOTTOM NAV MARKETPLACE === */
+  .bottom-nav-mkt { position: absolute; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; display: flex; align-items: stretch; justify-content: space-between; padding: 0 4px; }
+  .bn-item { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 2px; flex: 1; }
+  .bn-icon { font-size: 18px; }
+  .bn-label { font-size: 8px; font-weight: 500; color: #6b7280; margin-top: 1px; }
+  .bn-item.active .bn-icon, .bn-item.active .bn-label { color: #166534; }
+  .bn-item.home-link .bn-icon, .bn-item.home-link .bn-label { color: #166534; }
+  .bn-fab-wrap { display: flex; align-items: center; justify-content: center; flex: 1; }
+  .bn-fab { width: 44px; height: 44px; background: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; margin-top: -20px; box-shadow: 0 4px 12px rgba(22,163,74,0.4); }
+  
+  /* === BOTTOM NAV AUTHENTICATED === */
+  .bottom-nav-auth { position: absolute; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; display: grid; grid-template-columns: repeat(6, 1fr); }
+  .bna-item { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 2px; }
+  .bna-icon { font-size: 16px; }
+  .bna-label { font-size: 8px; font-weight: 500; color: #6b7280; margin-top: 2px; }
+  .bna-item.active .bna-icon, .bna-item.active .bna-label { color: #166534; }
+  .bna-item.new { background: #f0fdf4; }
+  .bna-item.new .bna-icon, .bna-item.new .bna-label { color: #16a34a; font-weight: 700; }
+  
+  /* === DASHBOARD CONTENT === */
+  .dash-content { padding: 10px; height: 420px; overflow: hidden; }
+  .dash-welcome { font-size: 14px; font-weight: 800; margin-bottom: 8px; }
+  .dash-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .dash-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; }
+  .dash-card-label { font-size: 9px; color: #9ca3af; text-transform: uppercase; }
+  .dash-card-value { font-size: 16px; font-weight: 800; color: #166534; }
+  .dash-activity { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+  .dash-activity-item { display: flex; align-items: center; gap: 6px; padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
+  .dash-activity-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+  .dash-activity-text { font-size: 10px; color: #4b5563; }
+  
+  /* === ANNOTATIONS === */
+  .annotation { position: relative; }
+  .annotation::after { content: attr(data-note); position: absolute; right: -8px; top: -8px; background: #f59e0b; color: white; font-size: 9px; padding: 2px 6px; border-radius: 10px; font-weight: 700; white-space: nowrap; }
+  
+  .legend { margin-top: 24px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+  .legend-new { background: #f59e0b; }
+  .legend-existing { background: #166534; }
+  .legend-removed { background: #ef4444; }
+  
+  .footer-note { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+</style>
+</head>
+<body>
+
+<h1>🌾 AgroField2 — Maquette Navigation Unifiée</h1>
+<p class="subtitle">Priorité 1: Bouton Accueil général + Marketplace dans bottom nav + Suppression routes mortes</p>
+
+<div class="panels">
+
+  <!-- PANEL 1: DESKTOP MARKETPLACE HEADER -->
+  <div class="panel">
+    <div class="panel-title">🖥️ Desktop — Header Marketplace</div>
+    <div class="panel-desc">Nouveau bouton "← Accueil" à gauche pour revenir à la page d'accueil générale</div>
+    
+    <div class="browser-frame">
+      <div class="browser-bar">
+        <div class="browser-dot r"></div>
+        <div class="browser-dot y"></div>
+        <div class="browser-dot g"></div>
+        <div class="browser-url">agrofield2.vercel.app/marketplace</div>
+      </div>
+      
+      <div class="mkt-header">
+        <a class="btn-accueil annotation" data-note="NOUVEAU">← Accueil</a>
+        <div class="divider"></div>
+        <div class="logo-square">🌾</div>
+        <div>
+          <div class="mkt-title">AgroField Marketplace</div>
+          <div class="mkt-subtitle">Achetez et vendez entre producteurs</div>
+        </div>
+        <div class="desktop-nav">
+          <button class="nav-btn active">Marché</button>
+          <button class="nav-btn">Acheter</button>
+          <button class="nav-btn">Mes offres</button>
+          <button class="nav-btn">Commandes</button>
+          <button class="nav-btn">Messages</button>
+          <button class="btn-publish">+ Publier</button>
+        </div>
+      </div>
+      
+      <div class="product-grid">
+        <div class="product-card">
+          <div class="product-img">🌾</div>
+          <div class="product-info">
+            <div class="product-name">Mil local — 50kg</div>
+            <div class="product-price">15 000 FCFA</div>
+            <div class="product-seller">Coop. de Tenkodogo</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img">🌽</div>
+          <div class="product-info">
+            <div class="product-name">Maïs jaune — 100kg</div>
+            <div class="product-price">28 000 FCFA</div>
+            <div class="product-seller">Ferme Ouédraogo</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img">🍚</div>
+          <div class="product-info">
+            <div class="product-name">Riz local — 25kg</div>
+            <div class="product-price">12 500 FCFA</div>
+            <div class="product-seller">Coop. de Bobo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL 2: MOBILE MARKETPLACE -->
+  <div class="panel">
+    <div class="panel-title">📱 Mobile — Marketplace avec lien Accueil</div>
+    <div class="panel-desc">Bottom nav: lien "AgroField" (accueil général) + bouton "← Accueil" dans le header</div>
+    
+    <div class="mobile-frame">
+      <div class="mobile-notch"></div>
+      
+      <div class="mobile-header">
+        <span class="mobile-back annotation" data-note="NOUVEAU">←</span>
+        <div class="mobile-logo">🌾</div>
+        <div class="mobile-title">Marketplace</div>
+      </div>
+      
+      <div class="mobile-content">
+        <div style="font-size: 10px; color: #9ca3af; margin-bottom: 6px;">Offres actives: 24 • Valeur: 2.1M FCFA</div>
+        <div class="mobile-grid">
+          <div class="m-card">
+            <div class="m-card-img">🌾</div>
+            <div class="m-card-info">
+              <div class="m-card-name">Mil — 50kg</div>
+              <div class="m-card-price">15 000 F</div>
+            </div>
+          </div>
+          <div class="m-card">
+            <div class="m-card-img">🌽</div>
+            <div class="m-card-info">
+              <div class="m-card-name">Maïs — 100kg</div>
+              <div class="m-card-price">28 000 F</div>
+            </div>
+          </div>
+          <div class="m-card">
+            <div class="m-card-img">🍚</div>
+            <div class="m-card-info">
+              <div class="m-card-name">Riz — 25kg</div>
+              <div class="m-card-price">12 500 F</div>
+            </div>
+          </div>
+          <div class="m-card">
+            <div class="m-card-img">🥜</div>
+            <div class="m-card-info">
+              <div class="m-card-name">Arachide — 30kg</div>
+              <div class="m-card-price">9 000 F</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bottom-nav-mkt">
+        <div class="bn-item home-link annotation" data-note="NOUVEAU">
+          <div class="bn-icon">🌱</div>
+          <div class="bn-label">AgroField</div>
+        </div>
+        <div class="bn-item active">
+          <div class="bn-icon">🏠</div>
+          <div class="bn-label">Marché</div>
+        </div>
+        <div class="bn-fab-wrap">
+          <div class="bn-fab">+</div>
+        </div>
+        <div class="bn-item">
+          <div class="bn-icon">🛍️</div>
+          <div class="bn-label">Acheter</div>
+        </div>
+        <div class="bn-item">
+          <div class="bn-icon">📋</div>
+          <div class="bn-label">Mes offres</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL 3: AUTHENTICATED APP -->
+  <div class="panel">
+    <div class="panel-title">📱 Mobile — App authentifiée (Dashboard)</div>
+    <div class="panel-desc">Nouvel onglet "Marché" dans la bottom nav globale (6 onglets)</div>
+    
+    <div class="mobile-frame">
+      <div class="mobile-notch"></div>
+      
+      <div class="mobile-header">
+        <div class="mobile-logo">🌾</div>
+        <div class="mobile-title">Tableau de bord</div>
+      </div>
+      
+      <div class="dash-content">
+        <div class="dash-welcome">Bonjour Kouassi 👋</div>
+        
+        <div class="dash-cards">
+          <div class="dash-card">
+            <div class="dash-card-label">Parcelles</div>
+            <div class="dash-card-value">3</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-label">Diagnostics</div>
+            <div class="dash-card-value">7</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-label">Capteurs</div>
+            <div class="dash-card-value">4</div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-label">Finances</div>
+            <div class="dash-card-value">245k F</div>
+          </div>
+        </div>
+        
+        <div class="dash-activity">📍 Activité récente</div>
+        <div class="dash-activity-item">
+          <div class="dash-activity-dot"></div>
+          <div class="dash-activity-text">Diagnostic maïs — mildiou détecté</div>
+        </div>
+        <div class="dash-activity-item">
+          <div class="dash-activity-dot"></div>
+          <div class="dash-activity-text">Capteur #3 — humidité 42%</div>
+        </div>
+        <div class="dash-activity-item">
+          <div class="dash-activity-dot"></div>
+          <div class="dash-activity-text">Revenu vente mil — 15 000 FCFA</div>
+        </div>
+      </div>
+      
+      <div class="bottom-nav-auth">
+        <div class="bna-item active">
+          <div class="bna-icon">📊</div>
+          <div class="bna-label">Accueil</div>
+        </div>
+        <div class="bna-item">
+          <div class="bna-icon">🌱</div>
+          <div class="bna-label">Parcelles</div>
+        </div>
+        <div class="bna-item">
+          <div class="bna-icon">📷</div>
+          <div class="bna-label">Diagnostic</div>
+        </div>
+        <div class="bna-item">
+          <div class="bna-icon">📡</div>
+          <div class="bna-label">Capteurs</div>
+        </div>
+        <div class="bna-item">
+          <div class="bna-icon">💰</div>
+          <div class="bna-label">Finances</div>
+        </div>
+        <div class="bna-item new annotation" data-note="NOUVEAU">
+          <div class="bna-icon">🛍️</div>
+          <div class="bna-label">Marché</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot legend-new"></div> Nouveaux éléments</div>
+  <div class="legend-item"><div class="legend-dot legend-existing"></div> Éléments existants</div>
+  <div class="legend-item"><div class="legend-dot legend-removed"></div> Routes supprimées (archivées)</div>
+</div>
+
+<div class="footer-note">
+  <strong>Routes archivées (supprimées du routing):</strong> marketplace.my-offers, marketplace.create, marketplace.orders, marketplace.messages, marketplace.$id, marketplace.$id.edit, create-offer<br>
+  <strong>Tous les liens cassés corrigés:</strong> /marketplace/create → /marketplace • /marketplace/my-offers → /marketplace
+</div>
+
+</body>
+</html>

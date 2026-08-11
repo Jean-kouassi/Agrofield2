@@ -10,9 +10,29 @@ import { useState, useRef, useCallback } from "react";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) throw redirect({ to: "/auth" });
-    return { user: data.user };
+    try {
+      const { data, error } = await supabase.auth.getUser();
+      // Retry une fois en cas d'erreur réseau
+      if (error) {
+        await new Promise((r) => setTimeout(r, 1000));
+        const retry = await supabase.auth.getUser();
+        if (retry.error || !retry.data.user) throw redirect({ to: "/auth" });
+        return { user: retry.data.user };
+      }
+      if (!data.user) throw redirect({ to: "/auth" });
+      return { user: data.user };
+    } catch (e) {
+      // Si c'est une redirect, on la propage
+      if (e instanceof Error && e.message.includes("redirect")) throw e;
+      // Si c'est une erreur réseau, on retente
+      try {
+        const retry = await supabase.auth.getUser();
+        if (retry.error || !retry.data.user) throw redirect({ to: "/auth" });
+        return { user: retry.data.user };
+      } catch {
+        throw redirect({ to: "/auth" });
+      }
+    }
   },
   component: AuthedLayout,
 });

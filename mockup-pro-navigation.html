@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgroField2 — Navigation Professionnelle (Proposition)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #f0fdf4 0%, #ecfccb 100%); color: #1a1a1a; padding: 24px; min-height: 100vh; }
+  
+  header { max-width: 1200px; margin: 0 auto 32px; text-align: center; }
+  h1 { font-size: 28px; font-weight: 800; color: #166534; margin-bottom: 8px; letter-spacing: -0.5px; }
+  .subtitle { font-size: 15px; color: #4b5563; max-width: 700px; margin: 0 auto; line-height: 1.5; }
+  
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; max-width: 1400px; margin: 0 auto; }
+  
+  .card { background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.12); }
+  
+  .card-header { padding: 20px 24px; border-bottom: 1px solid #f3f4f6; }
+  .card-title { font-size: 16px; font-weight: 700; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
+  .card-title .icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .card-title .icon.green { background: #dcfce7; }
+  .card-title .icon.blue { background: #dbeafe; }
+  .card-desc { font-size: 13px; color: #6b7280; margin-top: 6px; line-height: 1.4; }
+  
+  .preview { padding: 20px 24px; background: #fafafa; }
+  
+  /* === TOP BAR PRO === */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: white; border-bottom: 1px solid #e5e7eb; }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .logo-group { display: flex; align-items: center; gap: 12px; }
+  .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #166534, #22c55e); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 12px rgba(22,101,52,0.2); }
+  .brand { font-size: 18px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.3px; }
+  .brand span { color: #166534; }
+  
+  .nav-tabs { display: flex; gap: 4px; background: #f9fafb; padding: 4px; border-radius: 12px; }
+  .nav-tab { padding: 8px 14px; font-size: 13px; font-weight: 600; color: #6b7280; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .nav-tab:hover { background: white; color: #1a1a1a; }
+  .nav-tab.active { background: white; color: #166534; shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .btn-icon { width: 36px; height: 36px; border-radius: 10px; border: 1px solid #e5e7eb; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; position: relative; }
+  .btn-icon:hover { background: #f9fafb; border-color: #d1d5db; }
+  .badge { position: absolute; top: -2px; right: -2px; width: 18px; height: 18px; background: #ef4444; color: white; font-size: 10px; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+  .avatar { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #fbbf24, #f59e0b); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: white; cursor: pointer; }
+  
+  /* === MAIN CONTENT AREA === */
+  .main-area { padding: 24px 20px; min-height: 400px; }
+  .hero { background: linear-gradient(135deg, #166534, #22c55e); border-radius: 16px; padding: 24px; color: white; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+  .hero-text h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .hero-text p { font-size: 14px; opacity: 0.9; }
+  .hero-stats { display: flex; gap: 20px; }
+  .stat { text-align: center; }
+  .stat-value { font-size: 24px; font-weight: 800; }
+  .stat-label { font-size: 11px; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; }
+  
+  .section-title { font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+  .section-title a { font-size: 13px; color: #166534; font-weight: 600; text-decoration: none; }
+  
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .product-card { background: white; border: 1px solid #e5e7eb; border-radius: 14px; overflow: hidden; transition: all 0.2s; cursor: pointer; }
+  .product-card:hover { border-color: #166534; box-shadow: 0 8px 24px rgba(22,101,52,0.1); transform: translateY(-2px); }
+  .product-img { height: 100px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; }
+  .product-badge { position: absolute; top: 8px; left: 8px; background: rgba(255,255,255,0.95); padding: 4px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; color: #166534; text-transform: uppercase; }
+  .product-info { padding: 14px; }
+  .product-name { font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; }
+  .product-price { font-size: 18px; font-weight: 800; color: #166534; margin-bottom: 8px; }
+  .product-meta { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #9ca3af; }
+  .seller-tag { display: flex; align-items: center; gap: 4px; }
+  .verified { color: #22c55e; }
+  
+  /* === MOBILE PRO === */
+  .mobile-frame { width: 320px; height: 600px; border: 4px solid #1a1a1a; border-radius: 36px; margin: 0 auto; overflow: hidden; position: relative; background: #fafafa; }
+  .mobile-notch { width: 100px; height: 20px; background: #1a1a1a; border-radius: 0 0 16px 16px; margin: 0 auto; }
+  
+  .mobile-topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: white; border-bottom: 1px solid #e5e7eb; }
+  .menu-btn { width: 32px; height: 32px; border-radius: 8px; background: #f9fafb; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 0 8px; cursor: pointer; }
+  .menu-line { height: 2px; background: #6b7280; border-radius: 1px; }
+  .mobile-logo { width: 32px; height: 32px; background: linear-gradient(135deg, #166534, #22c55e); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .mobile-actions { display: flex; gap: 6px; }
+  .mobile-action { width: 32px; height: 32px; border-radius: 8px; background: #f9fafb; display: flex; align-items: center; justify-content: center; font-size: 16px; position: relative; }
+  .mobile-badge { position: absolute; top: -2px; right: -2px; width: 16px; height: 16px; background: #ef4444; color: white; font-size: 9px; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+  
+  .mobile-hero { background: linear-gradient(135deg, #166534, #22c55e); padding: 16px; color: white; margin: 12px; border-radius: 14px; }
+  .mobile-hero h3 { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .mobile-hero p { font-size: 12px; opacity: 0.9; margin-bottom: 10px; }
+  .mobile-hero-search { background: white; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+  .mobile-hero-search input { border: none; outline: none; flex: 1; font-size: 13px; }
+  
+  .mobile-section { padding: 0 12px 12px; }
+  .mobile-section-title { font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .mobile-section-title a { font-size: 12px; color: #166534; font-weight: 600; text-decoration: none; }
+  
+  .mobile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .m-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
+  .m-card-img { height: 70px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); display: flex; align-items: center; justify-content: center; font-size: 28px; position: relative; }
+  .m-card-badge { position: absolute; top: 6px; left: 6px; background: rgba(255,255,255,0.95); padding: 3px 6px; border-radius: 12px; font-size: 8px; font-weight: 700; color: #166534; text-transform: uppercase; }
+  .m-card-info { padding: 10px; }
+  .m-card-name { font-size: 12px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .m-card-price { font-size: 14px; font-weight: 800; color: #166534; }
+  .m-card-seller { font-size: 10px; color: #9ca3af; margin-top: 4px; display: flex; align-items: center; gap: 3px; }
+  
+  .mobile-bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; padding: 8px 8px 12px; display: flex; justify-content: space-around; }
+  .mb-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 8px; border-radius: 12px; cursor: pointer; transition: all 0.2s; position: relative; }
+  .mb-item.active { background: #f0fdf4; }
+  .mb-icon { font-size: 20px; }
+  .mb-label { font-size: 10px; font-weight: 600; color: #6b7280; }
+  .mb-item.active .mb-icon, .mb-item.active .mb-label { color: #166534; }
+  .mb-fab { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); width: 52px; height: 52px; background: linear-gradient(135deg, #166534, #22c55e); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; box-shadow: 0 6px 20px rgba(22,101,52,0.4); border: 3px solid white; }
+  
+  /* === BOTTOM NAV AUTH PRO === */
+  .bottom-nav-auth-pro { position: absolute; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; padding: 8px 4px 12px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 2px; }
+  .ba-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 2px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+  .ba-item.active { background: #f0fdf4; }
+  .ba-icon { font-size: 18px; }
+  .ba-label { font-size: 9px; font-weight: 600; color: #6b7280; }
+  .ba-item.active .ba-icon, .ba-item.active .ba-label { color: #166534; }
+  .ba-item.new .ba-icon { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+  
+  /* === DASHBOARD PRO === */
+  .dash-pro-content { padding: 16px 12px; height: 460px; overflow: hidden; }
+  .dash-pro-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .dash-pro-welcome h4 { font-size: 16px; font-weight: 800; color: #1a1a1a; }
+  .dash-pro-welcome p { font-size: 12px; color: #6b7280; }
+  .dash-pro-notif { width: 36px; height: 36px; border-radius: 10px; background: #f9fafb; display: flex; align-items: center; justify-content: center; font-size: 18px; position: relative; cursor: pointer; }
+  
+  .dash-pro-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .dash-pro-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; }
+  .dash-pro-card-label { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .dash-pro-card-value { font-size: 20px; font-weight: 800; color: #166534; }
+  .dash-pro-card-trend { font-size: 10px; margin-top: 4px; display: flex; align-items: center; gap: 3px; }
+  .trend-up { color: #22c55e; }
+  .trend-down { color: #ef4444; }
+  
+  .dash-pro-section { font-size: 13px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; }
+  .dash-pro-activity { display: flex; flex-direction: column; gap: 8px; }
+  .dash-pro-activity-item { display: flex; align-items: center; gap: 10px; padding: 8px; background: #f9fafb; border-radius: 10px; }
+  .activity-icon { width: 32px; height: 32px; border-radius: 8px; background: white; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .activity-content { flex: 1; }
+  .activity-text { font-size: 11px; font-weight: 600; color: #1a1a1a; }
+  .activity-time { font-size: 9px; color: #9ca3af; }
+  
+  /* === COMPARISON TABLE === */
+  .comparison { max-width: 1000px; margin: 40px auto 0; background: white; border-radius: 20px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
+  .comparison h3 { font-size: 18px; font-weight: 800; color: #1a1a1a; margin-bottom: 20px; text-align: center; }
+  .comp-table { width: 100%; border-collapse: collapse; }
+  .comp-table th { text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e5e7eb; }
+  .comp-table td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid #f3f4f6; }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .comp-bad { color: #ef4444; }
+  .comp-good { color: #22c55e; font-weight: 600; }
+  .comp-best { color: #166534; font-weight: 700; }
+  
+  .footer-note { text-align: center; margin-top: 32px; font-size: 13px; color: #6b7280; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+  .footer-note strong { color: #166534; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌾 AgroField2 — Navigation Professionnelle</h1>
+  <p class="subtitle">Approche ergonomique inspirée des meilleures apps 2026 : navigation claire, hiérarchie visuelle forte, accès rapide aux actions principales</p>
+</header>
+
+<div class="grid">
+
+  <!-- CARD 1: DESKTOP PRO -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="icon green">🖥️</span>
+        Desktop — Top Bar Unifiée
+      </div>
+      <div class="card-desc">Navigation intégrée dans une top bar professionnelle avec logo, tabs, et actions utilisateur</div>
+    </div>
+    <div class="preview">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="logo-group">
+            <div class="logo">🌾</div>
+            <div class="brand">Agro<span>Field</span></div>
+          </div>
+          <div class="nav-tabs">
+            <div class="nav-tab">Tableau de bord</div>
+            <div class="nav-tab active">Marketplace</div>
+            <div class="nav-tab">Parcelles</div>
+            <div class="nav-tab">Diagnostic</div>
+            <div class="nav-tab">Capteurs</div>
+            <div class="nav-tab">Finances</div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="btn-icon">🔔<span class="badge">3</span></div>
+          <div class="btn-icon">💬</div>
+          <div class="avatar">JK</div>
+        </div>
+      </div>
+      
+      <div class="main-area">
+        <div class="hero">
+          <div class="hero-text">
+            <h2>Marketplace Agricole</h2>
+            <p>Achetez et vendez vos produits directement entre producteurs</p>
+          </div>
+          <div class="hero-stats">
+            <div class="stat">
+              <div class="stat-value">24</div>
+              <div class="stat-label">Offres actives</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">2.1M</div>
+              <div class="stat-label">Valeur FCFA</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">18</div>
+              <div class="stat-label">Vendeurs</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="section-title">
+          <span>🔥 Offres récentes</span>
+          <a href="#">Voir tout →</a>
+        </div>
+        
+        <div class="product-grid">
+          <div class="product-card">
+            <div class="product-img">🌾<span class="product-badge">Dispo</span></div>
+            <div class="product-info">
+              <div class="product-name">Mil local — 50kg</div>
+              <div class="product-price">15 000 FCFA</div>
+              <div class="product-meta">
+                <span class="seller-tag">✅ Coop. Tenkodogo</span>
+                <span>Il y a 2h</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-img">🌽<span class="product-badge">Dispo</span></div>
+            <div class="product-info">
+              <div class="product-name">Maïs jaune — 100kg</div>
+              <div class="product-price">28 000 FCFA</div>
+              <div class="product-meta">
+                <span class="seller-tag">✅ Ferme Ouédraogo</span>
+                <span>Il y a 4h</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-img">🍚<span class="product-badge">-10%</span></div>
+            <div class="product-info">
+              <div class="product-name">Riz local — 25kg</div>
+              <div class="product-price">12 500 FCFA</div>
+              <div class="product-meta">
+                <span class="seller-tag">✅ Coop. Bobo</span>
+                <span>Hier</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2: MOBILE MARKETPLACE PRO -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="icon blue">📱</span>
+        Mobile — Marketplace Ergonomique
+      </div>
+      <div class="card-desc">Menu hamburger + recherche prominante + FAB flottant pour publier</div>
+    </div>
+    <div class="preview">
+      <div class="mobile-frame">
+        <div class="mobile-notch"></div>
+        
+        <div class="mobile-topbar">
+          <div class="menu-btn">
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+          </div>
+          <div class="mobile-logo">🌾</div>
+          <div class="mobile-actions">
+            <div class="mobile-action">🔔<span class="mobile-badge">3</span></div>
+            <div class="mobile-action">💬</div>
+          </div>
+        </div>
+        
+        <div class="mobile-hero">
+          <h3>Marketplace</h3>
+          <p>Trouvez des produits agricoles près de chez vous</p>
+          <div class="mobile-hero-search">
+            <span>🔍</span>
+            <input placeholder="Rechercher un produit..." />
+          </div>
+        </div>
+        
+        <div class="mobile-section">
+          <div class="mobile-section-title">
+            <span>🔥 Tendances</span>
+            <a href="#">Voir tout</a>
+          </div>
+          <div class="mobile-grid">
+            <div class="m-card">
+              <div class="m-card-img">🌾<span class="m-card-badge">Dispo</span></div>
+              <div class="m-card-info">
+                <div class="m-card-name">Mil local — 50kg</div>
+                <div class="m-card-price">15 000 F</div>
+                <div class="m-card-seller">✅ Tenkodogo</div>
+              </div>
+            </div>
+            <div class="m-card">
+              <div class="m-card-img">🌽<span class="m-card-badge">Dispo</span></div>
+              <div class="m-card-info">
+                <div class="m-card-name">Maïs — 100kg</div>
+                <div class="m-card-price">28 000 F</div>
+                <div class="m-card-seller">✅ Ouaga</div>
+              </div>
+            </div>
+            <div class="m-card">
+              <div class="m-card-img">🍚<span class="m-card-badge">-10%</span></div>
+              <div class="m-card-info">
+                <div class="m-card-name">Riz — 25kg</div>
+                <div class="m-card-price">12 500 F</div>
+                <div class="m-card-seller">✅ Bobo</div>
+              </div>
+            </div>
+            <div class="m-card">
+              <div class="m-card-img">🥜<span class="m-card-badge">Nouveau</span></div>
+              <div class="m-card-info">
+                <div class="m-card-name">Arachide — 30kg</div>
+                <div class="m-card-price">9 000 F</div>
+                <div class="m-card-seller">✅ Koudougou</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mobile-bottom-nav">
+          <div class="mb-item">
+            <div class="mb-icon">🏠</div>
+            <div class="mb-label">Accueil</div>
+          </div>
+          <div class="mb-item active">
+            <div class="mb-icon">🛒</div>
+            <div class="mb-label">Marché</div>
+          </div>
+          <div class="mb-fab">+</div>
+          <div class="mb-item">
+            <div class="mb-icon">📦</div>
+            <div class="mb-label">Commandes</div>
+          </div>
+          <div class="mb-item">
+            <div class="mb-icon">👤</div>
+            <div class="mb-label">Profil</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 3: MOBILE DASHBOARD PRO -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <span class="icon green">📊</span>
+        Mobile — Dashboard Authentifié
+      </div>
+      <div class="card-desc">Bottom nav à 6 onglets avec "Marché" intégré naturellement</div>
+    </div>
+    <div class="preview">
+      <div class="mobile-frame">
+        <div class="mobile-notch"></div>
+        
+        <div class="mobile-topbar">
+          <div class="menu-btn">
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+            <div class="menu-line"></div>
+          </div>
+          <div class="mobile-logo">🌾</div>
+          <div class="mobile-actions">
+            <div class="mobile-action">🔔<span class="mobile-badge">2</span></div>
+          </div>
+        </div>
+        
+        <div class="dash-pro-content">
+          <div class="dash-pro-header">
+            <div class="dash-pro-welcome">
+              <h4>Bonjour Kouassi 👋</h4>
+              <p>Voici ce qui se passe aujourd'hui</p>
+            </div>
+            <div class="dash-pro-notif">🔔</div>
+          </div>
+          
+          <div class="dash-pro-cards">
+            <div class="dash-pro-card">
+              <div class="dash-pro-card-label">Parcelles</div>
+              <div class="dash-pro-card-value">3</div>
+              <div class="dash-pro-card-trend trend-up">↑ 1 cette semaine</div>
+            </div>
+            <div class="dash-pro-card">
+              <div class="dash-pro-card-label">Revenus</div>
+              <div class="dash-pro-card-value">245k F</div>
+              <div class="dash-pro-card-trend trend-up">↑ +12% vs mois dernier</div>
+            </div>
+            <div class="dash-pro-card">
+              <div class="dash-pro-card-label">Diagnostics</div>
+              <div class="dash-pro-card-value">7</div>
+              <div class="dash-pro-card-trend trend-down">↓ 2 en attente</div>
+            </div>
+            <div class="dash-pro-card">
+              <div class="dash-pro-card-label">Capteurs actifs</div>
+              <div class="dash-pro-card-value">4/5</div>
+              <div class="dash-pro-card-trend">● En ligne</div>
+            </div>
+          </div>
+          
+          <div class="dash-pro-section">Activité récente</div>
+          <div class="dash-pro-activity">
+            <div class="dash-pro-activity-item">
+              <div class="activity-icon">📷</div>
+              <div class="activity-content">
+                <div class="activity-text">Diagnostic maïs — mildiou détecté</div>
+                <div class="activity-time">Il y a 2h</div>
+              </div>
+            </div>
+            <div class="dash-pro-activity-item">
+              <div class="activity-icon">📡</div>
+              <div class="activity-content">
+                <div class="activity-text">Capteur #3 — humidité 42%</div>
+                <div class="activity-time">Il y a 4h</div>
+              </div>
+            </div>
+            <div class="dash-pro-activity-item">
+              <div class="activity-icon">💰</div>
+              <div class="activity-content">
+                <div class="activity-text">Vente mil — 15 000 FCFA reçu</div>
+                <div class="activity-time">Hier</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bottom-nav-auth-pro">
+          <div class="ba-item">
+            <div class="ba-icon">📊</div>
+            <div class="ba-label">Accueil</div>
+          </div>
+          <div class="ba-item">
+            <div class="ba-icon">🌱</div>
+            <div class="ba-label">Parcelles</div>
+          </div>
+          <div class="ba-item">
+            <div class="ba-icon">📷</div>
+            <div class="ba-label">Diagnostic</div>
+          </div>
+          <div class="ba-item">
+            <div class="ba-icon">📡</div>
+            <div class="ba-label">Capteurs</div>
+          </div>
+          <div class="ba-item">
+            <div class="ba-icon">💰</div>
+            <div class="ba-label">Finances</div>
+          </div>
+          <div class="ba-item new">
+            <div class="ba-icon">🛒</div>
+            <div class="ba-label">Marché</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- COMPARISON TABLE -->
+<div class="comparison">
+  <h3>📊 Comparaison : Approche Actuelle vs Proposition Pro</h3>
+  <table class="comp-table">
+    <thead>
+      <tr>
+        <th>Critère</th>
+        <th>Actuel (avant)</th>
+        <th>Proposition 1 (simple)</th>
+        <th>Proposition Pro (nouvelle)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Navigation desktop</strong></td>
+        <td class="comp-bad">Header marketplace isolé, pas de lien vers app</td>
+        <td class="comp-good">Bouton "← Accueil" ajouté</td>
+        <td class="comp-best">Top bar unifiée avec tabs globales</td>
+      </tr>
+      <tr>
+        <td><strong>Navigation mobile</strong></td>
+        <td class="comp-bad">Bottom nav différente selon les pages</td>
+        <td class="comp-good">Lien "AgroField" dans marketplace</td>
+        <td class="comp-best">Menu hamburger + bottom nav cohérente</td>
+      </tr>
+      <tr>
+        <td><strong>Hiérarchie visuelle</strong></td>
+        <td class="comp-bad">Éléments éparpillés, pas de focal point</td>
+        <td class="comp-good">Meilleure organisation</td>
+        <td class="comp-best">Hero section + cards + FAB clair</td>
+      </tr>
+      <tr>
+        <td><strong>Accès rapide actions</strong></td>
+        <td class="comp-bad">Publier caché dans la nav</td>
+        <td class="comp-good">FAB visible</td>
+        <td class="comp-best">FAB flottant + search prominant</td>
+      </tr>
+      <tr>
+        <td><strong>Cohérence design</strong></td>
+        <td class="comp-bad">2 systèmes de couleurs différents</td>
+        <td class="comp-good">Harmonisation partielle</td>
+        <td class="comp-best">Design system unifié (tokens shadcn)</td>
+      </tr>
+      <tr>
+        <td><strong>Feedback utilisateur</strong></td>
+        <td class="comp-bad">Pas d'indications de fraîcheur</td>
+        <td class="comp-good">Quelques badges</td>
+        <td class="comp-best">Badges + timestamps + verified sellers</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="footer-note">
+  <strong>Cette approche professionnelle inclut :</strong><br/>
+  • Top bar unifiée sur desktop avec navigation globale<br/>
+  • Menu hamburger sur mobile pour accéder à toutes les sections<br/>
+  • Bottom nav simplifiée (5 items max) + FAB pour action principale<br/>
+  • Hero section avec stats clés et search bar prominante<br/>
+  • Badges de statut, timestamps, et indicateurs de confiance<br/>
+  • Design cohérent avec le reste de l'app (tokens shadcn)<br/><br/>
+  <strong>Prochaine étape :</strong> Dis-moi quelle approche tu préfères et je l'implémente complètement !
+</div>
+
+</body>
+</html>

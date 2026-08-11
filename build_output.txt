@@ -1,0 +1,342 @@
+
+> build
+> vite build
+
+[36mvite v8.1.4 [32mbuilding client environment for production...[36m[39m
+[2Ktransforming...✓ 2884 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/registerSW.js                                  0.13 kB
+dist/manifest.webmanifest                           0.55 kB
+dist/assets/styles-BIN73MbS.css                   110.95 kB │ gzip:  18.24 kB
+dist/assets/root-DLTE-HSj.js                        0.03 kB │ gzip:   0.05 kB
+dist/assets/invariant-DEEwAagU.js                   0.06 kB │ gzip:   0.08 kB
+dist/assets/check-BQCP_yXn.js                       0.12 kB │ gzip:   0.14 kB
+dist/assets/plus-B_Sgta5L.js                        0.15 kB │ gzip:   0.15 kB
+dist/assets/x-Dt1M4OHV.js                           0.15 kB │ gzip:   0.15 kB
+dist/assets/arrow-up-PDhH_BPw.js                    0.16 kB │ gzip:   0.16 kB
+dist/assets/arrow-left-CD3Lt6-y.js                  0.16 kB │ gzip:   0.16 kB
+dist/assets/arrow-right-DB7mG5OX.js                 0.16 kB │ gzip:   0.16 kB
+dist/assets/clock-CNEvQSrP.js                       0.16 kB │ gzip:   0.16 kB
+dist/assets/search-DJwUescJ.js                      0.17 kB │ gzip:   0.17 kB
+dist/assets/trending-up-DE8N4ly2.js                 0.17 kB │ gzip:   0.17 kB
+dist/assets/circle-check-DoRC020M.js                0.17 kB │ gzip:   0.16 kB
+dist/assets/trending-down-s_aQLXKL.js               0.17 kB │ gzip:   0.17 kB
+dist/assets/matchContext-Cw7aJGQn.js                0.18 kB │ gzip:   0.14 kB
+dist/assets/circle-check-big-BqmTJfUW.js            0.19 kB │ gzip:   0.18 kB
+dist/assets/useRouter-Cz7DIE8l.js                   0.19 kB │ gzip:   0.15 kB
+dist/assets/user-Dgpa-nZA.js                        0.19 kB │ gzip:   0.18 kB
+dist/assets/smartphone-BaMrAFgy.js                  0.19 kB │ gzip:   0.18 kB
+dist/assets/lock-9YYMHThy.js                        0.20 kB │ gzip:   0.19 kB
+dist/assets/circle-x-BUspvfJi.js                    0.20 kB │ gzip:   0.17 kB
+dist/assets/skeleton-CUeLDq6L.js                    0.22 kB │ gzip:   0.19 kB
+dist/assets/upload-D2ruu8Ni.js                      0.23 kB │ gzip:   0.19 kB
+dist/assets/download-J5SakCJ7.js                    0.23 kB │ gzip:   0.19 kB
+dist/assets/eye-C0Zrz1IR.js                         0.25 kB │ gzip:   0.20 kB
+dist/assets/calendar-InQ4SET3.js                    0.25 kB │ gzip:   0.20 kB
+dist/assets/map-pin-dkTkZOFd.js                     0.25 kB │ gzip:   0.22 kB
+dist/assets/leaf-CIa2ySV9.js                        0.26 kB │ gzip:   0.22 kB
+dist/assets/triangle-alert-DQTm1rce.js              0.26 kB │ gzip:   0.21 kB
+dist/assets/typeof-B5XbjTb1.js                      0.27 kB │ gzip:   0.16 kB
+dist/assets/shield-CZmdUVZy.js                      0.27 kB │ gzip:   0.22 kB
+dist/assets/award-DUucbDlI.js                       0.27 kB │ gzip:   0.22 kB
+dist/assets/wallet-B5_1szHN.js                      0.28 kB │ gzip:   0.20 kB
+dist/assets/shopping-cart-DptM5ifS.js               0.29 kB │ gzip:   0.23 kB
+dist/assets/users-ozLcZINg.js                       0.30 kB │ gzip:   0.22 kB
+dist/assets/sprout-6FCPG25A.js                      0.30 kB │ gzip:   0.22 kB
+dist/assets/shield-check-BjjlYLIw.js                0.32 kB │ gzip:   0.25 kB
+dist/assets/trash-2-CAFDB18h.js                     0.32 kB │ gzip:   0.21 kB
+dist/assets/camera-poV8K1TA.js                      0.33 kB │ gzip:   0.25 kB
+dist/assets/shopping-bag-DXbV6mbR.js                0.34 kB │ gzip:   0.24 kB
+dist/assets/clsx-CjueKrWZ.js                        0.36 kB │ gzip:   0.23 kB
+dist/assets/package-DQugx3T7.js                     0.37 kB │ gzip:   0.25 kB
+dist/assets/droplets-ytb5InZC.js                    0.37 kB │ gzip:   0.28 kB
+dist/assets/radio-BxXghc4J.js                       0.37 kB │ gzip:   0.25 kB
+dist/assets/wifi-PxLSJ-52.js                        0.41 kB │ gzip:   0.27 kB
+dist/assets/qss-Bqk2G4CH.js                         0.44 kB │ gzip:   0.29 kB
+dist/assets/send-2S-sn17k.js                        0.47 kB │ gzip:   0.31 kB
+dist/assets/redirect-Dhm19zUi.js                    0.50 kB │ gzip:   0.31 kB
+dist/assets/textarea-D3r5FQ5R.js                    0.56 kB │ gzip:   0.37 kB
+dist/assets/share-2-D1wp75q2.js                     0.62 kB │ gzip:   0.36 kB
+dist/assets/input-BjcKLwlw.js                       0.66 kB │ gzip:   0.40 kB
+dist/assets/rolldown-runtime-QTnfLwEv.js            0.69 kB │ gzip:   0.42 kB
+dist/assets/badge-gISINJu7.js                       0.84 kB │ gzip:   0.44 kB
+dist/assets/wheat-jJaG2SoM.js                       0.88 kB │ gzip:   0.33 kB
+dist/assets/agrofield-CETGWQAP.js                   0.98 kB │ gzip:   0.61 kB
+dist/assets/spray-can-B_RqDNkn.js                   1.06 kB │ gzip:   0.51 kB
+dist/assets/card-rE37-Rjt.js                        1.10 kB │ gzip:   0.42 kB
+dist/assets/label-DZKT0nQA.js                       1.14 kB │ gzip:   0.67 kB
+dist/assets/createLucideIcon-BY6wzLgb.js            1.23 kB │ gzip:   0.71 kB
+dist/assets/terms-BKczZIVM.js                       2.13 kB │ gzip:   0.94 kB
+dist/assets/privacy-DY_6-ByW.js                     2.55 kB │ gzip:   1.07 kB
+dist/assets/profile-CEClJFkB.js                     2.77 kB │ gzip:   1.11 kB
+dist/assets/auth.callback-CP19geen.js               2.93 kB │ gzip:   1.08 kB
+dist/assets/pwa-install-prompt-CwEajwEu.js          3.27 kB │ gzip:   1.35 kB
+dist/assets/react-dom-CGMXk-vi.js                   3.59 kB │ gzip:   1.36 kB
+dist/assets/button-BqrA0ioE.js                      4.20 kB │ gzip:   1.88 kB
+dist/assets/useStore-8wMuFe36.js                    5.45 kB │ gzip:   2.31 kB
+dist/assets/route-j6AnKHgv.js                       5.77 kB │ gzip:   2.26 kB
+dist/assets/dist-CzGtIW8E.js                        6.11 kB │ gzip:   2.47 kB
+dist/assets/dialog-GWa572hk.js                      6.31 kB │ gzip:   2.28 kB
+dist/assets/marketplace.my-offers-3yW10hjz.js       6.97 kB │ gzip:   2.37 kB
+dist/assets/marketplace.orders-DGgZ7Ll9.js          7.00 kB │ gzip:   2.28 kB
+dist/assets/tabs-Cr8Siigr.js                        7.06 kB │ gzip:   2.77 kB
+dist/assets/parcels-DrPMUiZ-.js                     7.61 kB │ gzip:   2.77 kB
+dist/assets/jsx-runtime-CIxEorsV.js                 7.89 kB │ gzip:   2.98 kB
+dist/assets/auth-D1s2ISDA.js                        8.24 kB │ gzip:   2.93 kB
+dist/assets/marketplace._id-JlB_IzkB.js             8.50 kB │ gzip:   2.90 kB
+dist/assets/marketplace._id.edit-BOOe3_iv.js        8.54 kB │ gzip:   2.97 kB
+dist/assets/marketplace.messages-DeLfp2up.js        8.74 kB │ gzip:   2.92 kB
+dist/assets/useQuery-DJuAhQKy.js                    8.82 kB │ gzip:   3.22 kB
+dist/assets/marketplace.create-JbNB0wh9.js          9.17 kB │ gzip:   3.21 kB
+dist/assets/finances.add-QiWRih5T.js                9.19 kB │ gzip:   3.38 kB
+dist/assets/admin-DRzmK9DU.js                      10.17 kB │ gzip:   3.32 kB
+dist/assets/crop-events-BeHt6ysE.js                10.51 kB │ gzip:   3.21 kB
+dist/assets/diagnose-CSVwSt-t.js                   10.67 kB │ gzip:   4.23 kB
+dist/assets/create-offer-Disy5kOQ.js               10.69 kB │ gzip:   3.39 kB
+dist/assets/dashboard-BH3S3gf2.js                  14.51 kB │ gzip:   4.68 kB
+dist/assets/link-D-ew8Jba.js                       18.04 kB │ gzip:   6.74 kB
+dist/assets/finances.credit-i2wn-lWJ.js            19.13 kB │ gzip:   6.30 kB
+dist/assets/purify.es-DuRL7t6i.js                  26.87 kB │ gzip:  10.45 kB
+dist/assets/utils-B9URw_CD.js                      26.93 kB │ gzip:   8.59 kB
+dist/assets/routes-BvX1itAR.js                     28.04 kB │ gzip:   7.02 kB
+dist/assets/sensors-CchD6S3s.js                    44.41 kB │ gzip:  13.24 kB
+dist/assets/select-_t73Ww5V.js                     70.22 kB │ gzip:  24.22 kB
+dist/assets/marketplace-TnXK0_gZ.js               109.10 kB │ gzip:  30.82 kB
+dist/assets/index.es-BVI-yroT.js                  151.36 kB │ gzip:  48.90 kB
+dist/assets/html2canvas-BswC5BpG.js               199.56 kB │ gzip:  46.78 kB
+dist/assets/generateCategoricalChart-DPXqYIzF.js  361.50 kB │ gzip:  96.38 kB
+dist/assets/finance-oqDV0i1h.js                   456.47 kB │ gzip: 146.78 kB
+dist/assets/index-BdQJFj4Q.js                     562.68 kB │ gzip: 162.30 kB
+
+[32m✓ built in 7.72s[39m
+
+PWA v1.3.0
+mode      generateSW
+precache  105 entries (2350.25 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-f641ca17.js
+[36mvite v8.1.4 [32mbuilding ssr environment for production...[36m[39m
+[2Ktransforming...✓ 158 modules transformed.
+rendering chunks...
+computing gzip size...
+node_modules/.nitro/vite/services/ssr/registerSW.js                                               0.13 kB
+node_modules/.nitro/vite/services/ssr/manifest.webmanifest                                        0.55 kB
+node_modules/.nitro/vite/services/ssr/assets/styles-BIN73MbS.css                                110.95 kB │ gzip: 18.24 kB
+node_modules/.nitro/vite/services/ssr/assets/utils-C_uf36nf.js                                    0.18 kB │ gzip:  0.15 kB
+node_modules/.nitro/vite/services/ssr/assets/empty-plugin-adapters-D9UWiqvJ.js                    0.22 kB │ gzip:  0.16 kB
+node_modules/.nitro/vite/services/ssr/assets/skeleton-D9W9wFsj.js                                 0.33 kB │ gzip:  0.25 kB
+node_modules/.nitro/vite/services/ssr/assets/marketplace._id.edit-sanOfqTs.js                     0.38 kB │ gzip:  0.24 kB
+node_modules/.nitro/vite/services/ssr/assets/label-BPuF5-mq.js                                    0.64 kB │ gzip:  0.39 kB
+node_modules/.nitro/vite/services/ssr/assets/textarea-0bCmB9Nt.js                                 0.67 kB │ gzip:  0.42 kB
+node_modules/.nitro/vite/services/ssr/assets/input-C1GysFII.js                                    0.76 kB │ gzip:  0.46 kB
+node_modules/.nitro/vite/services/ssr/assets/__23tanstack-start-server-fn-resolver-BYZug0FS.js    0.79 kB │ gzip:  0.43 kB
+node_modules/.nitro/vite/services/ssr/assets/createMiddleware-B_4t7rW1.js                         0.83 kB │ gzip:  0.32 kB
+node_modules/.nitro/vite/services/ssr/assets/profile-BIoJnc2p.js                                  0.86 kB │ gzip:  0.42 kB
+node_modules/.nitro/vite/services/ssr/assets/sensors-BBPRndJJ.js                                  0.87 kB │ gzip:  0.42 kB
+node_modules/.nitro/vite/services/ssr/assets/parcels-C8-GgoAg.js                                  0.87 kB │ gzip:  0.43 kB
+node_modules/.nitro/vite/services/ssr/assets/dashboard-B4O7pbrt.js                                0.92 kB │ gzip:  0.44 kB
+node_modules/.nitro/vite/services/ssr/assets/finance-BSYXB9C6.js                                  0.93 kB │ gzip:  0.45 kB
+node_modules/.nitro/vite/services/ssr/assets/badge-D1Dupn2y.js                                    0.98 kB │ gzip:  0.50 kB
+node_modules/.nitro/vite/services/ssr/assets/client-NU9HZIUG.js                                   1.56 kB │ gzip:  0.85 kB
+node_modules/.nitro/vite/services/ssr/assets/agrofield-CWap2dgu.js                                1.58 kB │ gzip:  0.81 kB
+node_modules/.nitro/vite/services/ssr/assets/card-CkAivaVl.js                                     1.59 kB │ gzip:  0.49 kB
+node_modules/.nitro/vite/services/ssr/assets/tabs-BgKcOzjx.js                                     1.64 kB │ gzip:  0.60 kB
+node_modules/.nitro/vite/services/ssr/assets/button-C-0vf-pZ.js                                   1.67 kB │ gzip:  0.79 kB
+node_modules/.nitro/vite/services/ssr/assets/client.server-pv5dszoL.js                            1.71 kB │ gzip:  0.77 kB
+node_modules/.nitro/vite/services/ssr/assets/ai-provider.server-C4LNzWDN.js                       1.80 kB │ gzip:  0.93 kB
+node_modules/.nitro/vite/services/ssr/assets/start-g2FV1bLS.js                                    1.86 kB │ gzip:  0.83 kB
+node_modules/.nitro/vite/services/ssr/assets/auth-middleware-D_hiGrJN.js                          2.65 kB │ gzip:  1.08 kB
+node_modules/.nitro/vite/services/ssr/assets/terms-9rPsHFS7.js                                    2.79 kB │ gzip:  1.08 kB
+node_modules/.nitro/vite/services/ssr/assets/dialog-Y9HmOov6.js                                   3.12 kB │ gzip:  1.00 kB
+node_modules/.nitro/vite/services/ssr/index.js                                                    3.41 kB │ gzip:  1.46 kB
+node_modules/.nitro/vite/services/ssr/assets/privacy-CVvV_HWS.js                                  3.43 kB │ gzip:  1.21 kB
+node_modules/.nitro/vite/services/ssr/assets/analyze-plant.functions-DV_tkKuT.js                  3.53 kB │ gzip:  1.73 kB
+node_modules/.nitro/vite/services/ssr/assets/pwa-install-prompt-C3IAcIFn.js                       3.95 kB │ gzip:  1.32 kB
+node_modules/.nitro/vite/services/ssr/assets/auth.callback-DbiZkN6W.js                            4.43 kB │ gzip:  1.31 kB
+node_modules/.nitro/vite/services/ssr/assets/profile-V3Kbka9k2.js                                 4.45 kB │ gzip:  1.43 kB
+node_modules/.nitro/vite/services/ssr/assets/select-D6HJco7o.js                                   4.69 kB │ gzip:  1.34 kB
+node_modules/.nitro/vite/services/ssr/assets/route-1emIhXqR.js                                    8.55 kB │ gzip:  2.69 kB
+node_modules/.nitro/vite/services/ssr/assets/diagnose-HahQMnbx.js                                10.03 kB │ gzip:  3.35 kB
+node_modules/.nitro/vite/services/ssr/assets/marketplace.my-offers-Ck33Y4AV.js                   10.24 kB │ gzip:  2.61 kB
+node_modules/.nitro/vite/services/ssr/assets/marketplace.orders-ME40pVAQ.js                      11.08 kB │ gzip:  2.70 kB
+node_modules/.nitro/vite/services/ssr/assets/parcels-Bm180q6X.js                                 12.11 kB │ gzip:  3.54 kB
+node_modules/.nitro/vite/services/ssr/assets/createServerFn-BFFE07zL.js                          12.14 kB │ gzip:  3.54 kB
+node_modules/.nitro/vite/services/ssr/assets/auth-DJtKY7rj.js                                    12.92 kB │ gzip:  3.22 kB
+node_modules/.nitro/vite/services/ssr/assets/marketplace._id-B3nqZji8.js                         13.13 kB │ gzip:  3.54 kB
+node_modules/.nitro/vite/services/ssr/assets/finances.add-Ck4zPdEh.js                            13.68 kB │ gzip:  3.88 kB
+node_modules/.nitro/vite/services/ssr/assets/marketplace._id.edit-BWjIhnzi.js                    14.17 kB │ gzip:  3.73 kB
+node_modules/.nitro/vite/services/ssr/assets/admin-BNGgrqiO.js                                   14.25 kB │ gzip:  3.99 kB
+node_modules/.nitro/vite/services/ssr/assets/marketplace.messages-DiOPYP8f.js                    14.31 kB │ gzip:  3.91 kB
+node_modules/.nitro/vite/services/ssr/assets/marketplace.create-B_fqhtSN.js                      14.72 kB │ gzip:  3.90 kB
+node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-doinhmbf.js              14.73 kB │ gzip:  2.30 kB
+node_modules/.nitro/vite/services/ssr/assets/create-offer-B6YhYUPy.js                            16.62 kB │ gzip:  4.12 kB
+node_modules/.nitro/vite/services/ssr/assets/crop-events-BwkLpjmu.js                             16.63 kB │ gzip:  3.91 kB
+node_modules/.nitro/vite/services/ssr/assets/dashboard-CWsTkj7H.js                               21.38 kB │ gzip:  5.66 kB
+node_modules/.nitro/vite/services/ssr/assets/router-BXXGEpmf.js                                  26.75 kB │ gzip:  6.24 kB
+node_modules/.nitro/vite/services/ssr/assets/finances.credit-CwjtVnJm.js                         28.79 kB │ gzip:  7.22 kB
+node_modules/.nitro/vite/services/ssr/assets/routes-DUpkuzWD.js                                  40.48 kB │ gzip:  8.02 kB
+node_modules/.nitro/vite/services/ssr/assets/finance-D8VeB_oL.js                                 42.64 kB │ gzip:  9.94 kB
+node_modules/.nitro/vite/services/ssr/assets/sensors-BMjS-X1i.js                                 42.85 kB │ gzip:  8.90 kB
+node_modules/.nitro/vite/services/ssr/assets/server-DRJ1lQdO.js                                  53.24 kB │ gzip: 13.71 kB
+node_modules/.nitro/vite/services/ssr/assets/marketplace-Cb5rh7Vq.js                             92.50 kB │ gzip: 19.47 kB
+
+[32m✓ built in 4.07s[39m
+
+PWA v1.3.0
+mode      generateSW
+precache  105 entries (2350.25 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-f641ca17.js
+
+[90m[[90mnitro[90m][39m [35mo[39m Building [[35mNitro[39m] [2m(preset: [36mcloudflare-pages[39m, compatibility: [36m2026-08-11[39m)[22m
+[90m[[90mnitro[90m][39m [32m√[39m Generated public [36mdist[39m
+[36mvite v8.1.4 [32mbuilding nitro environment for production...[36m[39m
+[2Ktransforming...✓ 2883 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/_worker.js/registerSW.js                                         0.13 kB
+dist/_worker.js/manifest.webmanifest                                  0.55 kB
+dist/_worker.js/_libs/radix-ui__number.mjs                            0.17 kB │ gzip:   0.15 kB
+dist/_worker.js/_ssr/empty-plugin-adapters-D9UWiqvJ.mjs               0.23 kB │ gzip:   0.16 kB
+dist/_worker.js/_ssr/utils-C_uf36nf.mjs                               0.29 kB │ gzip:   0.21 kB
+dist/_worker.js/_libs/radix-ui__primitive.mjs                         0.43 kB │ gzip:   0.24 kB
+dist/_worker.js/_ssr/marketplace._id.edit-sanOfqTs.mjs                0.45 kB │ gzip:   0.29 kB
+dist/_worker.js/_ssr/skeleton-D9W9wFsj.mjs                            0.49 kB │ gzip:   0.33 kB
+dist/_worker.js/_libs/radix-ui__react-direction.mjs                   0.59 kB │ gzip:   0.31 kB
+dist/_worker.js/_chunks/ssr-renderer.mjs                              0.60 kB │ gzip:   0.36 kB
+dist/_worker.js/_ssr/createMiddleware-B_4t7rW1.mjs                    0.83 kB │ gzip:   0.33 kB
+dist/_worker.js/__23tanstack-start-server-fn-resolver-BYZug0FS.mjs    0.86 kB │ gzip:   0.47 kB
+dist/_worker.js/_libs/radix-ui__react-label.mjs                       0.87 kB │ gzip:   0.46 kB
+dist/_worker.js/_ssr/profile-BIoJnc2p.mjs                             0.92 kB │ gzip:   0.47 kB
+dist/_worker.js/_ssr/sensors-BBPRndJJ.mjs                             0.93 kB │ gzip:   0.47 kB
+dist/_worker.js/_ssr/parcels-C8-GgoAg.mjs                             0.93 kB │ gzip:   0.48 kB
+dist/_worker.js/_ssr/label-BPuF5-mq.mjs                               0.95 kB │ gzip:   0.48 kB
+dist/_worker.js/_ssr/finance-BSYXB9C6.mjs                             0.97 kB │ gzip:   0.49 kB
+dist/_worker.js/_ssr/dashboard-B4O7pbrt.mjs                           0.97 kB │ gzip:   0.49 kB
+dist/_worker.js/_ssr/textarea-0bCmB9Nt.mjs                            0.98 kB │ gzip:   0.53 kB
+dist/_worker.js/_ssr/input-C1GysFII.mjs                               1.07 kB │ gzip:   0.56 kB
+dist/_worker.js/_ssr/badge-D1Dupn2y.mjs                               1.19 kB │ gzip:   0.56 kB
+dist/_worker.js/_libs/radix-ui__react-separator.mjs                   1.26 kB │ gzip:   0.57 kB
+dist/_worker.js/_runtime.mjs                                          1.57 kB │ gzip:   0.74 kB
+dist/_worker.js/_ssr/client-NU9HZIUG.mjs                              1.61 kB │ gzip:   0.89 kB
+dist/_worker.js/_ssr/agrofield-CWap2dgu.mjs                           1.63 kB │ gzip:   0.85 kB
+dist/_worker.js/_libs/react-is.mjs                                    1.67 kB │ gzip:   0.65 kB
+dist/_worker.js/_ssr/start-g2FV1bLS.mjs                               1.76 kB │ gzip:   0.81 kB
+dist/_worker.js/_ssr/client.server-pv5dszoL.mjs                       1.81 kB │ gzip:   0.83 kB
+dist/_worker.js/_ssr/ai-provider.server-C4LNzWDN.mjs                  1.90 kB │ gzip:   0.98 kB
+dist/_worker.js/_ssr/tabs-BgKcOzjx.mjs                                1.96 kB │ gzip:   0.70 kB
+dist/_worker.js/_ssr/button-C-0vf-pZ.mjs                              1.98 kB │ gzip:   0.88 kB
+dist/_worker.js/_ssr/card-CkAivaVl.mjs                                2.04 kB │ gzip:   0.59 kB
+dist/_worker.js/_libs/prop-types.mjs                                  2.27 kB │ gzip:   0.84 kB
+dist/_worker.js/_ssr/auth-middleware-D_hiGrJN.mjs                     2.75 kB │ gzip:   1.13 kB
+dist/_worker.js/_libs/class-variance-authority+clsx.mjs               3.17 kB │ gzip:   1.24 kB
+dist/_worker.js/_libs/d3-path.mjs                                     3.25 kB │ gzip:   1.16 kB
+dist/_worker.js/_ssr/ssr.mjs                                          3.34 kB │ gzip:   1.46 kB
+dist/_worker.js/_ssr/terms-9rPsHFS7.mjs                               3.47 kB │ gzip:   1.16 kB
+dist/_worker.js/_ssr/analyze-plant.functions-DV_tkKuT.mjs             3.53 kB │ gzip:   1.74 kB
+dist/_worker.js/_libs/radix-ui__react-progress.mjs                    3.64 kB │ gzip:   1.24 kB
+dist/_worker.js/_ssr/dialog-Y9HmOov6.mjs                              3.77 kB │ gzip:   1.15 kB
+dist/_worker.js/_libs/babel__runtime.mjs                              4.01 kB │ gzip:   1.38 kB
+dist/_worker.js/_ssr/privacy-CVvV_HWS.mjs                             4.13 kB │ gzip:   1.30 kB
+dist/_worker.js/_ssr/pwa-install-prompt-C3IAcIFn.mjs                  4.72 kB │ gzip:   1.46 kB
+dist/_worker.js/_libs/d3-interpolate.mjs                              5.02 kB │ gzip:   1.61 kB
+dist/_worker.js/_ssr/auth.callback-DbiZkN6W.mjs                       5.41 kB │ gzip:   1.45 kB
+dist/_worker.js/_ssr/profile-V3Kbka9k2.mjs                            5.44 kB │ gzip:   1.56 kB
+dist/_worker.js/_ssr/select-D6HJco7o.mjs                              5.61 kB │ gzip:   1.53 kB
+dist/_worker.js/_libs/@radix-ui/react-collection+[...].mjs            5.80 kB │ gzip:   1.66 kB
+dist/_worker.js/_libs/radix-ui__react-tabs.mjs                        5.85 kB │ gzip:   1.69 kB
+dist/_worker.js/_libs/tanstack__react-query.mjs                       7.35 kB │ gzip:   1.94 kB
+dist/_worker.js/_libs/d3-array.mjs                                    8.05 kB │ gzip:   2.25 kB
+dist/_worker.js/_libs/eventemitter3.mjs                               8.31 kB │ gzip:   2.05 kB
+dist/_worker.js/_libs/@radix-ui/react-arrow+[...].mjs                 8.58 kB │ gzip:   2.76 kB
+dist/_worker.js/_libs/@radix-ui/react-roving-focus+[...].mjs          9.46 kB │ gzip:   2.66 kB
+dist/_worker.js/_libs/h3-v2+rou3.mjs                                  9.81 kB │ gzip:   3.05 kB
+dist/_worker.js/_ssr/route-1emIhXqR.mjs                               9.88 kB │ gzip:   2.84 kB
+dist/_worker.js/_libs/d3-color.mjs                                   10.38 kB │ gzip:   3.57 kB
+dist/_worker.js/_libs/d3-format.mjs                                  10.59 kB │ gzip:   3.02 kB
+dist/_worker.js/_libs/@radix-ui/react-popper+[...].mjs               11.35 kB │ gzip:   3.33 kB
+dist/_worker.js/_ssr/diagnose-HahQMnbx.mjs                           11.48 kB │ gzip:   3.44 kB
+dist/_worker.js/_ssr/createServerFn-BFFE07zL.mjs                     11.65 kB │ gzip:   3.55 kB
+dist/_worker.js/_libs/fflate.mjs                                     11.90 kB │ gzip:   4.38 kB
+dist/_worker.js/_libs/tanstack__history.mjs                          12.09 kB │ gzip:   3.48 kB
+dist/_worker.js/_libs/supabase__functions-js.mjs                     12.12 kB │ gzip:   3.31 kB
+dist/_worker.js/_ssr/marketplace.my-offers-Ck33Y4AV.mjs              12.21 kB │ gzip:   2.79 kB
+dist/_worker.js/_ssr/marketplace.orders-ME40pVAQ.mjs                 13.02 kB │ gzip:   2.87 kB
+dist/_worker.js/_ssr/parcels-Bm180q6X.mjs                            14.14 kB │ gzip:   3.69 kB
+dist/_worker.js/_libs/fast-equals.mjs                                14.37 kB │ gzip:   3.62 kB
+dist/_worker.js/_tanstack-start-manifest_v-doinhmbf.mjs              14.78 kB │ gzip:   2.34 kB
+dist/_worker.js/_ssr/auth-DJtKY7rj.mjs                               14.83 kB │ gzip:   3.35 kB
+dist/_worker.js/_libs/h3+rou3+srvx.mjs                               14.88 kB │ gzip:   4.42 kB
+dist/_worker.js/_ssr/marketplace._id-B3nqZji8.mjs                    15.23 kB │ gzip:   3.71 kB
+dist/_worker.js/_ssr/finances.add-Ck4zPdEh.mjs                       15.55 kB │ gzip:   4.00 kB
+dist/_worker.js/_ssr/admin-BNGgrqiO.mjs                              15.94 kB │ gzip:   4.15 kB
+dist/_worker.js/_ssr/marketplace.messages-DiOPYP8f.mjs               16.15 kB │ gzip:   4.06 kB
+dist/_worker.js/_ssr/marketplace._id.edit-BWjIhnzi.mjs               16.54 kB │ gzip:   3.91 kB
+dist/_worker.js/_ssr/marketplace.create-B_fqhtSN.mjs                 17.22 kB │ gzip:   4.09 kB
+dist/_worker.js/_ssr/create-offer-B6YhYUPy.mjs                       19.30 kB │ gzip:   4.30 kB
+dist/_worker.js/_ssr/crop-events-BwkLpjmu.mjs                        19.62 kB │ gzip:   4.10 kB
+dist/_worker.js/_libs/decimal.js-light.mjs                           23.31 kB │ gzip:   6.89 kB
+dist/_worker.js/_ssr/dashboard-CWsTkj7H.mjs                          23.78 kB │ gzip:   5.81 kB
+dist/_worker.js/_libs/d3-shape.mjs                                   24.72 kB │ gzip:   5.02 kB
+dist/_worker.js/_libs/@floating-ui/dom+[...].mjs                     25.85 kB │ gzip:   6.56 kB
+dist/_worker.js/_libs/@floating-ui/core+[...].mjs                    25.89 kB │ gzip:   6.36 kB
+dist/_worker.js/_ssr/router-BXXGEpmf.mjs                             26.44 kB │ gzip:   6.26 kB
+dist/_worker.js/_libs/@floating-ui/react-dom+[...].mjs               31.30 kB │ gzip:   7.98 kB
+dist/_worker.js/_ssr/finances.credit-CwjtVnJm.mjs                    32.13 kB │ gzip:   7.36 kB
+dist/_worker.js/_libs/supabase__supabase-js.mjs                      34.04 kB │ gzip:   9.93 kB
+dist/_worker.js/index.js                                             34.86 kB │ gzip:   9.14 kB
+dist/_worker.js/_libs/react-smooth.mjs                               37.83 kB │ gzip:   8.15 kB
+dist/_worker.js/_libs/@radix-ui/react-select+[...].mjs               45.86 kB │ gzip:   9.75 kB
+dist/_worker.js/_libs/lucide-react.mjs                               46.42 kB │ gzip:   9.11 kB
+dist/_worker.js/_ssr/routes-DUpkuzWD.mjs                             47.43 kB │ gzip:   8.36 kB
+dist/_worker.js/_ssr/finance-D8VeB_oL.mjs                            47.46 kB │ gzip:  10.18 kB
+dist/_worker.js/_ssr/sensors-BMjS-X1i.mjs                            48.93 kB │ gzip:   9.21 kB
+dist/_worker.js/_libs/supabase__phoenix.mjs                          49.12 kB │ gzip:  12.36 kB
+dist/_worker.js/_libs/sonner.mjs                                     51.91 kB │ gzip:  11.77 kB
+dist/_worker.js/_ssr/server-DRJ1lQdO.mjs                             52.04 kB │ gzip:  13.63 kB
+dist/_worker.js/_libs/vaul.mjs                                       55.98 kB │ gzip:  12.48 kB
+dist/_worker.js/_libs/d3-scale+[...].mjs                             58.25 kB │ gzip:  12.11 kB
+dist/_worker.js/_libs/jspdf-autotable.mjs                            60.73 kB │ gzip:  14.39 kB
+dist/_worker.js/_libs/tanstack__query-core.mjs                       65.81 kB │ gzip:  13.90 kB
+dist/_worker.js/_libs/@radix-ui/react-dialog+[...].mjs               69.59 kB │ gzip:  16.64 kB
+dist/_worker.js/_libs/dompurify.mjs                                  74.40 kB │ gzip:  20.29 kB
+dist/_worker.js/_libs/supabase__realtime-js+unenv.mjs                77.99 kB │ gzip:  19.91 kB
+dist/_worker.js/_libs/@tanstack/router-core+[...].mjs                80.21 kB │ gzip:  20.17 kB
+dist/_worker.js/_libs/tailwind-merge.mjs                             88.13 kB │ gzip:  15.66 kB
+dist/_worker.js/_libs/zod.mjs                                        99.85 kB │ gzip:  17.25 kB
+dist/_worker.js/_ssr/marketplace-Cb5rh7Vq.mjs                       103.89 kB │ gzip:  19.84 kB
+dist/_worker.js/_libs/supabase__postgrest-js.mjs                    105.41 kB │ gzip:  21.66 kB
+dist/_worker.js/_libs/@supabase/storage-js+[...].mjs                118.94 kB │ gzip:  22.11 kB
+dist/_worker.js/_libs/fast-png+iobuffer+pako.mjs                    143.23 kB │ gzip:  33.02 kB
+dist/_worker.js/_libs/lodash.mjs                                    161.80 kB │ gzip:  29.44 kB
+dist/_worker.js/_libs/supabase__auth-js.mjs                         302.19 kB │ gzip:  60.26 kB
+dist/_worker.js/_libs/html2canvas.mjs                               318.37 kB │ gzip:  63.06 kB
+dist/_worker.js/_libs/canvg+[...].mjs                               330.72 kB │ gzip:  72.77 kB
+dist/_worker.js/_libs/jspdf.mjs                                     476.97 kB │ gzip: 124.10 kB
+dist/_worker.js/_libs/recharts+[...].mjs                            537.33 kB │ gzip:  99.22 kB
+dist/_worker.js/_libs/@tanstack/react-router+[...].mjs              656.91 kB │ gzip: 138.20 kB
+
+[32m✓ built in 1.97s[39m
+
+PWA v1.3.0
+mode      generateSW
+precache  108 entries (2392.72 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-f641ca17.js
+[36mi[39m Generated [36mdist/_worker.js/wrangler.json[39m
+[36mi[39m Generated [36m.wrangler/deploy/config.json[39m
+[36mi[39m Generated [36mdist/_routes.json[39m
+[36mi[39m Generated [36mdist/_headers[39m
+[36mi[39m Generated [36mdist/_redirects[39m
+[36mi[39m Generated [36mdist/nitro.json[39m
+
+[90m[[90mnitro[90m][39m [32m√[39m You can preview this build using [36mnpx vite preview[39m
+[90m[[90mnitro[90m][39m [32m√[39m You can deploy this build using [36mnpx nitro deploy --prebuilt[39m
+
+ ⛅️ wrangler 4.120.1
+────────────────────
+

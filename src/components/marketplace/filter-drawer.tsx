@@ -28,13 +28,14 @@ export interface FilterValues {
 }
 
 interface FilterDrawerProps {
+  isOpen: boolean
   filters: FilterValues
   setFilters: (f: FilterValues) => void
   onClose: () => void
   onApply: (f: FilterValues) => void
 }
 
-export function FilterDrawer({ filters, setFilters, onClose, onApply }: FilterDrawerProps) {
+export function FilterDrawer({ isOpen, filters, setFilters, onClose, onApply }: FilterDrawerProps) {
   const [local, setLocal] = useState(filters)
 
   function update(field: keyof FilterValues, value: string) {
@@ -54,12 +55,12 @@ export function FilterDrawer({ filters, setFilters, onClose, onApply }: FilterDr
   }
 
   return (
-    <Drawer open onOpenChange={onClose}>
+    <Drawer open={isOpen} onOpenChange={(open) => { if (!open) onClose() }}>
       <DrawerContent className="af-bottom-sheet">
         <DrawerHeader className="border-b">
           <DrawerTitle className="af-display flex items-center justify-between">
             Filtres avancés
-            <Button variant="ghost" size="icon" onClick={onClose}>
+            <Button variant="ghost" size="icon" onClick={onClose} aria-label="Fermer">
               <X size={20} />
             </Button>
           </DrawerTitle>

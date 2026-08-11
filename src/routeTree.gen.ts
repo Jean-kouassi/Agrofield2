@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as CreateOfferRouteImport } from './routes/create-offer'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -26,6 +25,7 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedSensorsRouteImport } from './routes/_authenticated/sensors'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedParcelsRouteImport } from './routes/_authenticated/parcels'
+import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedDiagnoseRouteImport } from './routes/_authenticated/diagnose'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -52,11 +52,6 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MarketplaceRoute = MarketplaceRouteImport.update({
-  id: '/marketplace',
-  path: '/marketplace',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CreateOfferRoute = CreateOfferRouteImport.update({
   id: '/create-offer',
   path: '/create-offer',
@@ -77,29 +72,29 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceOrdersRoute = MarketplaceOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => MarketplaceRoute,
+  id: '/marketplace/orders',
+  path: '/marketplace/orders',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceMyOffersRoute = MarketplaceMyOffersRouteImport.update({
-  id: '/my-offers',
-  path: '/my-offers',
-  getParentRoute: () => MarketplaceRoute,
+  id: '/marketplace/my-offers',
+  path: '/marketplace/my-offers',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceMessagesRoute = MarketplaceMessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
-  getParentRoute: () => MarketplaceRoute,
+  id: '/marketplace/messages',
+  path: '/marketplace/messages',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceCreateRoute = MarketplaceCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
-  getParentRoute: () => MarketplaceRoute,
+  id: '/marketplace/create',
+  path: '/marketplace/create',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceIdRoute = MarketplaceIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => MarketplaceRoute,
+  id: '/marketplace/$id',
+  path: '/marketplace/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/callback',
@@ -121,6 +116,12 @@ const AuthenticatedParcelsRoute = AuthenticatedParcelsRouteImport.update({
   path: '/parcels',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMarketplaceRoute =
+  AuthenticatedMarketplaceRouteImport.update({
+    id: '/marketplace',
+    path: '/marketplace',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
@@ -179,7 +180,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
   '/create-offer': typeof CreateOfferRoute
-  '/marketplace': typeof MarketplaceRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -188,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/diagnose': typeof AuthenticatedDiagnoseRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/parcels': typeof AuthenticatedParcelsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/sensors': typeof AuthenticatedSensorsRoute
@@ -207,7 +208,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
   '/create-offer': typeof CreateOfferRoute
-  '/marketplace': typeof MarketplaceRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -216,6 +216,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/diagnose': typeof AuthenticatedDiagnoseRoute
   '/finance': typeof AuthenticatedFinanceRoute
+  '/marketplace': typeof AuthenticatedMarketplaceRoute
   '/parcels': typeof AuthenticatedParcelsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/sensors': typeof AuthenticatedSensorsRoute
@@ -237,7 +238,6 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/create-offer': typeof CreateOfferRoute
-  '/marketplace': typeof MarketplaceRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -246,6 +246,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/diagnose': typeof AuthenticatedDiagnoseRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
+  '/_authenticated/marketplace': typeof AuthenticatedMarketplaceRoute
   '/_authenticated/parcels': typeof AuthenticatedParcelsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/sensors': typeof AuthenticatedSensorsRoute
@@ -267,7 +268,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/create-offer'
-    | '/marketplace'
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
@@ -276,6 +276,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/diagnose'
     | '/finance'
+    | '/marketplace'
     | '/parcels'
     | '/profile'
     | '/sensors'
@@ -295,7 +296,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/create-offer'
-    | '/marketplace'
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
@@ -304,6 +304,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/diagnose'
     | '/finance'
+    | '/marketplace'
     | '/parcels'
     | '/profile'
     | '/sensors'
@@ -324,7 +325,6 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/create-offer'
-    | '/marketplace'
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
@@ -333,6 +333,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/diagnose'
     | '/_authenticated/finance'
+    | '/_authenticated/marketplace'
     | '/_authenticated/parcels'
     | '/_authenticated/profile'
     | '/_authenticated/sensors'
@@ -354,10 +355,14 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   CreateOfferRoute: typeof CreateOfferRoute
-  MarketplaceRoute: typeof MarketplaceRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  MarketplaceIdRoute: typeof MarketplaceIdRouteWithChildren
+  MarketplaceCreateRoute: typeof MarketplaceCreateRoute
+  MarketplaceMessagesRoute: typeof MarketplaceMessagesRoute
+  MarketplaceMyOffersRoute: typeof MarketplaceMyOffersRoute
+  MarketplaceOrdersRoute: typeof MarketplaceOrdersRoute
   ApiPublicSensorsCommandsRoute: typeof ApiPublicSensorsCommandsRoute
   ApiPublicSensorsIngestRoute: typeof ApiPublicSensorsIngestRoute
 }
@@ -383,13 +388,6 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/marketplace': {
-      id: '/marketplace'
-      path: '/marketplace'
-      fullPath: '/marketplace'
-      preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/create-offer': {
@@ -422,38 +420,38 @@ declare module '@tanstack/react-router' {
     }
     '/marketplace/orders': {
       id: '/marketplace/orders'
-      path: '/orders'
+      path: '/marketplace/orders'
       fullPath: '/marketplace/orders'
       preLoaderRoute: typeof MarketplaceOrdersRouteImport
-      parentRoute: typeof MarketplaceRoute
+      parentRoute: typeof rootRouteImport
     }
     '/marketplace/my-offers': {
       id: '/marketplace/my-offers'
-      path: '/my-offers'
+      path: '/marketplace/my-offers'
       fullPath: '/marketplace/my-offers'
       preLoaderRoute: typeof MarketplaceMyOffersRouteImport
-      parentRoute: typeof MarketplaceRoute
+      parentRoute: typeof rootRouteImport
     }
     '/marketplace/messages': {
       id: '/marketplace/messages'
-      path: '/messages'
+      path: '/marketplace/messages'
       fullPath: '/marketplace/messages'
       preLoaderRoute: typeof MarketplaceMessagesRouteImport
-      parentRoute: typeof MarketplaceRoute
+      parentRoute: typeof rootRouteImport
     }
     '/marketplace/create': {
       id: '/marketplace/create'
-      path: '/create'
+      path: '/marketplace/create'
       fullPath: '/marketplace/create'
       preLoaderRoute: typeof MarketplaceCreateRouteImport
-      parentRoute: typeof MarketplaceRoute
+      parentRoute: typeof rootRouteImport
     }
     '/marketplace/$id': {
       id: '/marketplace/$id'
-      path: '/$id'
+      path: '/marketplace/$id'
       fullPath: '/marketplace/$id'
       preLoaderRoute: typeof MarketplaceIdRouteImport
-      parentRoute: typeof MarketplaceRoute
+      parentRoute: typeof rootRouteImport
     }
     '/auth/callback': {
       id: '/auth/callback'
@@ -481,6 +479,13 @@ declare module '@tanstack/react-router' {
       path: '/parcels'
       fullPath: '/parcels'
       preLoaderRoute: typeof AuthenticatedParcelsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/marketplace': {
+      id: '/_authenticated/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof AuthenticatedMarketplaceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/finance': {
@@ -562,6 +567,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiagnoseRoute: typeof AuthenticatedDiagnoseRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
+  AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
   AuthenticatedParcelsRoute: typeof AuthenticatedParcelsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSensorsRoute: typeof AuthenticatedSensorsRoute
@@ -575,6 +581,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiagnoseRoute: AuthenticatedDiagnoseRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
+  AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,
   AuthenticatedParcelsRoute: AuthenticatedParcelsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSensorsRoute: AuthenticatedSensorsRoute,
@@ -607,35 +614,19 @@ const MarketplaceIdRouteWithChildren = MarketplaceIdRoute._addFileChildren(
   MarketplaceIdRouteChildren,
 )
 
-interface MarketplaceRouteChildren {
-  MarketplaceIdRoute: typeof MarketplaceIdRouteWithChildren
-  MarketplaceCreateRoute: typeof MarketplaceCreateRoute
-  MarketplaceMessagesRoute: typeof MarketplaceMessagesRoute
-  MarketplaceMyOffersRoute: typeof MarketplaceMyOffersRoute
-  MarketplaceOrdersRoute: typeof MarketplaceOrdersRoute
-}
-
-const MarketplaceRouteChildren: MarketplaceRouteChildren = {
-  MarketplaceIdRoute: MarketplaceIdRouteWithChildren,
-  MarketplaceCreateRoute: MarketplaceCreateRoute,
-  MarketplaceMessagesRoute: MarketplaceMessagesRoute,
-  MarketplaceMyOffersRoute: MarketplaceMyOffersRoute,
-  MarketplaceOrdersRoute: MarketplaceOrdersRoute,
-}
-
-const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
-  MarketplaceRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   CreateOfferRoute: CreateOfferRoute,
-  MarketplaceRoute: MarketplaceRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  MarketplaceIdRoute: MarketplaceIdRouteWithChildren,
+  MarketplaceCreateRoute: MarketplaceCreateRoute,
+  MarketplaceMessagesRoute: MarketplaceMessagesRoute,
+  MarketplaceMyOffersRoute: MarketplaceMyOffersRoute,
+  MarketplaceOrdersRoute: MarketplaceOrdersRoute,
   ApiPublicSensorsCommandsRoute: ApiPublicSensorsCommandsRoute,
   ApiPublicSensorsIngestRoute: ApiPublicSensorsIngestRoute,
 }
