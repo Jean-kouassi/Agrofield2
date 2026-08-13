@@ -68,6 +68,17 @@ export async function startConversationWithUser(
   listingId: string,
   currentUserId: string
 ): Promise<{ conversationId: string; isNew: boolean }> {
+  // Validation des UUIDs
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  
+  if (!uuidRegex.test(sellerId)) {
+    throw new Error(`Invalid seller ID format: ${sellerId}`);
+  }
+  
+  if (!uuidRegex.test(currentUserId)) {
+    throw new Error(`Invalid user ID format: ${currentUserId}`);
+  }
+  
   try {
     // D'abord, vérifions s'il existe déjà une conversation
     const { data: existingConv, error: fetchError } = await supabase
