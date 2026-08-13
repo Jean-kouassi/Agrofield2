@@ -36,13 +36,14 @@ function CreateOfferPage() {
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) {
-        toast.error('Vous devez être connecté')
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        toast.error('❌ Vous devez être connecté')
         router.navigate({ to: '/auth' })
         return
       }
-      setUser(data.user)
+      console.log('User authenticated:', { id: user.id, email: user.email })
+      setUser(user)
     })
   }, [router])
 
@@ -112,9 +113,24 @@ function CreateOfferPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     
-    // Validation
-    if (!formData.title || !formData.description || !formData.category || !formData.quantity || !formData.price || !formData.location || !formData.region) {
-      toast.error('Veuillez remplir tous les champs obligatoires (*)')
+    // Validation renforcée
+    const errors: string[] = []
+    if (!formData.title || formData.title.trim().length < 3) errors.push('Titre trop court (min 3 caractères)')
+    if (!formData.description || formData.description.trim().length < 10) errors.push('Description trop courte (min 10 caractères)')
+    if (!formData.category) errors.push('Catégorie requise')
+    if (!formData.quantity || parseFloat(formData.quantity) <= 0) errors.push('Quantité invalide')
+    if (!formData.price || parseFloat(formData.price) <= 0) errors.push('Prix invalide')
+    if (!formData.location || formData.location.trim().length < 2) errors.push('Localisation requise')
+    if (!formData.region) errors.push('Région requise')
+    
+    if (errors.length > 0) {
+      toast.error('❌ ' + errors.join(', '))
+      return
+    }
+
+    if (!user || !user.id) {
+      toast.error('❌ Utilisateur non connecté. Veuillez vous reconnecter.')
+      router.navigate({ to: '/auth' })
       return
     }
 
@@ -392,9 +408,9 @@ function CreateOfferPage() {
                   type="submit" 
                   size="lg"
                   className="bg-green-600 hover:bg-green-700 flex-1"
-                  disabled={loading}
+                  disabled={loading || !user}
                 >
-                  {loading ? 'Publication en cours...' : '✅ Publier l\'offre'}
+                  {loading ? '📤 Publication en cours...' : '✅ Publier l\'offre'}
                 </Button>
                 <Button 
                   type="button"
@@ -406,6 +422,33 @@ function CreateOfferPage() {
                   Annuler
                 </Button>
               </div>
+              
+              {/* Debug info (à supprimer en prod) */}
+              {process.env.NODE_ENV === 'development' && user && (
+                <div className="mt-4 p-3 bg-gray-100 rounded text-xs font-mono">
+                  <p><strong>User ID:</strong> {user.id}</p>
+                  <p><strong>Email:</strong> {user.email}</p>
+                  <Button 
+                    type="button" 
+                    size="sm" 
+                    variant="outline"
+                    onClick={async () => {
+                      const { error } = await supabase
+                        .from('marketplace_listings')
+                        .select('id')
+                        .limit(1)
+                      if (error) {
+                        toast.error('DB Error: ' + error.message)
+                        console.error(error)
+                      } else {
+                        toast.success('✅ DB connection OK')
+                      }
+                    }}
+                  >
+                    Test DB Connection
+                  </Button>
+                </div>
+              )}
             </form>
           </CardContent>
         </Card>
