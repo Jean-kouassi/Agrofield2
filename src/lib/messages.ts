@@ -31,6 +31,19 @@ export interface Message {
   deletedByReceiver: boolean;
 }
 
+export interface Notification {
+  id: string;
+  userId: string;
+  type: 'message' | 'order' | 'system';
+  title: string;
+  message: string;
+  isRead: boolean;
+  readAt: string | null;
+  actionUrl: string | null;
+  metadata: Record<string, any>;
+  createdAt: string;
+}
+
 /**
  * Obtenir ou créer une conversation avec un autre utilisateur
  */
@@ -45,6 +58,48 @@ export async function getOrCreateConversation(
 
   if (error) throw error;
   return data as string;
+}
+
+/**
+ * Obtenir ou créer une conversation et démarrer le chat
+ */
+export async function startConversationWithUser(
+  sellerId: string,
+  listingId: string,
+  currentUserId: string
+): Promise<{ conversationId: string; isNew: boolean }> {
+  try {
+    // D'abord, vérifions s'il existe déjà une conversation
+    const { data: existingConv, error: fetchError } = await supabase
+      .from('conversations')
+      .select('id')
+      .or(`and(participant_1_id.eq.${currentUserId},participant_2_id.eq.${sellerId}),and(participant_1_id.eq.${sellerId},participant_2_id.eq.${currentUserId})`)
+      .eq('listing_id', listingId)
+      .single();
+
+    if (existingConv && !fetchError) {
+      return { conversationId: existingConv.id, isNew: false };
+    }
+
+    // Créer une nouvelle conversation
+    const { data: newConv, error: createError } = await supabase
+      .from('conversations')
+      .insert({
+        participant_1_id: currentUserId,
+        participant_2_id: sellerId,
+        listing_id: listingId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single();
+
+    if (createError) throw createError;
+    return { conversationId: newConv.id, isNew: true };
+  } catch (error: any) {
+    console.error('Error starting conversation:', error);
+    throw error;
+  }
 }
 
 /**
@@ -274,6 +329,110 @@ export function subscribeToConversations(
           lastMessageAt: newConv.last_message_at,
           createdAt: newConv.created_at,
           updatedAt: newConv.updated_at,
+        });
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}
+
+/**
+ * Récupérer les notifications d'un utilisateur
+ */
+export async function getUserNotifications(userId: string, limit: number = 20): Promise<Notification[]> {
+  const { data, error } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+
+  return (data || []).map((notif: any) => ({
+    id: notif.id,
+    userId: notif.user_id,
+    type: notif.type,
+    title: notif.title,
+    message: notif.message,
+    isRead: notif.is_read,
+    readAt: notif.read_at,
+    actionUrl: notif.action_url,
+    metadata: notif.metadata || {},
+    createdAt: notif.created_at,
+  }));
+}
+
+/**
+ * Obtenir le compteur de notifications non lues
+ */
+export async function getUnreadNotificationsCount(): Promise<number> {
+  const { data, error } = await supabase.rpc('get_unread_notifications_count');
+
+  if (error) throw error;
+  return data as number;
+}
+
+/**
+ * Marquer une notification comme lue
+ */
+export async function markNotificationAsRead(notificationId: string): Promise<void> {
+  await supabase
+    .from('notifications')
+    .update({
+      is_read: true,
+      read_at: new Date().toISOString(),
+    })
+    .eq('id', notificationId);
+}
+
+/**
+ * Marquer toutes les notifications comme lues
+ */
+export async function markAllNotificationsAsRead(userId: string): Promise<void> {
+  await supabase
+    .from('notifications')
+    .update({
+      is_read: true,
+      read_at: new Date().toISOString(),
+    })
+    .eq('user_id', userId)
+    .eq('is_read', false);
+}
+
+/**
+ * S'abonner aux nouvelles notifications en temps réel
+ */
+export function subscribeToNotifications(
+  userId: string,
+  callback: (notification: Notification) => void
+) {
+  const channel = supabase
+    .channel(`notifications:${userId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${userId}`,
+      },
+      (payload) => {
+        const newNotif = payload.new as any;
+        callback({
+          id: newNotif.id,
+          userId: newNotif.user_id,
+          type: newNotif.type,
+          title: newNotif.title,
+          message: newNotif.message,
+          isRead: newNotif.is_read,
+          readAt: newNotif.read_at,
+          actionUrl: newNotif.action_url,
+          metadata: newNotif.metadata || {},
+          createdAt: newNotif.created_at,
         });
       }
     )

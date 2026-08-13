@@ -9,16 +9,20 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { X, ArrowLeft, MapPin, Phone, Share2, Flag, Minus, Plus, CircleCheck } from 'lucide-react'
+import { X, ArrowLeft, MapPin, Share2, Flag, Minus, Plus, CircleCheck, MessageCircle } from 'lucide-react'
 import { CategoryBadge } from './category-badge'
 import { StatusBadge } from './status-badge'
 import { StarRating } from './stars'
 import { cn } from '@/lib/utils'
 import { productImage, fcfa, initials } from '@/lib/marketplace-data'
+import { startConversationWithUser } from '@/lib/messages'
+import { supabase } from '@/integrations/supabase/client'
+import { toast } from 'sonner'
 import type {
   MarketplaceListing,
   MarketplaceOrder,
 } from '@/lib/marketplace-data'
+import { Card } from '@/components/ui/card'
 
 interface ProductDetailModalProps {
   listing: MarketplaceListing
@@ -27,6 +31,7 @@ interface ProductDetailModalProps {
   onSelect: (listing: MarketplaceListing) => void
   onClose: () => void
   onPlaceOrder: (order: MarketplaceOrder) => void
+  onNavigate?: (path: string) => void
 }
 
 export function ProductDetailModal({
@@ -36,20 +41,78 @@ export function ProductDetailModal({
   onSelect,
   onClose,
   onPlaceOrder,
+  onNavigate,
 }: ProductDetailModalProps) {
   const [activeImg, setActiveImg] = useState(0)
   const [mode, setMode] = useState<'view' | 'order' | 'confirmed'>(
     jumpToOrder ? 'order' : 'view'
   )
-  const [qty, setQty] = useState(listing.minOrder)
+  const [qty, setQty] = useState(listing.minOrder || 1)
   const [delivery, setDelivery] = useState<'pickup' | 'delivery'>('pickup')
   const [note, setNote] = useState('')
+  const [contacting, setContacting] = useState(false)
 
   const similar = allListings
     .filter((l) => l.category === listing.category && l.id !== listing.id)
     .slice(0, 5)
 
-  const total = qty * listing.price
+  const total = (listing.price || 0) * (qty || 0)
+
+  async function handleContactSeller() {
+    setContacting(true)
+    try {
+      const user = await supabase.auth.getUser()
+      if (!user.data.user) {
+        toast.error('Vous devez être connecté pour contacter le vendeur')
+        return
+      }
+
+      // Récupérer le vrai seller_id depuis la base de données
+      const { data: listingData, error: listingError } = await supabase
+        .from('marketplace_listings')
+        .select('seller_id')
+        .eq('id', listing.id)
+        .single()
+
+      if (listingError || !listingData?.seller_id) {
+        toast.error('Impossible de trouver le vendeur')
+        console.error('Listing error:', listingError)
+        setContacting(false)
+        return
+      }
+
+      const sellerId = listingData.seller_id
+      
+      // Vérifier qu'on n'essaie pas de se contacter soi-même
+      if (sellerId === user.data.user.id) {
+        toast.info('C\'est votre propre offre !')
+        setContacting(false)
+        return
+      }
+      
+      const result = await startConversationWithUser(
+        sellerId,
+        listing.id,
+        user.data.user.id
+      )
+
+      toast.success(
+        result.isNew 
+          ? '✅ Conversation créée avec le vendeur !' 
+          : '✅ Conversation ouverte !'
+      )
+
+      // Navigate to messages page
+      if (onNavigate) {
+        onNavigate('/marketplace/messages')
+      }
+    } catch (error: any) {
+      console.error('Error contacting seller:', error)
+      toast.error('❌ Erreur: ' + (error?.message || 'Impossible de contacter le vendeur'))
+    } finally {
+      setContacting(false)
+    }
+  }
 
   function confirm() {
     const order: MarketplaceOrder = {
@@ -68,7 +131,9 @@ export function ProductDetailModal({
 
   function adjust(delta: number) {
     const next = qty + delta
-    setQty(Math.max(listing.minOrder, Math.min(listing.qty, next)))
+    const minOrder = listing.minOrder || 1
+    const maxQty = listing.qty || minOrder
+    setQty(Math.max(minOrder, Math.min(maxQty, next)))
   }
 
   return (
@@ -140,28 +205,28 @@ export function ProductDetailModal({
               </div>
 
               <div className="flex items-end gap-2">
-                <span className="af-display text-3xl font-extrabold text-primary">
-                  {fcfa(listing.price)}
+                <span className="af-display text-3xl font-extrabold" style={{ color: '#166534' }}>
+                  {fcfa(listing.price || 0)}
                 </span>
                 <span className="text-sm mb-1 text-muted-foreground">/ {listing.unit}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <Card className="rounded-xl p-3">
+                <Card className="rounded-xl p-3" style={{ background: 'var(--agro-light)', border: '1px solid var(--agro-border)' }}>
                   <div className="text-muted-foreground">Quantité disponible</div>
-                  <div className="font-semibold">{listing.qty} {listing.unit}</div>
+                  <div className="font-semibold">{listing.qty || 0} {listing.unit}</div>
                 </Card>
-                <Card className="rounded-xl p-3">
+                <Card className="rounded-xl p-3" style={{ background: 'var(--agro-light)', border: '1px solid var(--agro-border)' }}>
                   <div className="text-muted-foreground">Commande minimum</div>
-                  <div className="font-semibold">{listing.minOrder} {listing.unit}</div>
+                  <div className="font-semibold">{listing.minOrder || 1} {listing.unit}</div>
                 </Card>
-                <Card className="rounded-xl p-3">
+                <Card className="rounded-xl p-3" style={{ background: 'var(--agro-light)', border: '1px solid var(--agro-border)' }}>
                   <div className="text-muted-foreground">Localisation</div>
                   <div className="font-semibold inline-flex items-center gap-1">
                     <MapPin size={13} /> {listing.city}, {listing.region}
                   </div>
                 </Card>
-                <Card className="rounded-xl p-3">
+                <Card className="rounded-xl p-3" style={{ background: 'var(--agro-light)', border: '1px solid var(--agro-border)' }}>
                   <div className="text-muted-foreground">Type de vente</div>
                   <div className="font-semibold capitalize">
                     {listing.saleType === 'gros' ? 'Vente en gros' : 'Vente au détail'}
@@ -169,10 +234,10 @@ export function ProductDetailModal({
                 </Card>
               </div>
 
-              <div className="af-card rounded-xl p-4 flex items-center gap-3">
+              <div className="rounded-xl p-4 flex items-center gap-3" style={{ background: 'var(--agro-light)', border: '1px solid var(--agro-border)' }}>
                 <div
                   className="w-11 h-11 rounded-full flex items-center justify-center af-display font-bold text-white shrink-0"
-                  style={{ background: 'var(--agro-primary)' }}
+                  style={{ background: '#166534' }}
                 >
                   {initials(listing.seller)}
                 </div>
@@ -180,8 +245,18 @@ export function ProductDetailModal({
                   <div className="font-semibold text-sm">{listing.seller}</div>
                   <StarRating rating={listing.rating} />
                 </div>
-                <Button variant="outline" className="af-btn-ghost rounded-lg px-3 py-2 text-xs font-semibold inline-flex items-center gap-1">
-                  <Phone size={13} /> Contacter
+                <Button 
+                  variant="outline" 
+                  onClick={handleContactSeller}
+                  disabled={contacting}
+                  className="rounded-lg px-3 py-2 text-xs font-semibold inline-flex items-center gap-1"
+                  style={{
+                    borderColor: '#166534',
+                    color: '#166534',
+                    background: '#fff',
+                  }}
+                >
+                  <MessageCircle size={13} /> {contacting ? '...' : 'Contacter'}
                 </Button>
               </div>
 
@@ -189,17 +264,38 @@ export function ProductDetailModal({
                 <Button
                   onClick={() => setMode('order')}
                   disabled={listing.status !== 'available'}
-                  className="af-btn-primary flex-1 rounded-xl font-semibold h-12"
+                  className="flex-1 rounded-xl font-semibold h-12"
+                  style={{
+                    background: listing.status === 'available' ? '#166534' : 'var(--agro-border)',
+                    color: '#fff',
+                    boxShadow: listing.status === 'available' ? '0 4px 12px rgba(22,101,52,0.3)' : 'none',
+                  }}
                 >
                   {listing.status === 'available' ? 'Commander' : 'Indisponible'}
                 </Button>
-                <Button variant="outline" className="af-btn-ghost rounded-xl px-3.5 h-12">
+                <Button 
+                  variant="outline" 
+                  onClick={handleContactSeller}
+                  disabled={contacting}
+                  className="rounded-xl px-3.5 h-12"
+                  style={{
+                    borderColor: '#166534',
+                    color: '#166534',
+                    background: '#fff',
+                  }}
+                >
+                  <MessageCircle size={18} />
+                </Button>
+                <Button variant="outline" className="rounded-xl px-3.5 h-12" style={{ borderColor: 'var(--agro-border)' }}>
                   <Share2 size={18} />
                 </Button>
                 <Button
                   variant="outline"
-                  className="af-btn-ghost rounded-xl px-3.5 h-12"
-                  style={{ color: 'var(--agro-danger)' }}
+                  className="rounded-xl px-3.5 h-12"
+                  style={{ 
+                    borderColor: 'var(--agro-border)',
+                    color: 'var(--agro-danger)',
+                  }}
                 >
                   <Flag size={18} />
                 </Button>
@@ -213,7 +309,8 @@ export function ProductDetailModal({
                       <button
                         key={s.id}
                         onClick={() => onSelect(s)}
-                        className="af-card rounded-xl overflow-hidden shrink-0 w-36 text-left"
+                        className="rounded-xl overflow-hidden shrink-0 w-36 text-left"
+                        style={{ background: 'var(--agro-light)', border: '1px solid var(--agro-border)' }}
                       >
                         <img
                           src={productImage(s.id, 1)}
@@ -222,7 +319,7 @@ export function ProductDetailModal({
                         />
                         <div className="p-2">
                           <div className="text-xs font-semibold line-clamp-1">{s.title}</div>
-                          <div className="text-xs font-bold text-primary">{fcfa(s.price)}</div>
+                          <div className="text-xs font-bold" style={{ color: '#166534' }}>{fcfa(s.price || 0)}</div>
                         </div>
                       </button>
                     ))}
@@ -235,7 +332,7 @@ export function ProductDetailModal({
 
         {mode === 'order' && (
           <div className="p-5 flex flex-col gap-5">
-            <div className="af-card rounded-xl p-3 flex gap-3 items-center">
+            <div className="rounded-xl p-3 flex gap-3 items-center" style={{ background: 'var(--agro-light)', border: '1px solid var(--agro-border)' }}>
               <img
                 src={productImage(listing.id, 1)}
                 className="w-14 h-14 rounded-lg object-cover"
@@ -244,7 +341,7 @@ export function ProductDetailModal({
               <div className="flex-1">
                 <div className="font-semibold text-sm">{listing.title}</div>
                 <div className="text-xs text-muted-foreground">
-                  {fcfa(listing.price)} / {listing.unit}
+                  {fcfa(listing.price || 0)} / {listing.unit}
                 </div>
               </div>
             </div>
@@ -256,34 +353,34 @@ export function ProductDetailModal({
               <div className="flex items-center gap-3">
                 <Button
                   variant="outline"
-                  onClick={() => adjust(-listing.minOrder)}
-                  className="af-btn-ghost rounded-full w-11 h-11 p-0"
+                  onClick={() => adjust(- (listing.minOrder || 1))}
+                  className="rounded-full w-11 h-11 p-0"
+                  style={{ borderColor: '#166534', color: '#166534' }}
                 >
                   <Minus size={16} />
                 </Button>
                 <Input
                   type="number"
                   value={qty}
-                  onChange={(e) =>
-                    setQty(
-                      Math.max(
-                        listing.minOrder,
-                        Number(e.target.value) || listing.minOrder
-                      )
-                    )
-                  }
-                  className="af-input rounded-lg text-center py-2.5 w-24 font-semibold"
+                  onChange={(e) => {
+                    const val = Number(e.target.value)
+                    const minOrder = listing.minOrder || 1
+                    setQty(Number.isNaN(val) ? minOrder : Math.max(minOrder, val))
+                  }}
+                  className="rounded-lg text-center py-2.5 w-24 font-semibold"
+                  style={{ borderColor: '#166534' }}
                 />
                 <Button
                   variant="outline"
-                  onClick={() => adjust(listing.minOrder)}
-                  className="af-btn-ghost rounded-full w-11 h-11 p-0"
+                  onClick={() => adjust(listing.minOrder || 1)}
+                  className="rounded-full w-11 h-11 p-0"
+                  style={{ borderColor: '#166534', color: '#166534' }}
                 >
                   <Plus size={16} />
                 </Button>
               </div>
               <p className="text-xs mt-1 text-muted-foreground">
-                Minimum {listing.minOrder} {listing.unit} · {listing.qty}{' '}
+                Minimum {listing.minOrder || 1} {listing.unit} · {listing.qty || 0}{' '}
                 {listing.unit} disponibles
               </p>
             </div>
@@ -299,10 +396,13 @@ export function ProductDetailModal({
                     key={v}
                     variant="outline"
                     onClick={() => setDelivery(v as 'pickup' | 'delivery')}
-                    className={cn(
-                      'af-chip rounded-lg px-3.5 py-2.5 text-sm font-medium flex-1',
-                      delivery === v && 'af-chip-active'
-                    )}
+                    className="rounded-lg px-3.5 py-2.5 text-sm font-medium flex-1"
+                    style={{
+                      borderColor: delivery === v ? '#166534' : 'var(--agro-border)',
+                      background: delivery === v ? '#166534' : '#fff',
+                      color: delivery === v ? '#fff' : 'var(--agro-muted)',
+                      boxShadow: delivery === v ? '0 2px 8px rgba(22,101,52,0.2)' : 'none',
+                    }}
                   >
                     {l}
                   </Button>
@@ -319,20 +419,27 @@ export function ProductDetailModal({
                 onChange={(e) => setNote(e.target.value)}
                 rows={3}
                 placeholder="Ex : merci de préparer la commande avant 8h..."
-                className="af-input rounded-lg px-3 py-2.5 text-sm w-full resize-none"
+                className="rounded-lg px-3 py-2.5 text-sm w-full resize-none"
+                style={{ borderColor: 'var(--agro-border)' }}
               />
             </div>
 
-            <div className="af-card rounded-xl p-4 flex items-center justify-between">
-              <span className="text-sm font-medium text-muted-foreground">Total</span>
-              <span className="af-display text-xl font-extrabold text-primary">{fcfa(total)}</span>
+            <div className="rounded-xl p-4 flex items-center justify-between" style={{ background: 'var(--agro-light)', border: '1px solid var(--agro-border)' }}>
+              <span className="text-sm font-medium" style={{ color: 'var(--agro-muted)' }}>Total</span>
+              <span className="af-display text-xl font-extrabold" style={{ color: '#166534' }}>{total > 0 ? fcfa(total) : '—'}</span>
             </div>
 
             <Button
               onClick={confirm}
-              className="af-btn-primary rounded-xl font-semibold h-12"
+              disabled={total <= 0 || qty < (listing.minOrder || 1)}
+              className="rounded-xl font-semibold h-12"
+              style={{
+                background: total <= 0 || qty < (listing.minOrder || 1) ? 'var(--agro-border)' : '#166534',
+                color: '#fff',
+                boxShadow: total > 0 && qty >= (listing.minOrder || 1) ? '0 4px 12px rgba(22,101,52,0.3)' : 'none',
+              }}
             >
-              Confirmer la commande
+              {total <= 0 ? 'Sélectionnez une quantité' : 'Confirmer la commande'}
             </Button>
           </div>
         )}
@@ -341,16 +448,20 @@ export function ProductDetailModal({
           <div className="p-8 flex flex-col items-center text-center gap-3">
             <div
               className="w-16 h-16 rounded-full flex items-center justify-center"
-              style={{ background: 'var(--agro-light)' }}
+              style={{ background: 'rgba(22,101,52,0.1)' }}
             >
-              <CircleCheck size={32} className="text-primary" />
+              <CircleCheck size={32} style={{ color: '#166534' }} />
             </div>
             <h3 className="af-display font-bold text-lg">Commande envoyée</h3>
             <p className="text-sm max-w-xs text-muted-foreground">
               {listing.seller} a reçu votre demande pour {qty} {listing.unit} de{' '}
               {listing.title}. Vous serez notifié dès confirmation.
             </p>
-            <Button onClick={onClose} className="af-btn-primary rounded-lg px-5 py-3 text-sm font-semibold mt-2">
+            <Button 
+              onClick={onClose} 
+              className="rounded-lg px-5 py-3 text-sm font-semibold mt-2"
+              style={{ background: '#166534', color: '#fff' }}
+            >
               Suivre mes commandes
             </Button>
           </div>
@@ -359,5 +470,3 @@ export function ProductDetailModal({
     </Dialog>
   )
 }
-
-import { Card } from '@/components/ui/card'

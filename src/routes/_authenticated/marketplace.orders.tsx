@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import type { Order } from '@/types/marketplace'
 import type { MarketplaceListing } from '@/lib/marketplace-data'
 import { EditOfferModal } from '@/components/marketplace/edit-offer-modal'
+import { DebugOrders } from '@/components/marketplace/debug-orders'
 
 export const Route = createFileRoute('/_authenticated/marketplace/orders')({
   ssr: false,
@@ -97,6 +98,9 @@ function OrdersPage() {
       </header>
 
       <main className="container mx-auto p-4 max-w-4xl">
+        {/* Debug Component - À supprimer après fix */}
+        <DebugOrders />
+
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
           <Button
