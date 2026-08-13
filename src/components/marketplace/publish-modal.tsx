@@ -1,4 +1,4 @@
-import { Fragment, useState, useMemo, useRef } from 'react'
+import { Fragment, useState, useMemo, useRef, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,8 @@ import {
   fcfa,
 } from '@/lib/marketplace-data'
 import { createListing } from '@/lib/marketplace.service'
+import { BF_REGIONS, getCitiesByRegion } from '@/data/locations'
+import { LocationPicker } from '@/components/ui/location-picker'
 
 interface PublishModalProps {
   onClose: () => void
@@ -32,6 +34,9 @@ export function PublishModal({ onClose, onPublish }: PublishModalProps) {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [availableCities, setAvailableCities] = useState<string[]>([])
+  const [geoLocationOpen, setGeoLocationOpen] = useState(false)
+  const [geoCoords, setGeoCoords] = useState<{ latitude: number; longitude: number; address?: string } | null>(null)
   const [data, setData] = useState({
     title: '',
     category: 'legumes',
@@ -41,10 +46,20 @@ export function PublishModal({ onClose, onPublish }: PublishModalProps) {
     unit: 'kg',
     qty: '',
     minOrder: '',
-    region: REGIONS[0],
+    region: BF_REGIONS[0].name,
     city: '',
     images: [] as string[],
   })
+
+  // Update cities when region changes
+  useEffect(() => {
+    const cities = getCitiesByRegion(data.region)
+    setAvailableCities(cities)
+    // Reset city if not in new region
+    if (data.city && !cities.includes(data.city)) {
+      setData(d => ({ ...d, city: '' }))
+    }
+  }, [data.region])
   const fileRef = useRef<HTMLInputElement | null>(null)
 
   function set(field: keyof typeof data, value: unknown) {
@@ -68,9 +83,9 @@ export function PublishModal({ onClose, onPublish }: PublishModalProps) {
         Number(data.qty) > 0 &&
         Number(data.minOrder) > 0
       )
-    if (step === 3) return data.city.trim().length > 0
+    if (step === 3) return data.city.trim().length > 0 && availableCities.includes(data.city)
     return true
-  }, [step, data])
+  }, [step, data, availableCities])
 
   async function handlePublish() {
     setLoading(true)
@@ -317,28 +332,61 @@ export function PublishModal({ onClose, onPublish }: PublishModalProps) {
                   onChange={(e) => set('region', e.target.value)}
                   className="af-input rounded-lg px-3 py-2.5 text-sm w-full"
                 >
-                  {REGIONS.map((r) => (
-                    <option key={r} value={r}>{r}</option>
+                  {BF_REGIONS.map((r) => (
+                    <option key={r.id} value={r.name}>{r.name}</option>
                   ))}
                 </select>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-semibold">Ville / village</Label>
-                <Input
+                <Label className="text-sm font-semibold">Ville / village *</Label>
+                <select
                   value={data.city}
                   onChange={(e) => set('city', e.target.value)}
-                  placeholder="Ex : Dédougou"
-                  className="af-input"
-                />
+                  className="af-input rounded-lg px-3 py-2.5 text-sm w-full"
+                  disabled={!data.region || availableCities.length === 0}
+                >
+                  <option value="">
+                    {data.region ? "Choisir une ville" : "Sélectionnez d'abord une région"}
+                  </option>
+                  {availableCities.map((city) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+                {!data.region && (
+                  <p className="text-xs text-gray-500 mt-1">Sélectionnez une région d'abord</p>
+                )}
               </div>
 
               <Button
+                type="button"
                 variant="outline"
-                className="af-btn-ghost rounded-lg py-3 text-sm font-semibold inline-flex items-center justify-center gap-2 w-full"
+                onClick={() => setGeoLocationOpen(true)}
+                className="af-btn-ghost rounded-lg py-3 text-sm font-semibold inline-flex items-center justify-center gap-2 w-full border-green-300 text-green-700 hover:bg-green-50"
               >
-                <MapPin size={16} /> Ajouter la géolocalisation (optionnel)
+                <MapPin size={16} />
+                {geoCoords ? '📍 Position définie' : 'Ajouter la géolocalisation (optionnel)'}
               </Button>
+
+              {geoCoords && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-xs">
+                  <p className="font-semibold text-green-800 mb-1">📍 Localisation enregistrée :</p>
+                  <p className="text-green-700 font-mono">
+                    {geoCoords.latitude.toFixed(6)}, {geoCoords.longitude.toFixed(6)}
+                  </p>
+                  {geoCoords.address && (
+                    <p className="text-green-700 mt-1 truncate">{geoCoords.address}</p>
+                  )}
+                  <a
+                    href={`https://www.openstreetmap.org/?mlat=${geoCoords.latitude}&mlon=${geoCoords.longitude}#map=16/${geoCoords.latitude}/${geoCoords.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-green-600 hover:underline block mt-2"
+                  >
+                    🗺️ Voir sur la carte
+                  </a>
+                </div>
+              )}
             </>
           )}
 
@@ -462,6 +510,15 @@ export function PublishModal({ onClose, onPublish }: PublishModalProps) {
           </div>
         )}
       </DialogContent>
+
+      {/* Location Picker Modal */}
+      <LocationPicker
+        open={geoLocationOpen}
+        onOpenChange={setGeoLocationOpen}
+        onSelect={(location) => {
+          setGeoCoords(location)
+        }}
+      />
     </Dialog>
   )
 }

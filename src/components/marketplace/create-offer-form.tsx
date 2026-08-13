@@ -6,10 +6,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Leaf, CheckCircle, Upload, X, AlertCircle } from 'lucide-react'
+import { Leaf, CheckCircle, Upload, X, AlertCircle, MapPin } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import type { ProductCategory, UnitType } from '@/types/marketplace'
+import { BF_REGIONS, getCitiesByRegion } from '@/data/locations'
+import { LocationPicker } from '@/components/ui/location-picker'
 
 interface CreateOfferFormProps {
   onSuccess?: () => void
@@ -22,11 +24,6 @@ const CATEGORIES: ProductCategory[] = [
 
 const UNITS: UnitType[] = ['kg', 'sac', 'panier', 'caisse', 'unite']
 
-const REGIONS = [
-  'Centre', 'Boucle du Mouhoun', 'Cascades', 'Centre-Est', 'Centre-Nord', 'Centre-Ouest',
-  'Centre-Sud', 'Est', 'Hauts-Bassins', 'Nord', 'Plateau-Central', 'Sahel', 'Sud-Ouest'
-]
-
 export function CreateOfferForm({ onSuccess, onCancel }: CreateOfferFormProps) {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
@@ -34,6 +31,9 @@ export function CreateOfferForm({ onSuccess, onCancel }: CreateOfferFormProps) {
   const [success, setSuccess] = useState(false)
   const [selectedImages, setSelectedImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
+  const [availableCities, setAvailableCities] = useState<string[]>([])
+  const [geoLocationOpen, setGeoLocationOpen] = useState(false)
+  const [geoCoords, setGeoCoords] = useState<{ latitude: number; longitude: number; address?: string } | null>(null)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -45,6 +45,18 @@ export function CreateOfferForm({ onSuccess, onCancel }: CreateOfferFormProps) {
     location: '',
     region: '',
   })
+
+  // Update cities when region changes
+  useEffect(() => {
+    if (formData.region) {
+      const cities = getCitiesByRegion(formData.region)
+      setAvailableCities(cities)
+      // Reset city if it's not in the new region
+      if (formData.location && !cities.includes(formData.location)) {
+        setFormData(prev => ({ ...prev, location: '' }))
+      }
+    }
+  }, [formData.region])
 
   // Auth check
   useEffect(() => {
@@ -140,11 +152,11 @@ export function CreateOfferForm({ onSuccess, onCancel }: CreateOfferFormProps) {
     if (!formData.price || parseFloat(formData.price) <= 0) {
       errors.push('Prix invalide')
     }
-    if (!formData.location || formData.location.trim().length < 2) {
-      errors.push('Localisation requise')
-    }
     if (!formData.region) {
       errors.push('Région requise')
+    }
+    if (!formData.location || !availableCities.includes(formData.location)) {
+      errors.push('Ville requise (sélectionnez dans la liste)')
     }
     
     return errors
@@ -404,21 +416,8 @@ export function CreateOfferForm({ onSuccess, onCancel }: CreateOfferFormProps) {
             </div>
           </div>
 
-          {/* Location & Region */}
+          {/* Region & City */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="location" className="font-semibold text-gray-700">Localisation *</Label>
-              <Input
-                id="location"
-                name="location"
-                placeholder="Ex: Ouagadougou, Bobo-Dioulasso..."
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                required
-                className="mt-1"
-              />
-            </div>
-
             <div>
               <Label htmlFor="region-select" className="font-semibold text-gray-700">Région *</Label>
               <Select value={formData.region} onValueChange={(v) => setFormData({ ...formData, region: v })}>
@@ -426,12 +425,66 @@ export function CreateOfferForm({ onSuccess, onCancel }: CreateOfferFormProps) {
                   <SelectValue placeholder="Choisir" />
                 </SelectTrigger>
                 <SelectContent>
-                  {REGIONS.map((r) => (
-                    <SelectItem key={r} value={r}>{r}</SelectItem>
+                  {BF_REGIONS.map((r) => (
+                    <SelectItem key={r.id} value={r.name}>{r.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+
+            <div>
+              <Label htmlFor="city-select" className="font-semibold text-gray-700">Ville *</Label>
+              <Select 
+                value={formData.location} 
+                onValueChange={(v) => setFormData({ ...formData, location: v })}
+                disabled={!formData.region || availableCities.length === 0}
+              >
+                <SelectTrigger id="city-select" aria-label="Choisir la ville">
+                  <SelectValue placeholder={formData.region ? "Choisir une ville" : "Sélectionnez d'abord une région"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableCities.map((city) => (
+                    <SelectItem key={city} value={city}>{city}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {!formData.region && (
+                <p className="text-xs text-gray-500 mt-1">Sélectionnez une région d'abord</p>
+              )}
+            </div>
+          </div>
+
+          {/* Geolocation button */}
+          <div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setGeoLocationOpen(true)}
+              className="w-full border-green-300 text-green-700 hover:bg-green-50"
+            >
+              <MapPin className="w-4 h-4 mr-2" />
+              {geoCoords ? '📍 Position définie' : 'Ajouter ma localisation GPS (optionnel)'}
+            </Button>
+
+            {geoCoords && (
+              <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg text-xs">
+                <p className="font-semibold text-green-800 mb-1">📍 Localisation :</p>
+                <p className="text-green-700 font-mono">
+                  {geoCoords.latitude.toFixed(6)}, {geoCoords.longitude.toFixed(6)}
+                </p>
+                {geoCoords.address && (
+                  <p className="text-green-700 truncate">{geoCoords.address}</p>
+                )}
+                <a
+                  href={`https://www.openstreetmap.org/?mlat=${geoCoords.latitude}&mlon=${geoCoords.longitude}#map=16/${geoCoords.latitude}/${geoCoords.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-green-600 hover:underline block mt-2"
+                >
+                  🗺️ Voir sur la carte
+                </a>
+              </div>
+            )}
           </div>
 
           {/* Actions */}
@@ -492,6 +545,15 @@ export function CreateOfferForm({ onSuccess, onCancel }: CreateOfferFormProps) {
             </div>
           )}
         </form>
+
+        {/* Location Picker Modal */}
+        <LocationPicker
+          open={geoLocationOpen}
+          onOpenChange={setGeoLocationOpen}
+          onSelect={(location) => {
+            setGeoCoords(location)
+          }}
+        />
       </CardContent>
     </Card>
   )
