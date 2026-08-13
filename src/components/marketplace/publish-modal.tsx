@@ -132,37 +132,40 @@ export function PublishModal({ onClose, onPublish }: PublishModalProps) {
                     className="af-display w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-200"
                     style={{
                       background:
-                        i + 1 <= step ? 'var(--agro-primary)' : '#e2e8e0',
-                      color: i + 1 <= step ? '#fff' : 'var(--agro-muted)',
-                      boxShadow: i + 1 === step ? '0 0 0 3px rgba(22,101,52,0.18)' : 'none',
+                        i + 1 <= step ? '#166534' : '#e2e8e0',
+                      color: i + 1 <= step ? '#fff' : '#64748b',
+                      boxShadow: i + 1 === step ? '0 0 0 3px rgba(22,101,52,0.3)' : 'none',
+                      border: i + 1 === step ? '2px solid #166534' : '2px solid transparent',
                     }}
                   >
                     {i + 1 < step ? (
-                      <Check size={14} />
+                      <Check size={14} strokeWidth={3} />
                     ) : (
                       i + 1
                     )}
                   </div>
                   <span
-                    className="af-text-10 hidden sm:block"
+                    className="af-text-10 hidden sm:block text-xs font-semibold transition-all duration-200"
                     style={{
                       color:
                         i + 1 === step
-                          ? 'var(--agro-primary)'
+                          ? '#166534'
                           : i + 1 < step
-                            ? 'var(--agro-ink)'
-                            : 'var(--agro-muted)',
-                      fontWeight: i + 1 === step ? 700 : 500,
+                            ? '#166534'
+                            : '#94a3b8',
                     }}
                   >
                     {label}
                   </span>
                 </div>
                 {i < STEP_LABELS.length - 1 && (
-                  <div className="flex-1 h-1 af-progress-line rounded-full mx-1">
+                  <div className="flex-1 h-1.5 bg-gray-200 rounded-full mx-1 overflow-hidden">
                     <div
-                      className="af-progress-fill h-1 rounded-full"
-                      style={{ width: i + 1 < step ? '100%' : '0%' }}
+                      className="h-full rounded-full transition-all duration-300"
+                      style={{ 
+                        width: i + 1 < step ? '100%' : '0%',
+                        background: i + 1 < step ? '#166534' : 'transparent'
+                      }}
                     />
                   </div>
                 )}
@@ -199,8 +202,10 @@ export function PublishModal({ onClose, onPublish }: PublishModalProps) {
                         variant="outline"
                         onClick={() => set('category', c.id)}
                         className={cn(
-                          'af-chip rounded-lg px-3 py-2.5 text-sm font-medium inline-flex items-center gap-2',
-                          data.category === c.id && 'af-chip-active'
+                          'rounded-lg px-3 py-2.5 text-sm font-medium inline-flex items-center gap-2 border-2 transition-all duration-200',
+                          data.category === c.id
+                            ? 'bg-green-700 border-green-800 text-white shadow-lg'
+                            : 'bg-white border-gray-200 text-gray-700 hover:bg-green-50 hover:border-green-300'
                         )}
                       >
                         <Icon size={16} /> {c.label}
@@ -236,8 +241,10 @@ export function PublishModal({ onClose, onPublish }: PublishModalProps) {
                       variant="outline"
                       onClick={() => set('saleType', v as 'gros' | 'detail')}
                       className={cn(
-                        'af-chip rounded-lg px-3.5 py-2.5 text-sm font-medium flex-1',
-                        data.saleType === v && 'af-chip-active'
+                        'rounded-lg px-3.5 py-2.5 text-sm font-medium flex-1 border-2 transition-all duration-200',
+                        data.saleType === v
+                          ? 'bg-green-700 border-green-800 text-white shadow-lg'
+                          : 'bg-white border-gray-200 text-gray-700 hover:bg-green-50 hover:border-green-300'
                       )}
                     >
                       {l}
