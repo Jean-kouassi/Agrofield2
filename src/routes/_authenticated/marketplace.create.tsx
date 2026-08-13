@@ -1,5 +1,5 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import type { ProductCategory, UnitType } from '@/types/marketplace'
 
-export const Route = createFileRoute('/marketplace/create')({
+export const Route = createFileRoute('/_authenticated/marketplace/create')({
   ssr: false,
   component: CreateOfferPage,
 })
@@ -35,31 +35,16 @@ function CreateOfferPage() {
   const [selectedImages, setSelectedImages] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
 
-  useState(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user))
-  })
-
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-        <Card className="max-w-md w-full mx-4">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Leaf className="h-6 w-6 text-green-600" />
-              Connexion requise
-            </CardTitle>
-            <CardDescription>
-              Vous devez être connecté pour créer une offre.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Button onClick={() => router.navigate({ to: '/auth' })}>Se connecter</Button>
-            <Button variant="outline" onClick={() => router.navigate({ to: '/' })}>Retour</Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) {
+        toast.error('Vous devez être connecté')
+        router.navigate({ to: '/auth' })
+        return
+      }
+      setUser(data.user)
+    })
+  }, [router])
 
   const [formData, setFormData] = useState({
     title: '',
@@ -126,6 +111,13 @@ function CreateOfferPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    
+    // Validation
+    if (!formData.title || !formData.description || !formData.category || !formData.quantity || !formData.price || !formData.location || !formData.region) {
+      toast.error('Veuillez remplir tous les champs obligatoires (*)')
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -138,14 +130,14 @@ function CreateOfferPage() {
 
       const offerData = {
         seller_id: user.id,
-        seller_name: user.email || 'Agriculteur',
-        title: formData.title,
-        description: formData.description,
+        seller_name: user.user_metadata?.full_name || user.email || 'Agriculteur',
+        title: formData.title.trim(),
+        description: formData.description.trim(),
         category: formData.category,
         quantity: parseFloat(formData.quantity),
         unit: formData.unit,
         price: parseFloat(formData.price),
-        location: formData.location,
+        location: formData.location.trim(),
         region: formData.region,
         images: imageUrls,
         available_from: new Date().toISOString(),
@@ -153,17 +145,25 @@ function CreateOfferPage() {
         status: 'available',
       }
 
+      console.log('Inserting offer:', offerData)
+
       const { data, error } = await supabase
         .from('marketplace_listings')
         .insert([offerData])
         .select()
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase error:', error)
+        throw error
+      }
 
+      console.log('Offer created:', data)
       setSuccess(true)
+      toast.success('✅ Offre publiée avec succès !')
       setTimeout(() => router.navigate({ to: '/marketplace' }), 2000)
     } catch (error: any) {
-      toast.error('Erreur: ' + error.message)
+      console.error('Error creating offer:', error)
+      toast.error('Erreur lors de la publication: ' + (error.message || 'Erreur inconnue'))
     } finally {
       setLoading(false)
     }
@@ -179,7 +179,9 @@ function CreateOfferPage() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Offre publiée avec succès ! 🎉</h2>
             <p className="text-gray-600 mb-4">Votre produit sera bientôt visible sur le marketplace.</p>
-            <p className="text-sm text-gray-500">Redirection...</p>
+            <Button onClick={() => router.navigate({ to: '/marketplace' })}>
+              Retour au marketplace
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -216,10 +218,12 @@ function CreateOfferPage() {
 
           <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Titre */}
               <div>
                 <Label htmlFor="title" className="font-semibold text-gray-700">Titre *</Label>
                 <Input
                   id="title"
+                  name="title"
                   placeholder="Ex: Tomates fraîches - Récolte du jour"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -228,11 +232,13 @@ function CreateOfferPage() {
                 />
               </div>
 
+              {/* Description */}
               <div>
                 <Label htmlFor="description" className="font-semibold text-gray-700">Description *</Label>
                 <Textarea
                   id="description"
-                  placeholder="Décrivez votre produit..."
+                  name="description"
+                  placeholder="Décrivez votre produit (qualité, variété, mode de culture...)"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   required
@@ -243,7 +249,9 @@ function CreateOfferPage() {
 
               {/* Images */}
               <div>
-                <Label className="font-semibold text-gray-700">Photos du produit (max 5)</Label>
+                <Label htmlFor="product-images" className="font-semibold text-gray-700 block mb-2">
+                  Photos du produit (max 5)
+                </Label>
                 {imagePreviews.length > 0 && (
                   <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mb-3">
                     {imagePreviews.map((preview, idx) => (
@@ -253,6 +261,7 @@ function CreateOfferPage() {
                           type="button"
                           onClick={() => removeImage(idx)}
                           className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                          aria-label="Supprimer l'image"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -269,85 +278,134 @@ function CreateOfferPage() {
                     JPG, PNG, WEBP — max 5MB par image
                   </p>
                   <Input
+                    id="product-images"
+                    name="product-images"
                     type="file"
                     accept="image/*"
                     multiple
                     onChange={handleImageSelect}
                     className="cursor-pointer"
+                    aria-label="Sélectionner des images du produit"
                   />
                 </div>
               </div>
 
+              {/* Catégorie et Unité */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="font-semibold text-gray-700">Catégorie *</Label>
+                  <Label htmlFor="category" className="font-semibold text-gray-700">Catégorie *</Label>
                   <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v as ProductCategory })}>
-                    <SelectTrigger><SelectValue placeholder="Choisir" /></SelectTrigger>
+                    <SelectTrigger id="category" aria-label="Choisir la catégorie">
+                      <SelectValue placeholder="Choisir" />
+                    </SelectTrigger>
                     <SelectContent>
-                      {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      {categories.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <Label className="font-semibold text-gray-700">Unité *</Label>
+                  <Label htmlFor="unit" className="font-semibold text-gray-700">Unité *</Label>
                   <Select value={formData.unit} onValueChange={(v) => setFormData({ ...formData, unit: v as UnitType })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger id="unit" aria-label="Choisir l'unité">
+                      <SelectValue placeholder="kg" />
+                    </SelectTrigger>
                     <SelectContent>
-                      {units.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                      {units.map((u) => (
+                        <SelectItem key={u} value={u}>{u}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
+              {/* Quantité et Prix */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="font-semibold text-gray-700">Quantité *</Label>
+                  <Label htmlFor="quantity" className="font-semibold text-gray-700">Quantité *</Label>
                   <Input
+                    id="quantity"
+                    name="quantity"
                     type="number"
-                    step="0.01"
+                    min="0"
+                    step="0.1"
+                    placeholder="0"
                     value={formData.quantity}
                     onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
                     required
+                    className="mt-1"
                   />
                 </div>
 
                 <div>
-                  <Label className="font-semibold text-gray-700">Prix / unité (FCFA) *</Label>
+                  <Label htmlFor="price" className="font-semibold text-gray-700">Prix unitaire (FCFA) *</Label>
                   <Input
+                    id="price"
+                    name="price"
                     type="number"
+                    min="0"
+                    step="1"
+                    placeholder="0"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     required
+                    className="mt-1"
                   />
                 </div>
               </div>
 
+              {/* Localisation et Région */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="font-semibold text-gray-700">Localisation (ville) *</Label>
+                  <Label htmlFor="location" className="font-semibold text-gray-700">Localisation *</Label>
                   <Input
-                    placeholder="Ex: Ouagadougou"
+                    id="location"
+                    name="location"
+                    placeholder="Ex: Ouagadougou, Bobo-Dioulasso..."
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                     required
+                    className="mt-1"
                   />
                 </div>
 
                 <div>
-                  <Label className="font-semibold text-gray-700">Région *</Label>
+                  <Label htmlFor="region" className="font-semibold text-gray-700">Région *</Label>
                   <Select value={formData.region} onValueChange={(v) => setFormData({ ...formData, region: v })}>
-                    <SelectTrigger><SelectValue placeholder="Choisir" /></SelectTrigger>
+                    <SelectTrigger id="region" aria-label="Choisir la région">
+                      <SelectValue placeholder="Choisir" />
+                    </SelectTrigger>
                     <SelectContent>
-                      {regions.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                      {regions.map((r) => (
+                        <SelectItem key={r} value={r}>{r}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Publication en cours...' : 'Publier l\'offre'}
-              </Button>
+              {/* Boutons */}
+              <div className="flex gap-3 pt-4 border-t">
+                <Button 
+                  type="submit" 
+                  size="lg"
+                  className="bg-green-600 hover:bg-green-700 flex-1"
+                  disabled={loading}
+                >
+                  {loading ? 'Publication en cours...' : '✅ Publier l\'offre'}
+                </Button>
+                <Button 
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={() => router.navigate({ to: '/marketplace' })}
+                  disabled={loading}
+                >
+                  Annuler
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>

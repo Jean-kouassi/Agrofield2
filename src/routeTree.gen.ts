@@ -16,7 +16,6 @@ import { Route as CreateOfferRouteImport } from './routes/create-offer'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as MarketplaceCreateRouteImport } from './routes/marketplace.create'
 import { Route as MarketplaceIdRouteImport } from './routes/marketplace.$id'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedSensorsRouteImport } from './routes/_authenticated/sensors'
@@ -32,6 +31,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedMarketplaceOrdersRouteImport } from './routes/_authenticated/marketplace.orders'
 import { Route as AuthenticatedMarketplaceMyOffersRouteImport } from './routes/_authenticated/marketplace.my-offers'
 import { Route as AuthenticatedMarketplaceMessagesRouteImport } from './routes/_authenticated/marketplace.messages'
+import { Route as AuthenticatedMarketplaceCreateRouteImport } from './routes/_authenticated/marketplace.create'
 import { Route as AuthenticatedFinancesCreditRouteImport } from './routes/_authenticated/finances.credit'
 import { Route as AuthenticatedFinancesAddRouteImport } from './routes/_authenticated/finances.add'
 import { Route as ApiPublicSensorsIngestRouteImport } from './routes/api/public/sensors/ingest'
@@ -70,11 +70,6 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MarketplaceCreateRoute = MarketplaceCreateRouteImport.update({
-  id: '/marketplace/create',
-  path: '/marketplace/create',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceIdRoute = MarketplaceIdRouteImport.update({
@@ -156,6 +151,12 @@ const AuthenticatedMarketplaceMessagesRoute =
     path: '/messages',
     getParentRoute: () => AuthenticatedMarketplaceRoute,
   } as any)
+const AuthenticatedMarketplaceCreateRoute =
+  AuthenticatedMarketplaceCreateRouteImport.update({
+    id: '/create',
+    path: '/create',
+    getParentRoute: () => AuthenticatedMarketplaceRoute,
+  } as any)
 const AuthenticatedFinancesCreditRoute =
   AuthenticatedFinancesCreditRouteImport.update({
     id: '/finances/credit',
@@ -205,9 +206,9 @@ export interface FileRoutesByFullPath {
   '/sensors': typeof AuthenticatedSensorsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
-  '/marketplace/create': typeof MarketplaceCreateRoute
   '/finances/add': typeof AuthenticatedFinancesAddRoute
   '/finances/credit': typeof AuthenticatedFinancesCreditRoute
+  '/marketplace/create': typeof AuthenticatedMarketplaceCreateRoute
   '/marketplace/messages': typeof AuthenticatedMarketplaceMessagesRoute
   '/marketplace/my-offers': typeof AuthenticatedMarketplaceMyOffersRoute
   '/marketplace/orders': typeof AuthenticatedMarketplaceOrdersRoute
@@ -234,9 +235,9 @@ export interface FileRoutesByTo {
   '/sensors': typeof AuthenticatedSensorsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
-  '/marketplace/create': typeof MarketplaceCreateRoute
   '/finances/add': typeof AuthenticatedFinancesAddRoute
   '/finances/credit': typeof AuthenticatedFinancesCreditRoute
+  '/marketplace/create': typeof AuthenticatedMarketplaceCreateRoute
   '/marketplace/messages': typeof AuthenticatedMarketplaceMessagesRoute
   '/marketplace/my-offers': typeof AuthenticatedMarketplaceMyOffersRoute
   '/marketplace/orders': typeof AuthenticatedMarketplaceOrdersRoute
@@ -265,9 +266,9 @@ export interface FileRoutesById {
   '/_authenticated/sensors': typeof AuthenticatedSensorsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/marketplace/$id': typeof MarketplaceIdRoute
-  '/marketplace/create': typeof MarketplaceCreateRoute
   '/_authenticated/finances/add': typeof AuthenticatedFinancesAddRoute
   '/_authenticated/finances/credit': typeof AuthenticatedFinancesCreditRoute
+  '/_authenticated/marketplace/create': typeof AuthenticatedMarketplaceCreateRoute
   '/_authenticated/marketplace/messages': typeof AuthenticatedMarketplaceMessagesRoute
   '/_authenticated/marketplace/my-offers': typeof AuthenticatedMarketplaceMyOffersRoute
   '/_authenticated/marketplace/orders': typeof AuthenticatedMarketplaceOrdersRoute
@@ -296,9 +297,9 @@ export interface FileRouteTypes {
     | '/sensors'
     | '/auth/callback'
     | '/marketplace/$id'
-    | '/marketplace/create'
     | '/finances/add'
     | '/finances/credit'
+    | '/marketplace/create'
     | '/marketplace/messages'
     | '/marketplace/my-offers'
     | '/marketplace/orders'
@@ -325,9 +326,9 @@ export interface FileRouteTypes {
     | '/sensors'
     | '/auth/callback'
     | '/marketplace/$id'
-    | '/marketplace/create'
     | '/finances/add'
     | '/finances/credit'
+    | '/marketplace/create'
     | '/marketplace/messages'
     | '/marketplace/my-offers'
     | '/marketplace/orders'
@@ -355,9 +356,9 @@ export interface FileRouteTypes {
     | '/_authenticated/sensors'
     | '/auth/callback'
     | '/marketplace/$id'
-    | '/marketplace/create'
     | '/_authenticated/finances/add'
     | '/_authenticated/finances/credit'
+    | '/_authenticated/marketplace/create'
     | '/_authenticated/marketplace/messages'
     | '/_authenticated/marketplace/my-offers'
     | '/_authenticated/marketplace/orders'
@@ -375,7 +376,6 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   MarketplaceIdRoute: typeof MarketplaceIdRoute
-  MarketplaceCreateRoute: typeof MarketplaceCreateRoute
   ApiPublicSensorsCommandsRoute: typeof ApiPublicSensorsCommandsRoute
   ApiPublicSensorsIngestRoute: typeof ApiPublicSensorsIngestRoute
 }
@@ -429,13 +429,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/marketplace/create': {
-      id: '/marketplace/create'
-      path: '/marketplace/create'
-      fullPath: '/marketplace/create'
-      preLoaderRoute: typeof MarketplaceCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace/$id': {
@@ -543,6 +536,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMarketplaceMessagesRouteImport
       parentRoute: typeof AuthenticatedMarketplaceRoute
     }
+    '/_authenticated/marketplace/create': {
+      id: '/_authenticated/marketplace/create'
+      path: '/create'
+      fullPath: '/marketplace/create'
+      preLoaderRoute: typeof AuthenticatedMarketplaceCreateRouteImport
+      parentRoute: typeof AuthenticatedMarketplaceRoute
+    }
     '/_authenticated/finances/credit': {
       id: '/_authenticated/finances/credit'
       path: '/finances/credit'
@@ -582,6 +582,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedMarketplaceRouteChildren {
+  AuthenticatedMarketplaceCreateRoute: typeof AuthenticatedMarketplaceCreateRoute
   AuthenticatedMarketplaceMessagesRoute: typeof AuthenticatedMarketplaceMessagesRoute
   AuthenticatedMarketplaceMyOffersRoute: typeof AuthenticatedMarketplaceMyOffersRoute
   AuthenticatedMarketplaceOrdersRoute: typeof AuthenticatedMarketplaceOrdersRoute
@@ -590,6 +591,7 @@ interface AuthenticatedMarketplaceRouteChildren {
 
 const AuthenticatedMarketplaceRouteChildren: AuthenticatedMarketplaceRouteChildren =
   {
+    AuthenticatedMarketplaceCreateRoute: AuthenticatedMarketplaceCreateRoute,
     AuthenticatedMarketplaceMessagesRoute:
       AuthenticatedMarketplaceMessagesRoute,
     AuthenticatedMarketplaceMyOffersRoute:
@@ -655,7 +657,6 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   MarketplaceIdRoute: MarketplaceIdRoute,
-  MarketplaceCreateRoute: MarketplaceCreateRoute,
   ApiPublicSensorsCommandsRoute: ApiPublicSensorsCommandsRoute,
   ApiPublicSensorsIngestRoute: ApiPublicSensorsIngestRoute,
 }

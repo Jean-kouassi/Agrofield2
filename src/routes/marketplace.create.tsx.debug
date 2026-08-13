@@ -1,2 +1,0 @@
-// DEBUG: Si tu vois ça dans la console, le fichier est chargé
-console.log('🔍 marketplace.create.tsx LOADED');
