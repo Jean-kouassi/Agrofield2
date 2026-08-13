@@ -18,7 +18,7 @@ import {
   type Message,
 } from '@/lib/messages'
 
-export const Route = createFileRoute('/marketplace/messages')({
+export const Route = createFileRoute('/_authenticated/marketplace/messages')({
   ssr: false,
   component: MessagesPage,
 })

@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import type { Order } from '@/types/marketplace'
 
-export const Route = createFileRoute('/marketplace/orders')({
+export const Route = createFileRoute('/_authenticated/marketplace/orders')({
   ssr: false,
   component: OrdersPage,
 })

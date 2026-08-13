@@ -357,7 +357,7 @@ function CreditScorePage() {
                     {creditScore.factors.accountAge < 50 && (
                       <li className="flex items-start gap-2">
                         <CheckCircle className="w-4 h-4 mt-0.5 shrink-0 text-blue-500" />
-                        Continuez à utiliser AgroField régulièrement — l'ancienneté de votre compte renforce votre score.
+                        Continuez à utiliser AgroSphere régulièrement — l'ancienneté de votre compte renforce votre score.
                       </li>
                     )}
                     {creditScore.factors.transactionHistory >= 70 && creditScore.factors.repaymentHistory >= 70 && creditScore.factors.incomeStability >= 70 && creditScore.factors.debtRatio >= 60 && (

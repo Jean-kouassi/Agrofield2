@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { CROP_TYPES, EXPENSE_CATEGORIES, formatFcfa } from "@/lib/agrofield";
+import { CROP_TYPES, EXPENSE_CATEGORIES, formatFcfa } from "@/lib/agrosphere";
 import { exportFinanceToPDF } from "@/lib/pdf-export";
 import { toast } from "sonner";
 import {
@@ -24,9 +24,9 @@ import {
 export const Route = createFileRoute("/_authenticated/finance")({
   head: () => ({
     meta: [
-      { title: "Finance agricole — AgroField" },
+      { title: "Finance agricole — AgroSphere" },
       { name: "description", content: "Suivi des dépenses et ventes en FCFA avec registre certifié infalsifiable." },
-      { property: "og:title", content: "Finance agricole — AgroField" },
+      { property: "og:title", content: "Finance agricole — AgroSphere" },
       { property: "og:description", content: "Suivi des dépenses et ventes en FCFA avec registre certifié infalsifiable." },
       { property: "og:url", content: "https://field-bloom-wise.lovable.app/finance" },
       { name: "robots", content: "noindex" },
@@ -109,7 +109,7 @@ function FinancePage() {
     if (!file) return null;
     const ext = file.name.split(".").pop() || "jpg";
     const path = `receipts/${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const { error } = await supabase.storage.from("agrofield-media").upload(path, file, {
+    const { error } = await supabase.storage.from("AgroSphere-media").upload(path, file, {
       cacheControl: "3600", upsert: false,
     });
     if (error) {
@@ -178,7 +178,7 @@ function FinancePage() {
 
     async function signed(path: string | null) {
       if (!path) return "";
-      const { data } = await supabase.storage.from("agrofield-media").createSignedUrl(path, 60 * 60 * 24 * 7);
+      const { data } = await supabase.storage.from("AgroSphere-media").createSignedUrl(path, 60 * 60 * 24 * 7);
       return data?.signedUrl ?? "";
     }
 
@@ -227,7 +227,7 @@ function FinancePage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `agrofield-registre-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `AgroSphere-registre-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success(`${rows.length} écriture${rows.length > 1 ? "s" : ""} exportée${rows.length > 1 ? "s" : ""}`);
@@ -366,7 +366,7 @@ function Row({ title, subtitle, amount, tone, hash, record }: {
   async function viewReceipt() {
     if (!record.receipt_path) return;
     const { data, error } = await supabase.storage
-      .from("agrofield-media")
+      .from("AgroSphere-media")
       .createSignedUrl(record.receipt_path, 300);
     if (error || !data?.signedUrl) { toast.error("Reçu introuvable"); return; }
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");

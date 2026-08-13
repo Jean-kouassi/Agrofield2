@@ -9,10 +9,10 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "rec
 export const Route = createFileRoute("/_authenticated/sensors")({
   head: () => ({
     meta: [
-      { title: "Capteurs — AgroField" },
-      { name: "description", content: "Pilotez vos stations AgroField Node : sol, météo, irrigation." },
-      { property: "og:title", content: "Capteurs — AgroField" },
-      { property: "og:description", content: "Pilotez vos stations AgroField Node : sol, météo, irrigation." },
+      { title: "Capteurs — AgroSphere" },
+      { name: "description", content: "Pilotez vos stations AgroSphere Node : sol, météo, irrigation." },
+      { property: "og:title", content: "Capteurs — AgroSphere" },
+      { property: "og:description", content: "Pilotez vos stations AgroSphere Node : sol, météo, irrigation." },
       { property: "og:url", content: "https://field-bloom-wise.lovable.app/sensors" },
       { name: "robots", content: "noindex" },
     ],

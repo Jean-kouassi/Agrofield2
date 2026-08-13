@@ -10,10 +10,10 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
-      { title: "Profil — AgroField" },
-      { name: "description", content: "Gérez vos informations personnelles et paramètres AgroField." },
-      { property: "og:title", content: "Profil — AgroField" },
-      { property: "og:description", content: "Gérez vos informations personnelles et paramètres AgroField." },
+      { title: "Profil — AgroSphere" },
+      { name: "description", content: "Gérez vos informations personnelles et paramètres AgroSphere." },
+      { property: "og:title", content: "Profil — AgroSphere" },
+      { property: "og:description", content: "Gérez vos informations personnelles et paramètres AgroSphere." },
       { property: "og:url", content: "https://field-bloom-wise.lovable.app/profile" },
       { name: "robots", content: "noindex" },
     ],

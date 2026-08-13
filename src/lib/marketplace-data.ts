@@ -74,7 +74,7 @@ export function catOf(id: string) {
 }
 
 export function productImage(seed: string, i: number) {
-  return `https://picsum.photos/seed/agrofield-${seed}-${i}/640/480`
+  return `https://picsum.photos/seed/AgroSphere-${seed}-${i}/640/480`
 }
 
 export function fcfa(n: number) {

@@ -1,6 +1,6 @@
-name = "agrofield2"
+name = "agrosphere-connect"
 compatibility_date = "2026-08-05"
 pages_build_output_dir = ".output/public"
 
 [vars]
-VITE_APP_URL = "https://agrofield2.pages.dev"
+VITE_APP_URL = "https://agrosphere-connect.pages.dev"

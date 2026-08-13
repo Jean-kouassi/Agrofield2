@@ -36,7 +36,7 @@ C'est la méthode la plus simple pour tester immédiatement sans configurer l'AP
 
 3. **Lancez le script de test :**
    ```bash
-   cd C:\Users\Kouassi\Desktop\Agrofield2
+   cd C:\Users\Kouassi\Desktop\AgroSphere2
    node scripts/test-direct-supabase.mjs
    ```
 

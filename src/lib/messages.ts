@@ -1,5 +1,5 @@
 /**
- * Messagerie Interne AgroField
+ * Messagerie Interne AgroSphere
  * Fonctions pour gérer les conversations et messages
  */
 

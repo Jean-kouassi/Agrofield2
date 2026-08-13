@@ -1,5 +1,5 @@
 /**
- * AgroField Marketplace - Supabase Integration
+ * AgroSphere Marketplace - Supabase Integration
  * Fonctions pour interagir avec la base de données
  */
 

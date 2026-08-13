@@ -1,4 +1,4 @@
-# 🚀 Migration AgroField2 - Statut et Prochaines Étapes
+# 🚀 Migration AgroSphere2 - Statut et Prochaines Étapes
 
 **Date:** 22 Juillet 2026  
 **Statut:** 70% complété ✅
@@ -30,7 +30,7 @@
 - ✅ `src/routes/marketplace.$id.tsx` - Page de détail avec commande
 
 ### 4. **Configuration Supabase**
-- ✅ `.env` configuré avec projet Agrofield2
+- ✅ `.env` configuré avec projet AgroSphere2
 - ✅ Client Supabase natif (pas Lovable)
 
 ---
@@ -50,11 +50,11 @@
 ```bash
 # 1. Page principale marketplace
 cp "C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect\src\routes\marketplace.tsx" \
-   "C:\Users\Kouassi\Desktop\Agrofield2\src\routes\marketplace.tsx"
+   "C:\Users\Kouassi\Desktop\AgroSphere2\src\routes\marketplace.tsx"
 
 # 2. Page détail offre
 cp "C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect\src\routes\marketplace.\$id.tsx" \
-   "C:\Users\Kouassi\Desktop\Agrofield2\src\routes\marketplace.\$id.tsx"
+   "C:\Users\Kouassi\Desktop\AgroSphere2\src\routes\marketplace.\$id.tsx"
 ```
 
 **Tables SQL à vérifier dans Supabase :**
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS public.marketplace_stats (
 
 ### B. Finances Agricoles + Credit Scoring
 
-**Déjà présent dans Agrofield2 :**
+**Déjà présent dans AgroSphere2 :**
 - ✅ Table `expenses` (dépenses)
 - ✅ Table `sales` (ventes)
 - ✅ Table `price_references` (références prix)
@@ -115,14 +115,14 @@ CREATE TABLE IF NOT EXISTS public.marketplace_stats (
 ```bash
 # 1. Système de credit scoring
 cp "C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect\src\lib\credit-score.ts" \
-   "C:\Users\Kouassi\Desktop\Agrofield2\src\lib\credit-score.ts"
+   "C:\Users\Kouassi\Desktop\AgroSphere2\src\lib\credit-score.ts"
 
 # 2. Routes finances additionnelles
 cp "C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect\src\routes\_authenticated\finances.add.tsx" \
-   "C:\Users\Kouassi\Desktop\Agrofield2\src\routes\_authenticated\finances.add.tsx"
+   "C:\Users\Kouassi\Desktop\AgroSphere2\src\routes\_authenticated\finances.add.tsx"
 
 cp "C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect\src\routes\_authenticated\finances.credit.tsx" \
-   "C:\Users\Kouassi\Desktop\Agrofield2\src\routes\_authenticated\finances.credit.tsx"
+   "C:\Users\Kouassi\Desktop\AgroSphere2\src\routes\_authenticated\finances.credit.tsx"
 ```
 
 **SQL pour credit scoring :**
@@ -211,11 +211,11 @@ CREATE POLICY "members can view own membership" ON public.organization_members F
 
 ```bash
 # Créer dossier components/cooperatives
-New-Item -ItemType Directory -Force -Path "C:\Users\Kouassi\Desktop\Agrofield2\src\components\cooperatives"
+New-Item -ItemType Directory -Force -Path "C:\Users\Kouassi\Desktop\AgroSphere2\src\components\cooperatives"
 
 # Copier depuis AgroSphere Connect
 cp "C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect\src\routes\_authenticated\admin.tsx" \
-   "C:\Users\Kouassi\Desktop\Agrofield2\src\routes\_authenticated\cooperatives.tsx"
+   "C:\Users\Kouassi\Desktop\AgroSphere2\src\routes\_authenticated\cooperatives.tsx"
 ```
 
 ---
@@ -249,7 +249,7 @@ function MobileLayout() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header mobile */}
       <header className="sticky top-0 z-50 bg-primary text-primary-foreground p-4 shadow-md">
-        <h1 className="text-lg font-bold">AgroField Mobile</h1>
+        <h1 className="text-lg font-bold">AgroSphere Mobile</h1>
       </header>
 
       {/* Content */}
@@ -276,11 +276,11 @@ function MobileLayout() {
 
 ---
 
-### E. Design Parcelles AgroSphere → Agrofield2
+### E. Design Parcelles AgroSphere → AgroSphere2
 
-**Agrofield2 a DÉJÀ une page parcels complète !**
+**AgroSphere2 a DÉJÀ une page parcels complète !**
 
-La page `src/routes/_authenticated/parcels.tsx` dans Agrofield2 est déjà fonctionnelle avec :
+La page `src/routes/_authenticated/parcels.tsx` dans AgroSphere2 est déjà fonctionnelle avec :
 - ✅ Liste des parcelles
 - ✅ Ajout/modification/suppression
 - ✅ Alertes de récolte

@@ -1,5 +1,5 @@
 /**
- * Agrofield - Composants Adaptatifs Lite Mode
+ * AgroSphere - Composants Adaptatifs Lite Mode
  * Date: 21 Juillet 2026
  * 
  * Fournit des versions "légères" des composants qui s'activent automatiquement

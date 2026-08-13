@@ -60,7 +60,7 @@ function AuthCallback() {
         {/* Logo */}
         <div className="inline-flex items-center gap-2 text-primary mb-6">
           <Leaf className="h-12 w-12" />
-          <span className="text-3xl font-black tracking-tight">AgroField</span>
+          <span className="text-3xl font-black tracking-tight">AgroSphere</span>
         </div>
 
         {status === "checking" && (

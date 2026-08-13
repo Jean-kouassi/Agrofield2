@@ -136,7 +136,7 @@ function AuthedLayout() {
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
           <Link to="/dashboard" className="flex items-center gap-2 font-bold text-primary">
             <Leaf className="h-5 w-5" />
-            <span>AgroField</span>
+            <span>AgroSphere</span>
           </Link>
           <div className="flex items-center gap-2">
             <Link

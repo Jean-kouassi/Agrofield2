@@ -1,8 +1,8 @@
-# 🎯 Recommandations Prioritaires - Agrofield2
+# 🎯 Recommandations Prioritaires - AgroSphere2
 
 **Date:** 2026-07-24 18:30 GMT  
 **Statut:** Projet scané et prêt pour modifications  
-**Analyse complète:** `C:\Users\Kouassi\.openclaw\workspace\AGROFIELD2_ANALYSE_COMPLETE.md`
+**Analyse complète:** `C:\Users\Kouassi\.openclaw\workspace\AgroSphere2_ANALYSE_COMPLETE.md`
 
 ---
 
@@ -13,14 +13,14 @@
 1. **Architecture TanStack Start** - Build Cloudflare Workers opérationnel
 2. **Fonctionnalités IoT** - Dashboard capteurs avancé + API ingestion
 3. **Diagnostic IA** - Intégration Gemini vision complète
-4. **Alertes Agricoles** - Système de récolte intelligente dans agrofield.ts
+4. **Alertes Agricoles** - Système de récolte intelligente dans AgroSphere.ts
 5. **Credit Scoring** - Algorithmes financiers avancés
 6. **Scripts Automation** - Migration Supabase, tests, déploiement
 
 ### ⚠️ Problèmes à Résoudre
 
 1. **Duplication avec AgroSphere Connect** - Deux codebases quasi-identiques
-2. **Features éparpillées** - Mobile/cooperatives dans AgroSphere, sensors/diagnose dans Agrofield2
+2. **Features éparpillées** - Mobile/cooperatives dans AgroSphere, sensors/diagnose dans AgroSphere2
 3. **Migrations SQL dispersées** - Certaines dans un projet, d'autres dans l'autre
 4. **Configuration env dupliquée** - .env, Vercel, Cloudflare à synchroniser
 
@@ -30,7 +30,7 @@
 
 ### Option 1: Fusion Totale ⭐ (RECOMMANDÉE)
 
-**Principe:** Agrofield2 devient la base unique + import features manquantes AgroSphere
+**Principe:** AgroSphere2 devient la base unique + import features manquantes AgroSphere
 
 **Avantages:**
 - Codebase unique, maintenance simplifiée
@@ -46,8 +46,8 @@
 robocopy "C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect" `
          "C:\Users\Kouassi\Desktop\Backup_AgroSphere" /MIR
 
-# 2. Renommer Agrofield2 → AgroSphere Connect (nouveau)
-Move-Item "C:\Users\Kouassi\Desktop\Agrofield2" `
+# 2. Renommer AgroSphere2 → AgroSphere Connect (nouveau)
+Move-Item "C:\Users\Kouassi\Desktop\AgroSphere2" `
           "C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect-unified"
 
 # 3. Importer depuis ancien AgroSphere:
@@ -59,14 +59,14 @@ Move-Item "C:\Users\Kouassi\Desktop\Agrofield2" `
 
 ---
 
-### Option 2: Garde AgroSphere, Importe Agrofield2 Features
+### Option 2: Garde AgroSphere, Importe AgroSphere2 Features
 
-**Principe:** On garde AgroSphere Connect comme base, on copie améliorations Agrofield2
+**Principe:** On garde AgroSphere Connect comme base, on copie améliorations AgroSphere2
 
 **À importer:**
 - `src/routes/_authenticated/sensors.tsx` (36KB vs 4.8KB)
 - `src/routes/_authenticated/diagnose.tsx` (8.3KB vs 4.6KB)
-- `src/lib/agrofield.ts` (alertes de récolte)
+- `src/lib/AgroSphere.ts` (alertes de récolte)
 - `src/server/api/sensors/ingest.post.ts` (endpoint API)
 - Migrations SQL `202607*` (credit scoring, fixes)
 
@@ -84,7 +84,7 @@ Move-Item "C:\Users\Kouassi\Desktop\Agrofield2" `
 
 ### Phase 1: Analyse & Décision (18:30 - 19:00) ✅
 
-- [x] Scan complet structure Agrofield2
+- [x] Scan complet structure AgroSphere2
 - [x] Analyse comparative avec AgroSphere Connect
 - [x] Création document analyse complète
 - [x] Création ce fichier de recommandations
@@ -99,12 +99,12 @@ Move-Item "C:\Users\Kouassi\Desktop\Agrofield2" `
 ### Phase 3: Exécution (19:30 - 20:30)
 
 **Si Option 1:**
-- [ ] Renommer/move Agrofield2 → agrosphere-connect-unified
+- [ ] Renommer/move AgroSphere2 → agrosphere-connect-unified
 - [ ] Copier features manquantes depuis ancien AgroSphere
 - [ ] Test build immédiat
 
 **Si Option 2:**
-- [ ] Copier sensors.tsx, diagnose.tsx, agrofield.ts vers AgroSphere
+- [ ] Copier sensors.tsx, diagnose.tsx, AgroSphere.ts vers AgroSphere
 - [ ] Copier migrations SQL manquantes
 - [ ] Test build immédiat
 
@@ -142,7 +142,7 @@ Move-Item "C:\Users\Kouassi\Desktop\Agrofield2" `
 
 ## 🗄️ Migrations SQL Critiques
 
-### Depuis Agrofield2 (à fusionner dans AgroSphere)
+### Depuis AgroSphere2 (à fusionner dans AgroSphere)
 
 ```sql
 -- Priority P0: Parcelles + Crop Events
@@ -175,33 +175,33 @@ CREATE TABLE lending_decisions (...);
 
 -- Priority P2: Storage Bucket
 -- Fichier: 20260723104501_create_storage_bucket.sql (2.2KB)
--- agrofield-media bucket + policies
+-- AgroSphere-media bucket + policies
 ```
 
 ---
 
 ## 📁 Fichiers Clés à Migrer
 
-### Si Option 2 (AgroSphere base + Agrofield2 improvements)
+### Si Option 2 (AgroSphere base + AgroSphere2 improvements)
 
 ```
-Depuis: C:\Users\Kouassi\Desktop\Agrofield2\
+Depuis: C:\Users\Kouassi\Desktop\AgroSphere2\
 Vers:   C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect\
 
 src/routes/_authenticated/parcels.tsx           ← REMPLACER (meilleure version)
 src/routes/_authenticated/diagnose.tsx          ← REMPLACER (meilleure version)
-src/lib/agrofield.ts                            ← REMPLACER (alertes récolte)
+src/lib/AgroSphere.ts                            ← REMPLACER (alertes récolte)
 src/server/api/sensors/ingest.post.ts           ← AJOUTER (manquant)
 supabase/migrations/202607*.sql                 ← AJOUTER (7 fichiers)
 docs/CAPTEURS_GUIDE_COMPLET.md                  ← AJOUTER (16KB docs IoT)
 docs/STORAGE_BUCKET_SETUP.md                    ← AJOUTER
 ```
 
-### Si Option 1 (Agrofield2 devient base unique)
+### Si Option 1 (AgroSphere2 devient base unique)
 
 ```
 Depuis: C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect\
-Vers:   C:\Users\Kouassi\Desktop\Agrofield2\ (futur agrosphere-connect-unified)
+Vers:   C:\Users\Kouassi\Desktop\AgroSphere2\ (futur agrosphere-connect-unified)
 
 src/routes/mobile/home.tsx                      ← COPIER
 src/routes/mobile/marketplace.tsx               ← COPIER
@@ -221,7 +221,7 @@ src/lib/image-compression.ts                    ← COPIER
 ### Scripts de Test Disponibles
 
 ```bash
-cd C:\Users\Kouassi\Desktop\Agrofield2
+cd C:\Users\Kouassi\Desktop\AgroSphere2
 
 # Test AI (Gemini)
 node scripts/test-ai.mjs
@@ -263,7 +263,7 @@ node scripts/test-direct-supabase.mjs
 ## 📈 Métriques de Succès
 
 ### Avant Fusion
-| Métrique | Agrofield2 | AgroSphere |
+| Métrique | AgroSphere2 | AgroSphere |
 |----------|-----------|------------|
 | Routes totales | ~12 | ~18 |
 | Features métier | 8/10 | 6/10 |
@@ -327,7 +327,7 @@ wrangler deploy     # Deploy Cloudflare Workers
 ```bash
 git status
 git add .
-git commit -m "feat: fusion Agrofield2 + AgroSphere"
+git commit -m "feat: fusion AgroSphere2 + AgroSphere"
 git push origin main
 ```
 
@@ -336,15 +336,15 @@ git push origin main
 ## 📞 Ressources
 
 ### Documentation
-- **Analyse Complète:** `C:\Users\Kouassi\.openclaw\workspace\AGROFIELD2_ANALYSE_COMPLETE.md`
-- **Comparative:** `docs/ANALYSE_COMPARATIVE_AGROFIELD2.md` (dans AgroSphere)
+- **Analyse Complète:** `C:\Users\Kouassi\.openclaw\workspace\AgroSphere2_ANALYSE_COMPLETE.md`
+- **Comparative:** `docs/ANALYSE_COMPARATIVE_AgroSphere2.md` (dans AgroSphere)
 - **Synthèse:** `docs/SYNTHESE_COMPARATIVE.md` (dans AgroSphere)
 - **Phases:** `docs/IMPLEMENTATION_PAR_PHASES.md` (dans AgroSphere)
 
 ### Locaux Projets
-- **Agrofield2:** `C:\Users\Kouassi\Desktop\Agrofield2`
+- **AgroSphere2:** `C:\Users\Kouassi\Desktop\AgroSphere2`
 - **AgroSphere Connect:** `C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect`
-- **Backup Desktop:** `C:\Users\Kouassi\Desktop\Agrofield2` (déjà sur desktop!)
+- **Backup Desktop:** `C:\Users\Kouassi\Desktop\AgroSphere2` (déjà sur desktop!)
 
 ### Outils
 - **OpenClaw Dashboard:** http://127.0.0.1:18789/
@@ -362,8 +362,8 @@ git push origin main
 
 **DÉCIDER MAINTENANT:**
 
-1. **Option 1** (Fusion totale, Agrofield2 devient base) → Rapide, propre, définitif
-2. **Option 2** (AgroSphere base + imports Agrofield2) → Plus prudent, conserve historique AgroSphere
+1. **Option 1** (Fusion totale, AgroSphere2 devient base) → Rapide, propre, définitif
+2. **Option 2** (AgroSphere base + imports AgroSphere2) → Plus prudent, conserve historique AgroSphere
 3. **Option 3** (Statu quo) → ❌ Déconseillé
 
 **Une fois décidé:**

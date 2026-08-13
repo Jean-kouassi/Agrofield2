@@ -1,5 +1,5 @@
 /**
- * AgroField - Credit Scoring System
+ * AgroSphere - Credit Scoring System
  * Algorithme de calcul de score de crédit pour les agriculteurs
  */
 

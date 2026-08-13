@@ -1,4 +1,4 @@
-# 📱 Configuration PWA & Mode Hors Ligne - AgroField
+# 📱 Configuration PWA & Mode Hors Ligne - AgroSphere
 
 ## ✅ Fonctionnalités implémentées
 
@@ -9,7 +9,7 @@
 - **Cache Supabase** pour les données API (24h)
 
 ### 2. Manifeste PWA
-- Nom court : "AgroField"
+- Nom court : "AgroSphere"
 - Icônes : 192x192, 512x512
 - Couleur thème : Vert (#16a34a)
 - Raccourcis : Dashboard, Parcelles, Diagnostic, Marketplace
@@ -26,22 +26,22 @@
 ### Étape 1 : Attendre le déploiement Vercel
 Le déploiement est en cours. Dans ~2-3 minutes, l'application sera mise à jour sur :
 ```
-https://agrofield2.vercel.app
+https://AgroSphere2.vercel.app
 ```
 
 ### Étape 2 : Installer l'application sur mobile
 
 **Sur Android (Chrome) :**
-1. Ouvre `https://agrofield2.vercel.app` dans Chrome
-2. Une bannière apparaît : "Installer AgroField"
+1. Ouvre `https://AgroSphere2.vercel.app` dans Chrome
+2. Une bannière apparaît : "Installer AgroSphere"
 3. Clique sur **"Installer"**
 4. L'app apparaît sur ton écran d'accueil
 
 **Sur iPhone (Safari) :**
-1. Ouvre `https://agrofield2.vercel.app` dans Safari
+1. Ouvre `https://AgroSphere2.vercel.app` dans Safari
 2. Appuie sur le bouton **Partager** (carré avec flèche vers le haut)
 3. Choisis **"Sur l'écran d'accueil"**
-4. Nomme l'app "AgroField" et valide
+4. Nomme l'app "AgroSphere" et valide
 
 ### Étape 3 : Tester le mode hors ligne
 
@@ -119,7 +119,7 @@ Dans `vite.config.ts` :
 
 ### L'application ne se met pas à jour ?
 1. Va dans `chrome://serviceworker-internals` (Chrome Android)
-2. Trouve "agrofield2.vercel.app"
+2. Trouve "AgroSphere2.vercel.app"
 3. Clique sur **"Unregister"**
 4. Rafraîchis la page
 

@@ -1,7 +1,7 @@
-# 🌾 AGROFIELD2 - PROJET LOCAL
+# 🌾 AgroSphere2 - PROJET LOCAL
 
 **Date de clonage:** 21 Juillet 2026  
-**Emplacement:** `C:\Users\Kouassi\Desktop\Agrofield2`  
+**Emplacement:** `C:\Users\Kouassi\Desktop\AgroSphere2`  
 **Projet original:** https://github.com/Jean-kouassi/field-bloom-wise.git
 
 ---
@@ -24,7 +24,7 @@ Le dossier `.git` a été renommé en `.git.disabled` pour empêcher toute opér
 
 **Si tu veux réactiver Git plus tard :**
 ```bash
-cd C:\Users\Kouassi\Desktop\Agrofield2
+cd C:\Users\Kouassi\Desktop\AgroSphere2
 Move-Item -Path ".git.disabled" -Destination ".git"
 ```
 
@@ -35,7 +35,7 @@ Move-Item -Path ".git.disabled" -Destination ".git"
 ### Dépendances déjà installées ✅
 
 ```bash
-cd C:\Users\Kouassi\Desktop\Agrofield2
+cd C:\Users\Kouassi\Desktop\AgroSphere2
 npm run dev
 ```
 
@@ -65,14 +65,14 @@ Maintenant que le projet est en local, tu peux :
 1. **Modifier le code** comme tu veux
 2. **Tester de nouvelles fonctionnalités**
 3. **Casser des trucs** (pas de problème, c'est local !)
-4. **Comparer avec Agrofield** (l'autre projet)
+4. **Comparer avec AgroSphere** (l'autre projet)
 
 ---
 
 ## 📁 STRUCTURE DU PROJET
 
 ```
-Agrofield2/
+AgroSphere2/
 ├── src/                      # Code source
 │   ├── routes/               # Pages (TanStack Router)
 │   ├── components/           # Composants React
@@ -87,11 +87,11 @@ Agrofield2/
 
 ---
 
-## 💡 DIFFÉRENCES AVEC AGROFIELD (workspace)
+## 💡 DIFFÉRENCES AVEC AgroSphere (workspace)
 
-| Aspect | Agrofield (workspace) | Agrofield2 (bureau) |
+| Aspect | AgroSphere (workspace) | AgroSphere2 (bureau) |
 |--------|----------------------|---------------------|
-| **Emplacement** | `C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect` | `C:\Users\Kouassi\Desktop\Agrofield2` |
+| **Emplacement** | `C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect` | `C:\Users\Kouassi\Desktop\AgroSphere2` |
 | **Git** | Non connecté | Cloné mais désactivé |
 | **Supabase** | `stzilbwemluhftcvdqfm` | `lddgtwqfhpiwodpmjhia` |
 | **Usage** | Développement principal | Tests/Expérimentation locale |
@@ -134,5 +134,5 @@ Le projet est maintenant :
 
 ---
 
-**Projet Agrofield2 — Copie locale pour développement et tests**  
+**Projet AgroSphere2 — Copie locale pour développement et tests**  
 *Ne pas pousser sur Git - Modifications locales uniquement*

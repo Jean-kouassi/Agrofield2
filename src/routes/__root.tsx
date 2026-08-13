@@ -79,13 +79,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#2f6b3a" },
-      { title: "AgroField — Assistant agricole intelligent" },
+      { title: "AgroSphere — Assistant agricole intelligent" },
       {
         name: "description",
         content:
-          "AgroField aide les agriculteurs à gérer leurs parcelles, détecter les maladies des cultures grâce à l'IA et suivre leurs finances en FCFA.",
+          "AgroSphere aide les agriculteurs à gérer leurs parcelles, détecter les maladies des cultures grâce à l'IA et suivre leurs finances en FCFA.",
       },
-      { property: "og:site_name", content: "AgroField" },
+      { property: "og:site_name", content: "AgroSphere" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -106,14 +106,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@graph": [
             {
               "@type": "Organization",
-              name: "AgroField",
-              url: "https://agrofield2.vercel.app",
+              name: "AgroSphere",
+              url: "https://AgroSphere2.vercel.app",
               description: "Plateforme d'assistance agricole intelligente pour l'Afrique de l'Ouest.",
             },
             {
               "@type": "WebSite",
-              name: "AgroField",
-              url: "https://agrofield2.vercel.app",
+              name: "AgroSphere",
+              url: "https://AgroSphere2.vercel.app",
               inLanguage: "fr",
             },
           ],

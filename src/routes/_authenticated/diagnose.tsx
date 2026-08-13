@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzePlantImage } from "@/lib/analyze-plant.functions";
-import { CROP_TYPES } from "@/lib/agrofield";
+import { CROP_TYPES } from "@/lib/agrosphere";
 import { toast } from "sonner";
 import { Camera, Loader2, AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,9 @@ import {
 export const Route = createFileRoute("/_authenticated/diagnose")({
   head: () => ({
     meta: [
-      { title: "Diagnostic IA des cultures — AgroField" },
+      { title: "Diagnostic IA des cultures — AgroSphere" },
       { name: "description", content: "Analysez une photo de plante pour détecter maladies et carences grâce à l'IA." },
-      { property: "og:title", content: "Diagnostic IA des cultures — AgroField" },
+      { property: "og:title", content: "Diagnostic IA des cultures — AgroSphere" },
       { property: "og:description", content: "Analysez une photo de plante pour détecter maladies et carences grâce à l'IA." },
       { property: "og:url", content: "https://field-bloom-wise.lovable.app/diagnose" },
       { name: "robots", content: "noindex" },

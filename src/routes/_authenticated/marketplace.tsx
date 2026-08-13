@@ -23,9 +23,9 @@ import type { MarketplaceListing } from "@/lib/marketplace-data";
 export const Route = createFileRoute("/_authenticated/marketplace")({
   head: () => ({
     meta: [
-      { title: "Marketplace — AgroField" },
+      { title: "Marketplace — AgroSphere" },
       { name: "description", content: "Achetez et vendez vos produits agricoles directement entre producteurs." },
-      { property: "og:title", content: "Marketplace — AgroField" },
+      { property: "og:title", content: "Marketplace — AgroSphere" },
       { property: "og:description", content: "Achetez et vendez vos produits agricoles directement entre producteurs." },
       { name: "robots", content: "noindex" },
     ],

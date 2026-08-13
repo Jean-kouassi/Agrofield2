@@ -1,5 +1,5 @@
 /**
- * AgroField - Finance Management
+ * AgroSphere - Finance Management
  * Gestion des dépenses et revenus pour les agriculteurs
  */
 

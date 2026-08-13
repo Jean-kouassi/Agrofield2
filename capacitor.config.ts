@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "bf.agrofield.app",
-  appName: "AgroField",
+  appId: "bf.agrosphere.app",
+  appName: "AgroSphere",
   webDir: ".output/public",
   bundledWebRuntime: false,
   android: {

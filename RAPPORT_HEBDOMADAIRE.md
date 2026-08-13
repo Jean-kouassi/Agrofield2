@@ -1,4 +1,4 @@
-# 📊 Rapport Hebdomadaire - AgroField (ex-AgroConnect)
+# 📊 Rapport Hebdomadaire - AgroSphere (ex-AgroConnect)
 **Période :** 23-31 Juillet 2026  
 **Semaine :** 1 (Développement initial)  
 **Rédigé le :** 31 Juillet 2026, 18:27 GMT
@@ -9,7 +9,7 @@
 
 ### Avancement Global : **75%** (4.5/6 phases complètes)
 
-La première semaine de développement d'AgroField a permis de poser les fondations solides d'une plateforme agricole complète pour l'Afrique de l'Ouest. Le projet a été **totalement détaché de la plateforme Lovable** et migrate vers une stack technique autonome et professionnelle.
+La première semaine de développement d'AgroSphere a permis de poser les fondations solides d'une plateforme agricole complète pour l'Afrique de l'Ouest. Le projet a été **totalement détaché de la plateforme Lovable** et migrate vers une stack technique autonome et professionnelle.
 
 ### Faits Marquants de la Semaine
 
@@ -93,7 +93,7 @@ import { generateContent } from "@google/generative-ai"; // Direct Gemini
 - `vite.config.ts` — Plugins natifs TanStack
 - `src/lib/ai-provider.server.ts` — API Gemini directe
 - `src/integrations/supabase/client.ts` — Erreurs personnalisées
-- `src/routes/__root.tsx` — URLs mises à jour (`agrofield2.vercel.app`)
+- `src/routes/__root.tsx` — URLs mises à jour (`AgroSphere2.vercel.app`)
 - `package.json` — 15 packages Lovable supprimés
 
 ### 2. Support Offline (PWA)
@@ -247,10 +247,10 @@ CREATE INDEX idx_sales_search ON sales USING gin(to_tsvector('french', title || 
 **Solution :**
 ```
 Dashboard Supabase → Authentication → URL Configuration
-Site URL: https://agrofield2.vercel.app
+Site URL: https://AgroSphere2.vercel.app
 Redirect URLs: 
-  - https://agrofield2.vercel.app/auth/callback
-  - https://agrofield2.vercel.app/dashboard
+  - https://AgroSphere2.vercel.app/auth/callback
+  - https://AgroSphere2.vercel.app/dashboard
 ```
 
 ### 3. Erreurs TypeScript (122)
@@ -279,7 +279,7 @@ rm src/integrations/lovable/index.ts
 
 | Jour | Tâche | Livrable |
 |------|-------|----------|
-| **Lun 05/08** | Fix déploiement Cloudflare | App en prod sur `agrofield2.pages.dev` |
+| **Lun 05/08** | Fix déploiement Cloudflare | App en prod sur `AgroSphere2.pages.dev` |
 | **Mar 06/08** | Correction erreurs TS | Build TypeScript clean (0 error) |
 | **Mer 07/08** | Tests RLS complets | Rapport de tests + fixes |
 | **Jeu 08/08** | Finaliser module Finances | Credit scoring fonctionnel |
@@ -297,7 +297,7 @@ rm src/integrations/lovable/index.ts
 ## 📚 Documentation Produite
 
 ### Fichiers Techniques
-- `AGROFIELD2_ARCHITECTURE.md` — Architecture complète, schema DB, design system
+- `AgroSphere2_ARCHITECTURE.md` — Architecture complète, schema DB, design system
 - `PWA_OFFLINE_SETUP.md` — Guide configuration mode hors ligne
 - `RAPPORT_HEBDOMADAIRE.md` — Ce document
 
@@ -359,13 +359,13 @@ rm src/integrations/lovable/index.ts
 - **GitHub :** (à configurer)
 
 ### Liens Utiles
-- **Dashboard Vercel :** https://vercel.com/jean-kouassis-projects/agrofield2
+- **Dashboard Vercel :** https://vercel.com/jean-kouassis-projects/AgroSphere2
 - **Dashboard Supabase :** https://supabase.com/dashboard/project/vtnduxtrnahhbgvlhqjw
-- **App en production :** https://agrofield2.vercel.app (version 23h)
+- **App en production :** https://AgroSphere2.vercel.app (version 23h)
 - **Documentation OpenClaw :** https://docs.openclaw.ai
 
 ### Dépôts
-- **Source principale :** `C:\Users\Kouassi\Desktop\Agrofield2`
+- **Source principale :** `C:\Users\Kouassi\Desktop\AgroSphere2`
 - **Workspace OpenClaw :** `C:\Users\Kouassi\.openclaw\workspace\agrosphere-connect`
 
 ---

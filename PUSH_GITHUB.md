@@ -1,4 +1,4 @@
-# 🚀 Push Agrofield2 sur GitHub
+# 🚀 Push AgroSphere2 sur GitHub
 
 **Date:** 22 Juillet 2026, 22:28 GMT
 
@@ -29,7 +29,7 @@ feat: Marketplace complet + Auth Google + Parcelles + Finances
 
 1. Va sur https://github.com/new
 2. Remplis :
-   - **Repository name:** `Agrofield2`
+   - **Repository name:** `AgroSphere2`
    - **Description:** "Application agricole pour le Burkina Faso - Marketplace, Parcelles, Finances, Diagnostic IA"
    - **Visibility:** Public (ou Private si tu préfères)
    - ❌ Ne PAS initialiser avec README (le projet existe déjà)
@@ -38,7 +38,7 @@ feat: Marketplace complet + Auth Google + Parcelles + Finances
 **Option B: Via GitHub CLI (si installé)**
 
 ```bash
-gh repo create Agrofield2 --public --source=. --remote=origin --push
+gh repo create AgroSphere2 --public --source=. --remote=origin --push
 ```
 
 ---
@@ -50,10 +50,10 @@ Après avoir créé le dépôt, exécute ces commandes :
 ### Si le dépôt est PUBLIC :
 
 ```bash
-cd C:\Users\Kouassi\Desktop\Agrofield2
+cd C:\Users\Kouassi\Desktop\AgroSphere2
 
 # Ajouter le remote GitHub (remplace TON_USERNAME par ton pseudo GitHub)
-git remote add origin https://github.com/TON_USERNAME/Agrofield2.git
+git remote add origin https://github.com/TON_USERNAME/AgroSphere2.git
 
 # Renommer la branche principale en 'main'
 git branch -M main
@@ -67,8 +67,8 @@ git push -u origin main
 Même commande, le dépôt sera privé :
 
 ```bash
-cd C:\Users\Kouassi\Desktop\Agrofield2
-git remote add origin https://github.com/TON_USERNAME/Agrofield2.git
+cd C:\Users\Kouassi\Desktop\AgroSphere2
+git remote add origin https://github.com/TON_USERNAME/AgroSphere2.git
 git branch -M main
 git push -u origin main
 ```
@@ -91,7 +91,7 @@ Si tu as une clé SSH :
 
 ```bash
 # Changer l'URL du remote en SSH
-git remote set-url origin git@github.com:TON_USERNAME/Agrofield2.git
+git remote set-url origin git@github.com:TON_USERNAME/AgroSphere2.git
 
 # Puis pousser
 git push -u origin main
@@ -103,7 +103,7 @@ git push -u origin main
 
 Après le push :
 
-1. Va sur https://github.com/TON_USERNAME/Agrofield2
+1. Va sur https://github.com/TON_USERNAME/AgroSphere2
 2. Vérifie que les fichiers sont présents :
    - `src/routes/marketplace.tsx`
    - `src/routes/marketplace.create.tsx`
@@ -120,7 +120,7 @@ Après le push :
 Voici ce qui sera pushé :
 
 ```
-Agrofield2/
+AgroSphere2/
 ├── src/
 │   ├── routes/
 │   │   ├── index.tsx              # Landing page
@@ -189,7 +189,7 @@ Même après le push, tu dois configurer Google :
 Après push sur GitHub :
 
 1. Va sur https://vercel.com/new
-2. Importe le dépôt `Agrofield2`
+2. Importe le dépôt `AgroSphere2`
 3. Configure les variables d'environnement :
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_PUBLISHABLE_KEY`
@@ -254,7 +254,7 @@ ssh -T git@github.com
 **Cause:** Mauvais nom ou dépôt privé sans accès
 
 **Solution:**
-- Vérifie l'URL : `https://github.com/USERNAME/Agrofield2.git`
+- Vérifie l'URL : `https://github.com/USERNAME/AgroSphere2.git`
 - Si dépôt privé, assure-toi d'être connecté avec le bon compte
 
 ### "Updates were rejected because the remote contains work that you do not have"

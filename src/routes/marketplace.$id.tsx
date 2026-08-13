@@ -80,7 +80,7 @@ function OfferDetailPage() {
   async function handleShare() {
     if (navigator.share) {
       await navigator.share({
-        title: offer?.title || 'Offre AgroField',
+        title: offer?.title || 'Offre AgroSphere',
         text: offer?.description || '',
         url: window.location.href,
       })

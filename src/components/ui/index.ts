@@ -47,7 +47,7 @@ export * from "./toggle-group";
 export * from "./toggle";
 export * from "./tooltip";
 
-// Nouveaux composants Agrofield2
+// Nouveaux composants AgroSphere2
 export * from "./empty-state";
 export * from "./crop-progress-card";
 export * from "./weather-mini-card";

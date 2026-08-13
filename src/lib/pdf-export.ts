@@ -66,7 +66,7 @@ export async function exportFinanceToPDF(
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(26);
   doc.setTextColor(255, 255, 255);
-  doc.text('AGROFIELD', pageWidth / 2, 18, { align: 'center' });
+  doc.text('AgroSphere', pageWidth / 2, 18, { align: 'center' });
   
   // Sous-titre
   doc.setFont('helvetica', 'normal');
@@ -285,9 +285,9 @@ export async function exportFinanceToPDF(
   doc.setTextColor(80, 80, 80);
   
   const legalText = [
-    'Document genere automatiquement par AgroField.',
+    'Document genere automatiquement par AgroSphere.',
     'Donnees infalsifiables (hash SHA-256).',
-    'Support: support@agrofield.bf',
+    'Support: support@AgroSphere.bf',
   ];
   
   legalText.forEach((line) => {
@@ -300,13 +300,13 @@ export async function exportFinanceToPDF(
   doc.setFont('helvetica', 'italic');
   doc.setFontSize(7);
   doc.setTextColor(150, 150, 150);
-  doc.text('(c) 2026 AgroField - Burkina Faso', pageWidth / 2, finalFooterY, { align: 'center' });
+  doc.text('(c) 2026 AgroSphere - Burkina Faso', pageWidth / 2, finalFooterY, { align: 'center' });
 
   // ============================================
   // GENERATION DU FICHIER
   // ============================================
   
-  const filename = 'AGROFIELD_Releve_Financier_' + new Date().toISOString().slice(0, 10) + '.pdf';
+  const filename = 'AgroSphere_Releve_Financier_' + new Date().toISOString().slice(0, 10) + '.pdf';
   doc.save(filename);
   
   console.log('PDF genere:', filename);

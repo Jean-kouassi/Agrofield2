@@ -51,9 +51,9 @@ export function PWAInstallPrompt() {
           <Download className="h-5 w-5 text-green-600" />
         </div>
         <div className="flex-1">
-          <h3 className="text-sm font-bold text-gray-900">Installer AgroField</h3>
+          <h3 className="text-sm font-bold text-gray-900">Installer AgroSphere</h3>
           <p className="mt-1 text-xs text-gray-600">
-            Ajoutez AgroField à votre écran d'accueil pour y accéder rapidement, même sans connexion internet.
+            Ajoutez AgroSphere à votre écran d'accueil pour y accéder rapidement, même sans connexion internet.
           </p>
           <div className="mt-3 flex gap-2">
             <button

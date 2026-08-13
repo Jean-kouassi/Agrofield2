@@ -1,4 +1,4 @@
-# 🚀 Guide de Déploiement - AgroField
+# 🚀 Guide de Déploiement - AgroSphere
 
 **Dernière mise à jour :** 2026-07-31  
 **Version :** 1.0
@@ -28,7 +28,7 @@ GEMINI_API_KEY=AIzaSy...
 GEMINI_MODEL=gemini-2.5-flash-preview-05-20
 
 # Application
-VITE_APP_URL=https://agrofield2.vercel.app
+VITE_APP_URL=https://AgroSphere2.vercel.app
 ```
 
 ⚠️ **Ne jamais committer `.env`** — il est dans `.gitignore`
@@ -40,8 +40,8 @@ VITE_APP_URL=https://agrofield2.vercel.app
 ### Étape 1 : Connecter le dépôt GitHub
 
 1. Aller sur https://vercel.com/new
-2. Importer le dépôt `Jean-kouassi/Agrofield2`
-3. Nom du projet : `agrofield2`
+2. Importer le dépôt `Jean-kouassi/AgroSphere2`
+3. Nom du projet : `AgroSphere2`
 4. Framework : **TanStack Start** (détection auto)
 
 ### Étape 2 : Configurer les variables d'environnement
@@ -55,7 +55,7 @@ Dans **Settings → Environment Variables**, ajouter :
 | `SUPABASE_SERVICE_ROLE_KEY` | (clé service role) | Production uniquement |
 | `GEMINI_API_KEY` | (clé API Google) | Production, Preview, Development |
 | `GEMINI_MODEL` | `gemini-2.5-flash-preview-05-20` | Production, Preview, Development |
-| `VITE_APP_URL` | `https://agrofield2.vercel.app` | Production |
+| `VITE_APP_URL` | `https://AgroSphere2.vercel.app` | Production |
 
 ### Étape 3 : Build Settings
 
@@ -75,7 +75,7 @@ Laisser Vercel détecter automatiquement :
 ### Étape 4 : Déployer
 
 ```bash
-cd C:\Users\Kouassi\Desktop\Agrofield2
+cd C:\Users\Kouassi\Desktop\AgroSphere2
 npx vercel --prod
 ```
 
@@ -144,12 +144,12 @@ Le output sera dans `.output/` avec structure Cloudflare-compatible.
 
 ```bash
 # Déploiement direct
-npx wrangler pages deploy .output/public --project-name=agrofield2
+npx wrangler pages deploy .output/public --project-name=AgroSphere2
 
 # OU : connecter le dépôt GitHub pour déploiement auto
 # 1. https://dash.cloudflare.com/?to=/:account/workers-and-pages/create
 # 2. Choisir "Connect to Git"
-# 3. Sélectionner le dépôt Agrofield2
+# 3. Sélectionner le dépôt AgroSphere2
 # 4. Build command: `npm run build`
 # 5. Build output directory: `.output/public`
 # 6. Variables d'environnement (mêmes que Vercel)
@@ -179,13 +179,13 @@ Après déploiement, configurer Supabase :
 2. Remplir :
 
 ```
-Site URL: https://agrofield2.vercel.app (ou .pages.dev)
+Site URL: https://AgroSphere2.vercel.app (ou .pages.dev)
 
 Redirect URLs:
-  - https://agrofield2.vercel.app/auth/callback
-  - https://agrofield2.vercel.app/dashboard
-  - https://agrofield2.pages.dev/auth/callback
-  - https://agrofield2.pages.dev/dashboard
+  - https://AgroSphere2.vercel.app/auth/callback
+  - https://AgroSphere2.vercel.app/dashboard
+  - https://AgroSphere2.pages.dev/auth/callback
+  - https://AgroSphere2.pages.dev/dashboard
 ```
 
 3. Sauvegarder
@@ -239,7 +239,7 @@ npx vite preview
 # 3. Refresh → l'app doit charger
 
 # Test PWA install
-# Mobile : attendre 30s → bannière "Installer AgroField" doit apparaître
+# Mobile : attendre 30s → bannière "Installer AgroSphere" doit apparaître
 ```
 
 ---
@@ -299,7 +299,7 @@ npx supabase gen types typescript \
 
 - **Vercel :** Dashboard → Deployments → [Deployment] → Logs
 - **Supabase :** Dashboard → Database → Query Editor → `select * from audit_logs`
-- **Cloudflare :** Dashboard → Workers & Pages → agrofield2 → Analytics
+- **Cloudflare :** Dashboard → Workers & Pages → AgroSphere2 → Analytics
 
 ---
 
@@ -354,7 +354,7 @@ npx wrangler pages deployment rollback <deployment-id>
 
 ### Contacts
 - **Développeur :** Jean Kouassi (jeankouasst@gmail.com)
-- **GitHub Issues :** https://github.com/Jean-kouassi/Agrofield2/issues
+- **GitHub Issues :** https://github.com/Jean-kouassi/AgroSphere2/issues
 
 ---
 

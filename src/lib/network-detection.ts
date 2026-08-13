@@ -1,5 +1,5 @@
 /**
- * Agrofield - Détection Intelligente de Réseau
+ * AgroSphere - Détection Intelligente de Réseau
  * Date: 21 Juillet 2026
  * 
  * Détecte automatiquement la qualité de connexion et adapte l'expérience utilisateur

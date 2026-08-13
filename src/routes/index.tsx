@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { formatFcfa, harvestAlert } from "@/lib/agrofield";
+import { formatFcfa, harvestAlert } from "@/lib/agrosphere";
 import {
   Leaf, Sprout, LineChart, Camera, ShoppingCart, CheckCircle, ArrowRight,
   Play, Users, TrendingUp, TrendingDown, Award, MapPin, Smartphone, Shield,
@@ -125,7 +125,7 @@ function Landing() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 font-bold text-primary">
             <Leaf className="h-7 w-7" />
-            <span className="text-xl tracking-tight">AgroField</span>
+            <span className="text-xl tracking-tight">AgroSphere</span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <a href="#fonctionnalites" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Fonctionnalités</a>
@@ -368,7 +368,7 @@ function Landing() {
                 <p className="mt-4 text-lg text-gray-600">Des agriculteurs comme vous qui ont transformé leur activité</p>
               </div>
               <div className="grid md:grid-cols-3 gap-8">
-                <TestimonialCard quote="Depuis AgroField, je sais exactement quand récolter et je vends 30% plus cher." author="Mamadou O." role="Maraîcher" location="Bobo-Dioulasso" rating={5} />
+                <TestimonialCard quote="Depuis AgroSphere, je sais exactement quand récolter et je vends 30% plus cher." author="Mamadou O." role="Maraîcher" location="Bobo-Dioulasso" rating={5} />
                 <TestimonialCard quote="Le diagnostic IA m'a sauvé ma récolte de tomates. J'ai détecté la maladie à temps !" author="Fatoumata K." role="Productrice" location="Ouagadougou" rating={5} />
                 <TestimonialCard quote="Je vends mes oignons directement sur le marketplace. Plus besoin d'intermédiaires." author="Ibrahim S." role="Agriculteur" location="Koudougou" rating={5} />
               </div>
@@ -403,7 +403,7 @@ function Landing() {
               <ShoppingCart className="h-8 w-8 text-[#166534]" />
             </div>
             <h2 className="text-3xl font-black text-gray-900 sm:text-4xl mb-4">
-              🛒 Marketplace AgroField
+              🛒 Marketplace AgroSphere
             </h2>
             <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed mb-8">
               Vendez vos récoltes et achetez des produits agricoles directement auprès des
@@ -447,7 +447,7 @@ function Landing() {
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 font-bold text-xl mb-4">
-                <Leaf className="h-7 w-7 text-green-400" /><span>AgroField</span>
+                <Leaf className="h-7 w-7 text-green-400" /><span>AgroSphere</span>
               </div>
               <p className="text-gray-400 text-sm max-w-md">L'outil numérique #1 pour les agriculteurs du Burkina Faso. 🇧🇫</p>
             </div>
@@ -467,7 +467,7 @@ function Landing() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-sm text-gray-400">
-            AgroField 🇧🇫 — © 2026
+            AgroSphere 🇧🇫 — © 2026
           </div>
         </div>
       </footer>

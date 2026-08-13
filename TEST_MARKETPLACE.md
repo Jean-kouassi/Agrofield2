@@ -78,9 +78,9 @@ SELECT * FROM offers ORDER BY created_at DESC LIMIT 1;
 
 ### Étape 2: Tester dans le Navigateur
 
-1. **Ouvre Agrofield2 en local :**
+1. **Ouvre AgroSphere2 en local :**
    ```bash
-   cd C:\Users\Kouassi\Desktop\Agrofield2
+   cd C:\Users\Kouassi\Desktop\AgroSphere2
    npm run dev
    ```
 

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { formatFcfa, harvestAlert } from "@/lib/agrofield";
+import { formatFcfa, harvestAlert } from "@/lib/agrosphere";
 import { Sprout, TrendingUp, TrendingDown, AlertTriangle, Camera, Plus, ShoppingCart, Calendar, Droplets, SprayCan, Pickaxe, Wheat, Paperclip, ArrowUp } from "lucide-react";
 import { ActivityTimeline } from "@/components/ui/activity-timeline";
 import { WeatherMiniCard } from "@/components/ui/weather-mini-card";
@@ -31,11 +31,11 @@ function formatTimestamp(dateString: string | null): string {
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Tableau de bord — AgroField" },
+      { title: "Tableau de bord — AgroSphere" },
       { name: "description", content: "Vue d'ensemble de vos parcelles, alertes IA et performance financière agricole." },
-      { property: "og:title", content: "Tableau de bord — AgroField" },
+      { property: "og:title", content: "Tableau de bord — AgroSphere" },
       { property: "og:description", content: "Vue d'ensemble de vos parcelles, alertes IA et performance financière agricole." },
-      { property: "og:url", content: "https://agrofield2.vercel.app/dashboard" },
+      { property: "og:url", content: "https://AgroSphere2.vercel.app/dashboard" },
       { name: "robots", content: "noindex" },
     ],
   }),

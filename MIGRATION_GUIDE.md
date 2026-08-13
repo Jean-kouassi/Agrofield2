@@ -1,4 +1,4 @@
-# 🗄️ Guide de Migration SQL - AgroField2
+# 🗄️ Guide de Migration SQL - AgroSphere2
 
 **Date:** 25 Juillet 2026  
 **Objectif:** Appliquer les nouvelles tables (parcels, crop_events, price_references) dans Supabase
@@ -37,7 +37,7 @@
 ### Méthode 2: Via CLI (Si tu as Supabase CLI installé)
 
 ```bash
-cd C:\Users\Kouassi\Desktop\Agrofield2
+cd C:\Users\Kouassi\Desktop\AgroSphere2
 npx supabase db push
 ```
 
@@ -51,7 +51,7 @@ Copie ce code dans le SQL Editor :
 -- ============================================
 -- MIGRATION P0: Parcelles & Suivi Cultural
 -- Date: 2026-07-25
--- Projet: AgroField2
+-- Projet: AgroSphere2
 -- ============================================
 
 -- 1. Fonction update_updated_at_column (si elle n'existe pas déjà)
@@ -248,7 +248,7 @@ Après avoir exécuté le SQL :
 
 1. **Redémarre le serveur de dev** :
    ```bash
-   cd C:\Users\Kouassi\Desktop\Agrofield2
+   cd C:\Users\Kouassi\Desktop\AgroSphere2
    npm run dev
    ```
 

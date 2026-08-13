@@ -30,9 +30,9 @@ const EVENT_TYPES = [
 export const Route = createFileRoute("/_authenticated/crop-events")({
   head: () => ({
     meta: [
-      { title: "Suivi Cultural — Agrofield2" },
+      { title: "Suivi Cultural — AgroSphere2" },
       { name: "description", content: "Enregistrez et suivez toutes les interventions sur vos parcelles." },
-      { property: "og:title", content: "Suivi Cultural — Agrofield2" },
+      { property: "og:title", content: "Suivi Cultural — AgroSphere2" },
       { property: "og:description", content: "Enregistrez et suivez toutes les interventions sur vos parcelles." },
       { name: "robots", content: "noindex" },
     ],

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { CROP_TYPES, harvestAlert, daysSince } from "@/lib/agrofield";
+import { CROP_TYPES, harvestAlert, daysSince } from "@/lib/agrosphere";
 import { toast } from "sonner";
 import { Plus, Sprout, Trash2, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,9 +21,9 @@ import { EmptyState } from "@/components/ui/empty-state";
 export const Route = createFileRoute("/_authenticated/parcels")({
   head: () => ({
     meta: [
-      { title: "Parcelles — AgroField" },
+      { title: "Parcelles — AgroSphere" },
       { name: "description", content: "Cartographiez vos parcelles, cultures et calendriers de récolte." },
-      { property: "og:title", content: "Parcelles — AgroField" },
+      { property: "og:title", content: "Parcelles — AgroSphere" },
       { property: "og:description", content: "Cartographiez vos parcelles, cultures et calendriers de récolte." },
       { property: "og:url", content: "https://field-bloom-wise.lovable.app/parcels" },
       { name: "robots", content: "noindex" },

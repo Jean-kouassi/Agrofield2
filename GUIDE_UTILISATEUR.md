@@ -1,4 +1,4 @@
-# 📱 Guide Utilisateur - AgroField
+# 📱 Guide Utilisateur - AgroSphere
 
 **Version :** 1.0  
 **Dernière mise à jour :** 31 Juillet 2026  
@@ -6,9 +6,9 @@
 
 ---
 
-## 👋 Bienvenue sur AgroField !
+## 👋 Bienvenue sur AgroSphere !
 
-AgroField est votre assistant agricole intelligent. Il vous aide à :
+AgroSphere est votre assistant agricole intelligent. Il vous aide à :
 
 - 🌾 **Gérer vos parcelles** (superficie, cultures, traitements)
 - 🤖 **Diagnostiquer les maladies** de vos plantes par photo
@@ -27,17 +27,17 @@ AgroField est votre assistant agricole intelligent. Il vous aide à :
 
 **Sur Android :**
 
-1. Ouvrez https://agrofield2.pages.dev dans Chrome
-2. Une bannière apparaît : **"Installer AgroField"**
+1. Ouvrez https://AgroSphere2.pages.dev dans Chrome
+2. Une bannière apparaît : **"Installer AgroSphere"**
 3. Appuyez sur **"Installer"**
-4. L'icône AgroField apparaît sur votre écran d'accueil
+4. L'icône AgroSphere apparaît sur votre écran d'accueil
 
 **Sur iPhone :**
 
-1. Ouvrez https://agrofield2.pages.dev dans Safari
+1. Ouvrez https://AgroSphere2.pages.dev dans Safari
 2. Appuyez sur le bouton **Partager** (carré avec flèche vers le haut)
 3. Choisissez **"Sur l'écran d'accueil"**
-4. Nommez "AgroField" et validez
+4. Nommez "AgroSphere" et validez
 
 > 💡 **Astuce :** L'application fonctionne même sans connexion internet après installation !
 
@@ -45,7 +45,7 @@ AgroField est votre assistant agricole intelligent. Il vous aide à :
 
 ### Étape 2 : Créer votre compte
 
-1. Ouvrez AgroField
+1. Ouvrez AgroSphere
 2. Appuyez sur **"Commencer"**
 3. Choisissez **"Se connecter avec Google"**
 4. Sélectionnez votre compte Google
@@ -247,7 +247,7 @@ Vous recevez une notification si :
 
 **Comment ça marche :**
 
-AgroField calcule automatiquement votre **score de crédit** (0 à 1000) basé sur :
+AgroSphere calcule automatiquement votre **score de crédit** (0 à 1000) basé sur :
 
 | Facteur | Poids | Comment l'améliorer |
 |---------|-------|---------------------|
@@ -313,9 +313,9 @@ Le mode hors ligne est **automatique** :
 
 **Solution :**
 1. Vérifiez votre connexion internet
-2. Essayez en navigation privée : https://agrofield2.pages.dev
+2. Essayez en navigation privée : https://AgroSphere2.pages.dev
 3. Si ça marche → Videz le cache de votre navigateur
-4. Si ça ne marche pas → Contactez support@agrofield.com
+4. Si ça ne marche pas → Contactez support@AgroSphere.com
 
 ---
 
@@ -347,19 +347,19 @@ Le mode hors ligne est **automatique** :
 **Solution :**
 - Redémarrez le capteur (bouton reset 3 secondes)
 - Dans l'app : **"Capteurs"** → **"Resynchroniser"**
-- Si ça persiste → Contactez support@agrofield.com
+- Si ça persiste → Contactez support@AgroSphere.com
 
 ---
 
 ### Problème : Je ne reçois pas les notifications
 
 **Sur Android :**
-1. Paramètres → Applications → AgroField → Notifications
+1. Paramètres → Applications → AgroSphere → Notifications
 2. Activez **"Autoriser les notifications"**
 3. Cochez toutes les catégories (Alertes, Rappels, Ventes)
 
 **Sur iPhone :**
-1. Réglages → Notifications → AgroField
+1. Réglages → Notifications → AgroSphere
 2. Activez **"Autoriser les notifications"**
 3. Choisissez **"Bannières"** ou **"Alertes"**
 
@@ -370,7 +370,7 @@ Le mode hors ligne est **automatique** :
 ### Besoin d'aide ?
 
 **Par email :**  
-📧 support@agrofield.com  
+📧 support@AgroSphere.com  
 (Réponse sous 24-48h)
 
 **Par WhatsApp :**  
@@ -414,12 +414,12 @@ Disponibles dans l'app : **"Profil"** → **"Ressources"**
 
 ### Vidéos tutorielles
 
-- 🎥 **"Premiers pas sur AgroField"** (5 min)
+- 🎥 **"Premiers pas sur AgroSphere"** (5 min)
 - 🎥 **"Diagnostiquer une maladie en 1 minute"** (2 min)
 - 🎥 **"Configurer son capteur ESP32"** (10 min)
 - 🎥 **"Vendre sur le marketplace"** (7 min)
 
-Disponibles sur : **YouTube → @AgroFieldAfrica**
+Disponibles sur : **YouTube → @AgroSphereAfrica**
 
 ---
 
@@ -432,7 +432,7 @@ R : Oui, 100% gratuite pendant la phase beta. À l'avenir, certaines fonctionnal
 R : Oui. Vos données sont stockées sur des serveurs sécurisés (Supabase) et ne sont jamais vendues à des tiers. Vous pouvez exporter/supprimer vos données anytime.
 
 **Q : Puis-je utiliser l'app sans smartphone ?**  
-R : Non, AgroField nécessite un smartphone Android ou iPhone. Cependant, une version USSD (*123#) est en développement pour les téléphones basiques.
+R : Non, AgroSphere nécessite un smartphone Android ou iPhone. Cependant, une version USSD (*123#) est en développement pour les téléphones basiques.
 
 **Q : Comment ajouter plusieurs utilisateurs (coopérative) ?**  
 R : Chaque membre crée son propre compte. Un compte "Chef de coopérative" (bientôt disponible) permettra de regrouper les parcelles de tous les membres.
@@ -472,7 +472,7 @@ R : Oui, comme toute IA, le diagnostic peut être incorrect à ~10-15%. Toujours
 
 ## 🙏 Remerciements
 
-Merci d'utiliser AgroField ! 🌾
+Merci d'utiliser AgroSphere ! 🌾
 
 Nous sommes fiers de contribuer au développement de l'agriculture ouest-africaine. Chaque parcelle enregistrée, chaque diagnostic effectué, chaque vente réalisée nous rapproche d'une agriculture plus productive, durable et rémunératrice.
 

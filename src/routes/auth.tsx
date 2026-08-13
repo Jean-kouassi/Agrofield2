@@ -14,9 +14,9 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Connexion — AgroField" },
+      { title: "Connexion — AgroSphere" },
       { name: "description", content: "Connectez-vous avec Google ou email pour gérer vos parcelles et finances agricoles." },
-      { property: "og:title", content: "Connexion — AgroField" },
+      { property: "og:title", content: "Connexion — AgroSphere" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -113,7 +113,7 @@ function AuthPage() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 text-primary mb-2">
             <Leaf className="h-8 w-8" />
-            <span className="text-2xl font-black tracking-tight">AgroField</span>
+            <span className="text-2xl font-black tracking-tight">AgroSphere</span>
           </div>
           <p className="text-muted-foreground">Votre assistant agricole intelligent</p>
         </div>
@@ -282,7 +282,7 @@ function AuthPage() {
             ← Retour à l'accueil
           </a>
           <p className="text-xs text-muted-foreground">
-            AgroField 🇧🇫 — Fait avec ❤️ pour les agriculteurs burkinabè
+            AgroSphere 🇧🇫 — Fait avec ❤️ pour les agriculteurs burkinabè
           </p>
         </div>
       </div>

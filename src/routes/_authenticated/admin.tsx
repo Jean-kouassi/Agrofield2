@@ -11,10 +11,10 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Administration — AgroField" },
-      { name: "description", content: "Console super-administrateur AgroField." },
-      { property: "og:title", content: "Administration — AgroField" },
-      { property: "og:description", content: "Console super-administrateur AgroField." },
+      { title: "Administration — AgroSphere" },
+      { name: "description", content: "Console super-administrateur AgroSphere." },
+      { property: "og:title", content: "Administration — AgroSphere" },
+      { property: "og:description", content: "Console super-administrateur AgroSphere." },
       { property: "og:url", content: "https://field-bloom-wise.lovable.app/admin" },
       { name: "robots", content: "noindex" },
     ],
@@ -143,7 +143,7 @@ function AdminPage() {
     const rows: any[] = [];
     async function signed(path: string | null) {
       if (!path) return "";
-      const { data } = await supabase.storage.from("agrofield-media").createSignedUrl(path, 60 * 60 * 24 * 7);
+      const { data } = await supabase.storage.from("AgroSphere-media").createSignedUrl(path, 60 * 60 * 24 * 7);
       return data?.signedUrl ?? "";
     }
     for (const e of expensesQ.data ?? []) {
@@ -194,7 +194,7 @@ function AdminPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `agrofield-admin-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `AgroSphere-admin-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success(`${rows.length} écriture${rows.length > 1 ? "s" : ""} exportée${rows.length > 1 ? "s" : ""}`);

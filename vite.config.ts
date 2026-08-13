@@ -15,9 +15,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'AgroField - Assistant agricole intelligent',
-        short_name: 'AgroField',
-        description: 'Gérez vos parcelles, diagnostiquez les maladies et vendez vos récoltes au meilleur prix',
+        name: 'AgroSphere - Plateforme agricole intelligente',
+        short_name: 'AgroSphere',
+        description: 'Gérez vos parcelles, capteurs IoT, diagnostics IA et vendez vos récoltes au meilleur prix',
         theme_color: '#16a34a',
         background_color: '#ffffff',
         display: 'standalone',

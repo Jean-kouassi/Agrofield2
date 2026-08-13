@@ -1,5 +1,5 @@
 /**
- * AgroField Marketplace Types
+ * AgroSphere Marketplace Types
  * Types pour la gestion des offres et commandes
  */
 

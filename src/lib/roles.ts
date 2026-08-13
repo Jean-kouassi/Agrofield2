@@ -1,8 +1,40 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/integrations/supabase/client'
 import type { Database } from '@/integrations/supabase/types'
+import { Leaf, Truck, Store, Users, Sprout } from 'lucide-react'
 
 export type AppRole = Database['public']['Enums']['app_role']
+
+export const ONBOARDING_ROLES = [
+  {
+    id: 'producer' as AppRole,
+    label: 'Agriculteur-Producteur',
+    icon: Leaf,
+    description: 'Je cultive des parcelles et je vends ma production',
+    color: 'var(--agro-primary)',
+  },
+  {
+    id: 'wholesaler' as AppRole,
+    label: 'Acheteur Grossiste',
+    icon: Truck,
+    description: "J'achète en gros volume pour redistribution",
+    color: '#2563eb',
+  },
+  {
+    id: 'retailer' as AppRole,
+    label: 'Acheteur Détaillant',
+    icon: Store,
+    description: "J'achète pour revendre au détail",
+    color: '#d97706',
+  },
+  {
+    id: 'cooperative_manager' as AppRole,
+    label: 'Gestionnaire Coopérative',
+    icon: Users,
+    description: 'Je gère une coopérative agricole',
+    color: '#7c3aed',
+  },
+] as const
 
 export interface NavItem {
   to: string
