@@ -8,6 +8,8 @@ import { ArrowLeft, ShoppingBag, Package, CheckCircle, XCircle, Clock } from 'lu
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import type { Order } from '@/types/marketplace'
+import type { MarketplaceListing } from '@/lib/marketplace-data'
+import { EditOfferModal } from '@/components/marketplace/edit-offer-modal'
 
 export const Route = createFileRoute('/_authenticated/marketplace/orders')({
   ssr: false,
@@ -28,6 +30,8 @@ function OrdersPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [tab, setTab] = useState<'buyer' | 'seller'>('buyer')
+  const [editingListing, setEditingListing] = useState<MarketplaceListing | null>(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -275,6 +279,17 @@ function OrdersPage() {
           </div>
         )}
       </main>
+
+      {/* Modal d'édition des offres */}
+      <EditOfferModal
+        listing={editingListing}
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        onSuccess={() => {
+          setEditingListing(null)
+          // Recharger les données si nécessaire
+        }}
+      />
     </div>
   )
 }

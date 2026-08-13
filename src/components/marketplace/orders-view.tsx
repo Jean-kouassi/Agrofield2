@@ -178,24 +178,22 @@ export function OrdersView({ orders: initialOrders, initialRole = 'buyer' }: Ord
         <button
           onClick={() => setRole('buyer')}
           className={cn(
-            'flex-1 rounded-xl p-3 flex items-center justify-center gap-2 text-sm font-bold transition-all duration-200',
+            'flex-1 rounded-xl p-3 flex items-center justify-center gap-2 text-sm font-bold transition-all duration-200 border-2',
             role === 'buyer'
-              ? 'text-white shadow-md'
-              : 'af-card text-muted-foreground hover:bg-[var(--agro-pale)]'
+              ? 'bg-green-700 text-white shadow-lg border-green-800'
+              : 'af-card text-gray-700 hover:bg-green-50 border-transparent'
           )}
-          style={role === 'buyer' ? { background: 'var(--agro-primary)' } : {}}
         >
           <ShoppingBag size={16} /> Mes achats
         </button>
         <button
           onClick={() => setRole('seller')}
           className={cn(
-            'flex-1 rounded-xl p-3 flex items-center justify-center gap-2 text-sm font-bold transition-all duration-200',
+            'flex-1 rounded-xl p-3 flex items-center justify-center gap-2 text-sm font-bold transition-all duration-200 border-2',
             role === 'seller'
-              ? 'text-white shadow-md'
-              : 'af-card text-muted-foreground hover:bg-[var(--agro-pale)]'
+              ? 'bg-green-700 text-white shadow-lg border-green-800'
+              : 'af-card text-gray-700 hover:bg-green-50 border-transparent'
           )}
-          style={role === 'seller' ? { background: 'var(--agro-primary)' } : {}}
         >
           <Store size={16} /> Mes ventes
         </button>

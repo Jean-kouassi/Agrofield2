@@ -341,9 +341,9 @@ export function CreateOfferForm({ onSuccess, onCancel }: CreateOfferFormProps) {
           {/* Category & Unit */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="category" className="font-semibold text-gray-700">Catégorie *</Label>
+              <Label htmlFor="category-select" className="font-semibold text-gray-700">Catégorie *</Label>
               <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v as ProductCategory })}>
-                <SelectTrigger id="category" aria-label="Choisir la catégorie">
+                <SelectTrigger id="category-select" aria-label="Choisir la catégorie">
                   <SelectValue placeholder="Choisir" />
                 </SelectTrigger>
                 <SelectContent>
@@ -355,9 +355,9 @@ export function CreateOfferForm({ onSuccess, onCancel }: CreateOfferFormProps) {
             </div>
 
             <div>
-              <Label htmlFor="unit" className="font-semibold text-gray-700">Unité *</Label>
+              <Label htmlFor="unit-select" className="font-semibold text-gray-700">Unité *</Label>
               <Select value={formData.unit} onValueChange={(v) => setFormData({ ...formData, unit: v as UnitType })}>
-                <SelectTrigger id="unit" aria-label="Choisir l'unité">
+                <SelectTrigger id="unit-select" aria-label="Choisir l'unité">
                   <SelectValue placeholder="kg" />
                 </SelectTrigger>
                 <SelectContent>
@@ -420,9 +420,9 @@ export function CreateOfferForm({ onSuccess, onCancel }: CreateOfferFormProps) {
             </div>
 
             <div>
-              <Label htmlFor="region" className="font-semibold text-gray-700">Région *</Label>
+              <Label htmlFor="region-select" className="font-semibold text-gray-700">Région *</Label>
               <Select value={formData.region} onValueChange={(v) => setFormData({ ...formData, region: v })}>
-                <SelectTrigger id="region" aria-label="Choisir la région">
+                <SelectTrigger id="region-select" aria-label="Choisir la région">
                   <SelectValue placeholder="Choisir" />
                 </SelectTrigger>
                 <SelectContent>

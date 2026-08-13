@@ -22,6 +22,10 @@ export function ProductCard({
   onEdit,
   onDelete,
 }: ProductCardProps) {
+  // Utiliser la première image du listing ou une image par défaut
+  const imageUrl = listing.images && listing.images.length > 0 
+    ? listing.images[0] 
+    : `https://picsum.photos/seed/AgroSphere-${listing.id}/640/480`
   return (
     <Card
       className="af-card rounded-2xl overflow-hidden cursor-pointer flex flex-col"
@@ -29,10 +33,14 @@ export function ProductCard({
     >
       <div className="relative af-aspect-43 overflow-hidden bg-gray-100">
         <img
-          src={productImage(listing.id, 1)}
+          src={imageUrl}
           alt={listing.title}
           className="w-full h-full object-cover"
           loading="lazy"
+          onError={(e) => {
+            // Fallback si l'image échoue
+            e.currentTarget.src = `https://picsum.photos/seed/AgroSphere-${listing.id}/640/480`
+          }}
         />
         <div className="absolute top-2 left-2">
           <CategoryBadge category={listing.category} />
