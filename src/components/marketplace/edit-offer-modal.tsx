@@ -59,14 +59,17 @@ export function EditOfferModal({ listing, open, onOpenChange, onSuccess }: EditO
     setLoading(true)
 
     try {
+      // Mapper les champs du formulaire vers les colonnes de la DB
       const updateData: any = {
         title: formData.title.trim(),
         description: formData.description.trim(),
         category: formData.category,
-        quantity: parseFloat(formData.quantity),
+        quantity: parseFloat(formData.quantity) || 0,
+        qty: parseFloat(formData.quantity) || 0, // Alias pour compatibilité
         unit: formData.unit,
-        price: parseFloat(formData.price),
+        price: parseFloat(formData.price) || 0,
         location: formData.location.trim(),
+        city: formData.location.trim(), // Alias pour compatibilité
         region: formData.region,
         updated_at: new Date().toISOString(),
       }
@@ -83,7 +86,7 @@ export function EditOfferModal({ listing, open, onOpenChange, onSuccess }: EditO
       onOpenChange(false)
     } catch (error: any) {
       console.error('Error updating offer:', error)
-      toast.error('❌ Erreur lors de la modification: ' + error.message)
+      toast.error('❌ Erreur lors de la modification: ' + (error.message || 'Erreur inconnue'))
     } finally {
       setLoading(false)
     }

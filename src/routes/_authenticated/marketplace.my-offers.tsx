@@ -8,6 +8,7 @@ import { ArrowLeft, Package, Plus, Edit, Trash2, Eye, ShoppingCart, Leaf } from 
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import type { Offer } from '@/types/marketplace'
+import { EditOfferModal } from '@/components/marketplace/edit-offer-modal'
 
 export const Route = createFileRoute('/_authenticated/marketplace/my-offers')({
   ssr: false,
@@ -28,11 +29,30 @@ const statusColors: Record<string, string> = {
   expired: 'bg-red-500',
 }
 
+interface SellerStats {
+  total: number
+  active: number
+  sold: number
+  revenue: number
+  views: number
+  contacts: number
+}
+
 function MyOffersPage() {
   const router = useRouter()
   const [offers, setOffers] = useState<Offer[]>([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
+  const [stats, setStats] = useState<SellerStats>({
+    total: 0,
+    active: 0,
+    sold: 0,
+    revenue: 0,
+    views: 0,
+    contacts: 0,
+  })
+  const [editingListing, setEditingListing] = useState<Offer | null>(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -49,20 +69,52 @@ function MyOffersPage() {
   async function loadOffers(userId: string) {
     try {
       setLoading(true)
-      const { data, error } = await supabase
+      
+      // Charger les offres
+      const { data: offersData, error: offersError } = await supabase
         .from('marketplace_listings')
         .select('*')
         .eq('seller_id', userId)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
-      setOffers((data || []) as unknown as Offer[])
+      if (offersError) throw offersError
+      setOffers((offersData || []) as unknown as Offer[])
+
+      // Charger les statistiques depuis la fonction
+      const { data: statsData, error: statsError } = await supabase
+        .rpc('get_seller_stats', { p_seller_id: userId })
+      
+      if (!statsError && statsData && statsData.length > 0) {
+        const s = statsData[0]
+        setStats({
+          total: Number(s.total_offers) || 0,
+          active: Number(s.active_offers) || 0,
+          sold: Number(s.sold_offers) || 0,
+          revenue: Number(s.total_revenue) || 0,
+          views: Number(s.total_views) || 0,
+          contacts: Number(s.total_contacts) || 0,
+        })
+      } else {
+        // Fallback: calcul local si la fonction n'existe pas
+        calculateLocalStats(offersData || [])
+      }
     } catch (err: any) {
       console.error('Failed to load offers:', err)
       toast.error('Erreur lors du chargement de vos offres')
     } finally {
       setLoading(false)
     }
+  }
+
+  function calculateLocalStats(data: any[]) {
+    const total = data.length
+    const active = data.filter(o => o.status === 'available').length
+    const sold = data.filter(o => o.status === 'sold').length
+    const revenue = data
+      .filter(o => o.status === 'sold')
+      .reduce((sum, o) => sum + ((o.price || 0) * (o.quantity || o.qty || 0)), 0)
+    
+    setStats({ total, active, sold, revenue, views: 0, contacts: 0 })
   }
 
   async function handleDelete(offerId: string, title: string) {
@@ -78,9 +130,21 @@ function MyOffersPage() {
 
       toast.success('✅ Offre supprimée')
       setOffers(prev => prev.filter(o => o.id !== offerId))
+      // Recharger pour mettre à jour les stats
+      if (user) loadOffers(user.id)
     } catch (err: any) {
       toast.error('❌ Erreur: ' + err.message)
     }
+  }
+
+  function handleEdit(offer: Offer) {
+    setEditingListing(offer)
+    setEditModalOpen(true)
+  }
+
+  function handleSuccess() {
+    // Recharger les offres et stats après modification
+    if (user) loadOffers(user.id)
   }
 
   if (!user) {
@@ -89,15 +153,6 @@ function MyOffersPage() {
         <Skeleton className="h-32 w-64" />
       </div>
     )
-  }
-
-  const stats = {
-    total: offers.length,
-    active: offers.filter(o => o.status === 'available').length,
-    sold: offers.filter(o => o.status === 'sold').length,
-    revenue: offers
-      .filter(o => o.status === 'sold')
-      .reduce((sum, o) => sum + (o.price * o.quantity), 0),
   }
 
   return (
@@ -129,7 +184,7 @@ function MyOffersPage() {
       </header>
 
       <main className="container mx-auto p-4 max-w-4xl">
-        {/* Stats */}
+        {/* Stats principales */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardContent className="p-4 text-center">
@@ -151,107 +206,94 @@ function MyOffersPage() {
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-green-600">
-                {stats.revenue.toLocaleString('fr-FR')}
-              </p>
-              <p className="text-xs text-gray-500">FCFA (revenus)</p>
+              <p className="text-2xl font-bold text-blue-600">{stats.revenue >= 1000 ? `${(stats.revenue / 1000).toFixed(1)}k` : stats.revenue}</p>
+              <p className="text-xs text-gray-500">Revenu (FCFA)</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Offers list */}
+        {/* Stats détaillées (vues et contacts) */}
+        {(stats.views > 0 || stats.contacts > 0) && (
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <Card className="bg-purple-50 border-purple-200">
+              <CardContent className="p-4 text-center">
+                <Eye className="w-6 h-6 mx-auto mb-2 text-purple-600" />
+                <p className="text-2xl font-bold text-purple-700">{stats.views}</p>
+                <p className="text-xs text-purple-600">Vues totales</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-orange-50 border-orange-200">
+              <CardContent className="p-4 text-center">
+                <ShoppingCart className="w-6 h-6 mx-auto mb-2 text-orange-600" />
+                <p className="text-2xl font-bold text-orange-700">{stats.contacts}</p>
+                <p className="text-xs text-orange-600">Contacts</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Liste des offres */}
         {loading ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <Card key={i}>
-                <CardContent className="p-4 space-y-3">
-                  <Skeleton className="h-6 w-1/2" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-10 w-full" />
-                </CardContent>
-              </Card>
+              <Skeleton key={i} className="h-32 w-full" />
             ))}
           </div>
         ) : offers.length === 0 ? (
           <Card className="p-12 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Leaf className="w-10 h-10 text-green-600" />
-            </div>
-            <h3 className="text-xl font-bold mb-2">Aucune offre publiée</h3>
-            <p className="text-gray-500 mb-4">
-              Publiez votre première offre pour atteindre les acheteurs de votre région.
-            </p>
+            <Leaf className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+            <p className="text-gray-500 text-lg">Aucune offre publiée</p>
             <Button
+              className="mt-4"
               onClick={() => router.navigate({ to: '/marketplace/create' })}
-              className="bg-green-600 hover:bg-green-700"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Publier une offre
+              Publier votre première offre
             </Button>
           </Card>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {offers.map((offer) => (
-              <Card key={offer.id} className="hover:shadow-md transition-shadow">
+              <Card key={offer.id}>
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-4">
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-lg truncate">{offer.title}</h3>
-                        <Badge className={`${statusColors[offer.status]} text-white text-xs`}>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className={statusColors[offer.status] || 'bg-gray-500'}>
                           {statusLabels[offer.status] || offer.status}
                         </Badge>
+                        <span className="text-xs text-gray-500">
+                          {new Date(offer.created_at).toLocaleDateString('fr-FR')}
+                        </span>
                       </div>
-                      <p className="text-sm text-gray-500 line-clamp-1 mb-2">
-                        {offer.description}
+                      <h3 className="font-semibold text-lg mb-1">{offer.title}</h3>
+                      <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                        {offer.description || offer.desc}
                       </p>
-                      <div className="flex flex-wrap items-center gap-4 text-sm">
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span className="font-bold text-green-600">
-                          {offer.price.toLocaleString('fr-FR')} FCFA/{offer.unit}
+                          {offer.price?.toLocaleString('fr-FR')} FCFA / {offer.unit}
                         </span>
-                        <span className="text-gray-500">
-                          {offer.quantity} {offer.unit}s dispo
-                        </span>
-                        <span className="text-gray-500 flex items-center gap-1">
-                          <Eye className="w-3 h-3" />
-                          {offer.views} vues
-                        </span>
-                        <span className="text-gray-500">
-                          👤 {offer.sellerName}
+                        <span>Qté: {offer.quantity || offer.qty}</span>
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" /> {offer.views || 0}
                         </span>
                       </div>
                     </div>
-
-                    {/* Actions */}
-                    <div className="flex flex-col gap-2 flex-shrink-0">
+                    <div className="flex flex-col gap-2">
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => router.navigate({ to: '/marketplace/$id', params: { id: offer.id } })}
+                        onClick={() => handleEdit(offer)}
                       >
-                        <Eye className="w-4 h-4 mr-1" />
-                        Voir
+                        <Edit className="w-4 h-4" />
                       </Button>
-                      {offer.status === 'available' && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-blue-300 text-blue-600 hover:bg-blue-50"
-                          onClick={() => router.navigate({ to: '/marketplace/$id/edit', params: { id: offer.id } })}
-                        >
-                          <Edit className="w-4 h-4 mr-1" />
-                          Modifier
-                        </Button>
-                      )}
                       <Button
                         size="sm"
                         variant="outline"
-                        className="border-red-300 text-red-600 hover:bg-red-50"
                         onClick={() => handleDelete(offer.id, offer.title)}
+                        className="text-red-600 hover:text-red-700"
                       >
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        Supprimer
+                        <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
@@ -261,6 +303,14 @@ function MyOffersPage() {
           </div>
         )}
       </main>
+
+      {/* Modal de modification */}
+      <EditOfferModal
+        listing={editingListing}
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        onSuccess={handleSuccess}
+      />
     </div>
   )
 }
