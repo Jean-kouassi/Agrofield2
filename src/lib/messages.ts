@@ -46,20 +46,20 @@ export interface Notification {
 
 /**
  * Obtenir ou créer une conversation avec un autre utilisateur
+ * Note: Fonction actuellement non utilisée - commentée pour référence future
  */
-export async function getOrCreateConversation(
-  participant2Id: string,
-  listingId?: string
-): Promise<string | undefined> {
-  const { data, error } = await supabase.rpc('get_or_create_conversation', {
-    p_participant_2_id: participant2Id,
-    p_listing_id: listingId || null,
-  });
+// export async function getOrCreateConversation(
+//   participant2Id: string,
+//   listingId?: string
+// ): Promise<string | null> {
+//   const { data, error } = await supabase.rpc('get_or_create_conversation', {
+//     p_participant_2_id: participant2Id,
+//     p_listing_id: listingId || null,
+//   });
 
-  if (error) throw error;
-  // eslint-disable-next-line @typescript-eslint/return-await
-  return data as unknown as string | undefined;
-}
+//   if (error) throw error;
+//   return data ?? null;
+// }
 
 /**
  * Obtenir ou créer une conversation et démarrer le chat
