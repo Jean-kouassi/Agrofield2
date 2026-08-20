@@ -44,7 +44,13 @@ export function ProductCard({
   return (
     <Card
       className="af-card rounded-2xl overflow-hidden cursor-pointer flex flex-col"
-      onClick={() => onSelect(listing)}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect(listing);
+      }}
+      onTouchEnd={(e) => {
+        e.stopPropagation();
+      }}
     >
       <div className="relative af-aspect-43 overflow-hidden bg-gray-100">
         <img
