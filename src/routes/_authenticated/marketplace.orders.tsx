@@ -1,28 +1,55 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ArrowLeft, ShoppingBag, Package, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
+import {
+  ArrowLeft, Package, ShoppingBag, Clock, CheckCircle2, XCircle, Calendar,
+} from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
-import type { Order } from '@/types/marketplace'
-import type { MarketplaceListing } from '@/lib/marketplace-data'
-import { EditOfferModal } from '@/components/marketplace/edit-offer-modal'
-import { DebugOrders } from '@/components/marketplace/debug-orders'
 
 export const Route = createFileRoute('/_authenticated/marketplace/orders')({
   ssr: false,
   component: OrdersPage,
 })
 
-const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  pending: { label: 'En attente', color: 'bg-yellow-500', icon: <Clock className="w-4 h-4" /> },
-  confirmed: { label: 'Confirmée', color: 'bg-blue-500', icon: <CheckCircle className="w-4 h-4" /> },
-  processing: { label: 'En cours', color: 'bg-purple-500', icon: <Clock className="w-4 h-4" /> },
-  completed: { label: 'Terminée', color: 'bg-green-600', icon: <CheckCircle className="w-4 h-4" /> },
-  cancelled: { label: 'Annulée', color: 'bg-red-500', icon: <XCircle className="w-4 h-4" /> },
+const statusLabels: Record<string, string> = {
+  pending: 'En attente',
+  confirmed: 'Confirmee',
+  processing: 'En cours',
+  completed: 'Terminee',
+  cancelled: 'Annulee',
+}
+
+const statusVariants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+  pending: 'secondary',
+  confirmed: 'default',
+  processing: 'default',
+  completed: 'outline',
+  cancelled: 'destructive',
+}
+
+const paymentLabels: Record<string, string> = {
+  cash: 'Cash',
+  orange_money: 'Orange Money',
+  moov_money: 'Moov Money',
+  virement: 'Virement',
+}
+
+interface Order {
+  id: string
+  offer_id: string
+  buyer_id: string
+  seller_id: string
+  quantity: number
+  total_price: number
+  payment_method: string
+  status: string
+  notes?: string | null
+  created_at: string
 }
 
 function OrdersPage() {
@@ -31,20 +58,18 @@ function OrdersPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [tab, setTab] = useState<'buyer' | 'seller'>('buyer')
-  const [editingListing, setEditingListing] = useState<MarketplaceListing | null>(null)
-  const [editModalOpen, setEditModalOpen] = useState(false)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user)
       if (!data.user) {
-        toast.error('Vous devez être connecté')
+        toast.error('Connectez-vous pour voir vos commandes')
         router.navigate({ to: '/auth' })
         return
       }
       loadOrders(data.user.id)
     })
-  }, [])
+  }, [router])
 
   async function loadOrders(userId: string) {
     try {
@@ -56,7 +81,7 @@ function OrdersPage() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setOrders((data || []) as unknown as Order[])
+      setOrders(data || [])
     } catch (err: any) {
       console.error('Failed to load orders:', err)
       toast.error('Erreur lors du chargement des commandes')
@@ -65,216 +90,184 @@ function OrdersPage() {
     }
   }
 
-  const buyerOrders = orders.filter(o => o.buyerId === user?.id)
-  const sellerOrders = orders.filter(o => o.sellerId === user?.id)
-  const displayedOrders = tab === 'buyer' ? buyerOrders : sellerOrders
+  async function updateStatus(orderId: string, status: string) {
+    const updates: Record<string, any> = { status }
+    if (status === 'confirmed') updates.confirmed_at = new Date().toISOString()
+    if (status === 'completed') updates.completed_at = new Date().toISOString()
+    if (status === 'cancelled') updates.cancelled_at = new Date().toISOString()
+
+    try {
+      const { error } = await supabase.from('orders').update(updates).eq('id', orderId)
+      if (error) throw error
+      toast.success('Statut mis a jour')
+      if (user) loadOrders(user.id)
+    } catch (err: any) {
+      toast.error('Erreur: ' + err.message)
+    }
+  }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <Skeleton className="h-32 w-64" />
       </div>
     )
   }
 
+  const buyerOrders = orders.filter((o) => o.buyer_id === user.id)
+  const sellerOrders = orders.filter((o) => o.seller_id === user.id)
+  const displayOrders = tab === 'buyer' ? buyerOrders : sellerOrders
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-green-600 text-white p-4 shadow-lg sticky top-0 z-10">
-        <div className="container mx-auto flex items-center justify-between">
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-20 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+        <div className="container mx-auto flex items-center justify-between px-4 py-3">
           <Button
             variant="ghost"
             onClick={() => router.navigate({ to: '/marketplace' })}
-            className="text-white hover:bg-green-700"
+            style={{ minHeight: 48 }}
+            aria-label="Retour au marketplace"
           >
-            <ArrowLeft className="w-5 h-5 mr-2" />
+            <ArrowLeft className="mr-2 h-5 w-5" />
             Marketplace
           </Button>
-          <h1 className="text-lg font-bold flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5" />
-            Mes commandes
+          <h1 className="flex items-center gap-2 text-lg font-bold text-foreground">
+            <Package className="h-5 w-5 text-primary" />
+            Commandes
           </h1>
+          <div className="w-24" />
         </div>
       </header>
 
-      <main className="container mx-auto p-4 max-w-4xl">
-        {/* Debug Component - À supprimer après fix */}
-        <DebugOrders />
-
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6">
-          <Button
-            variant={tab === 'buyer' ? 'default' : 'outline'}
+      <main className="container mx-auto max-w-3xl space-y-4 p-4">
+        <div className="grid grid-cols-2 gap-2">
+          <button
             onClick={() => setTab('buyer')}
-            className={tab === 'buyer' ? 'bg-green-600' : ''}
+            className={'flex items-center justify-center gap-2 rounded-lg border p-3 text-sm font-medium transition-colors ' + (tab === 'buyer' ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:bg-muted')}
+            style={{ minHeight: 48 }}
+            aria-pressed={tab === 'buyer'}
           >
-            <Package className="w-4 h-4 mr-2" />
+            <ShoppingBag className="h-4 w-4" />
             Mes achats ({buyerOrders.length})
-          </Button>
-          <Button
-            variant={tab === 'seller' ? 'default' : 'outline'}
+          </button>
+          <button
             onClick={() => setTab('seller')}
-            className={tab === 'seller' ? 'bg-green-600' : ''}
+            className={'flex items-center justify-center gap-2 rounded-lg border p-3 text-sm font-medium transition-colors ' + (tab === 'seller' ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:bg-muted')}
+            style={{ minHeight: 48 }}
+            aria-pressed={tab === 'seller'}
           >
-            <ShoppingBag className="w-4 h-4 mr-2" />
+            <Package className="h-4 w-4" />
             Mes ventes ({sellerOrders.length})
-          </Button>
+          </button>
         </div>
 
-        {/* Orders list */}
         {loading ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <Card key={i}>
-                <CardContent className="p-4 space-y-3">
-                  <Skeleton className="h-6 w-1/2" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-10 w-full" />
-                </CardContent>
-              </Card>
+              <Skeleton key={i} className="h-32 w-full rounded-xl" />
             ))}
           </div>
-        ) : displayedOrders.length === 0 ? (
-          <Card className="p-12 text-center">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <ShoppingBag className="w-10 h-10 text-gray-400" />
+        ) : displayOrders.length === 0 ? (
+          <Card className="p-8 text-center">
+            <div className="mx-auto mb-4 w-fit rounded-full bg-muted p-4">
+              <Package className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-bold mb-2">
-              {tab === 'buyer' ? 'Aucun achat' : 'Aucune vente'}
-            </h3>
-            <p className="text-gray-500 mb-4">
-              {tab === 'buyer'
-                ? 'Vous n\'avez pas encore passé de commande.'
-                : 'Personne n\'a encore commandé vos produits.'}
+            <p className="text-lg font-medium text-foreground">
+              {tab === 'buyer' ? 'Aucune commande' : 'Aucune vente'}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {tab === 'buyer' ? 'Vos achats apparaitront ici' : 'Vos ventes apparaitront ici'}
             </p>
             <Button
+              className="mt-6"
               onClick={() => router.navigate({ to: '/marketplace' })}
-              variant="outline"
-              className="border-green-600 text-green-600 hover:bg-green-50"
+              style={{ minHeight: 48 }}
             >
-              Parcourir le marketplace
+              Aller au marketplace
             </Button>
           </Card>
         ) : (
-          <div className="space-y-4">
-            {displayedOrders.map((order) => {
-              const status = statusConfig[order.status] || statusConfig.pending
+          <div className="space-y-3">
+            {displayOrders.map((order) => {
+              const isSeller = tab === 'seller'
               return (
-                <Card key={order.id} className="hover:shadow-md transition-shadow">
+                <Card key={order.id} className="overflow-hidden transition-shadow hover:shadow-md">
                   <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <p className="font-semibold text-lg">
-                          {tab === 'buyer' ? (order as any).seller_name || 'Vendeur' : (order as any).buyer_name || 'Acheteur'}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {new Date(order.createdAt).toLocaleDateString('fr-FR', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </p>
-                      </div>
-                      <Badge className={`${status.color} text-white`}>
-                        {status.icon}
-                        <span className="ml-1">{status.label}</span>
+                    <div className="flex items-center justify-between">
+                      <Badge variant={statusVariants[order.status] || 'outline'} className="text-[10px]">
+                        <Clock className="mr-1 h-3 w-3" />
+                        {statusLabels[order.status] || order.status}
                       </Badge>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(order.created_at).toLocaleDateString('fr-FR')}
+                      </span>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <Separator className="my-3" />
+
+                    <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <p className="text-gray-400">Quantité</p>
-                        <p className="font-medium">{order.quantity} {order.unit}</p>
+                        <p className="text-xs text-muted-foreground">Quantite</p>
+                        <p className="font-semibold text-foreground">{order.quantity}</p>
                       </div>
                       <div>
-                        <p className="text-gray-400">Prix unitaire</p>
-                        <p className="font-medium">{order.unitPrice.toLocaleString('fr-FR')} FCFA</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400">Total</p>
-                        <p className="font-bold text-green-600">
-                          {order.totalPrice.toLocaleString('fr-FR')} FCFA
+                        <p className="text-xs text-muted-foreground">Total</p>
+                        <p className="font-bold text-primary">
+                          {Number(order.total_price).toLocaleString('fr-FR')} FCFA
                         </p>
                       </div>
                       <div>
-                        <p className="text-gray-400">Paiement</p>
-                        <p className="font-medium capitalize">{order.paymentMethod}</p>
+                        <p className="text-xs text-muted-foreground">Paiement</p>
+                        <p className="font-medium text-foreground">
+                          {paymentLabels[order.payment_method] || order.payment_method}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Role</p>
+                        <p className="font-medium text-foreground">
+                          {isSeller ? 'Vendeur' : 'Acheteur'}
+                        </p>
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    {tab === 'seller' && order.status === 'pending' && (
-                      <div className="flex gap-2 mt-4 pt-4 border-t">
+                    {order.notes && (
+                      <div className="mt-2 rounded-md bg-muted/50 px-2 py-1.5">
+                        <p className="text-xs text-muted-foreground">{order.notes}</p>
+                      </div>
+                    )}
+
+                    {isSeller && order.status === 'pending' && (
+                      <div className="mt-3 flex gap-2">
                         <Button
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700"
-                          onClick={async () => {
-                            try {
-                              const { error } = await supabase
-                                .from('orders')
-                                .update({ status: 'confirmed', confirmed_at: new Date().toISOString() })
-                                .eq('id', order.id)
-                              if (error) throw error
-                              toast.success('✅ Commande confirmée')
-                              loadOrders(user.id)
-                            } catch (err: any) {
-                              toast.error('Erreur: ' + err.message)
-                            }
-                          }}
+                          className="flex-1"
+                          style={{ minHeight: 44 }}
+                          onClick={() => updateStatus(order.id, 'confirmed')}
                         >
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Confirmer
+                          <CheckCircle2 className="mr-1 h-4 w-4" /> Confirmer
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
-                          className="border-red-300 text-red-600 hover:bg-red-50"
-                          onClick={async () => {
-                            if (!confirm('Annuler cette commande ?')) return
-                            try {
-                              const { error } = await supabase
-                                .from('orders')
-                                .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
-                                .eq('id', order.id)
-                              if (error) throw error
-                              toast.success('Commande annulée')
-                              loadOrders(user.id)
-                            } catch (err: any) {
-                              toast.error('Erreur: ' + err.message)
-                            }
-                          }}
+                          className="flex-1 text-destructive hover:bg-destructive/10"
+                          style={{ minHeight: 44 }}
+                          onClick={() => updateStatus(order.id, 'cancelled')}
                         >
-                          <XCircle className="w-4 h-4 mr-1" />
-                          Refuser
+                          <XCircle className="mr-1 h-4 w-4" /> Refuser
                         </Button>
                       </div>
                     )}
 
-                    {tab === 'seller' && order.status === 'confirmed' && (
-                      <div className="flex gap-2 mt-4 pt-4 border-t">
-                        <Button
-                          size="sm"
-                          className="bg-green-600 hover:bg-green-700"
-                          onClick={async () => {
-                            try {
-                              const { error } = await supabase
-                                .from('orders')
-                                .update({ status: 'completed', completed_at: new Date().toISOString() })
-                                .eq('id', order.id)
-                              if (error) throw error
-                              toast.success('✅ Vente terminée')
-                              loadOrders(user.id)
-                            } catch (err: any) {
-                              toast.error('Erreur: ' + err.message)
-                            }
-                          }}
-                        >
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Marquer comme livré
-                        </Button>
-                      </div>
+                    {isSeller && order.status === 'confirmed' && (
+                      <Button
+                        size="sm"
+                        className="mt-3 w-full"
+                        style={{ minHeight: 44 }}
+                        onClick={() => updateStatus(order.id, 'completed')}
+                      >
+                        <CheckCircle2 className="mr-1 h-4 w-4" /> Marquer comme terminee
+                      </Button>
                     )}
                   </CardContent>
                 </Card>
@@ -283,17 +276,6 @@ function OrdersPage() {
           </div>
         )}
       </main>
-
-      {/* Modal d'édition des offres */}
-      <EditOfferModal
-        listing={editingListing}
-        open={editModalOpen}
-        onOpenChange={setEditModalOpen}
-        onSuccess={() => {
-          setEditingListing(null)
-          // Recharger les données si nécessaire
-        }}
-      />
     </div>
   )
 }

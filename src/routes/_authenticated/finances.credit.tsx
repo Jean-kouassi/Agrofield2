@@ -85,7 +85,7 @@ function CreditScorePage() {
 
       // Charger les demandes de prêt
       const applications = await getUserLoanApplications(user.id);
-      setLoanApplications(applications);
+      setLoanApplications(applications as any);
     } catch (error) {
       console.error("Erreur chargement credit:", error);
       toast.error("Impossible de charger votre score de crédit");

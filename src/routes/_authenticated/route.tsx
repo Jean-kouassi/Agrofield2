@@ -5,7 +5,7 @@ import { Leaf, LayoutDashboard, Sprout, Camera, Wallet, User, LogOut, Radio, Shi
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { OfflineBadge } from "@/components/ui/offline-badge";
 import { OfflineIndicator } from "@/components/ui/pwa-install-prompt";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -40,9 +40,15 @@ export const Route = createFileRoute("/_authenticated")({
 function AuthedLayout() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [isSwiping, setIsSwiping] = useState(false);
+  
+  // Swipe state
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [targetPage, setTargetPage] = useState<"prev" | "next" | null>(null);
+  
   const touchStartX = useRef<number>(0);
-  const touchEndX = useRef<number>(0);
+  const touchStartY = useRef<number>(0);
+  const screenWidth = typeof window !== "undefined" ? window.innerWidth : 375;
 
   const routes = [
     { path: "/", label: "Accueil" },
@@ -53,52 +59,96 @@ function AuthedLayout() {
     { path: "/marketplace", label: "Marché" },
   ];
 
+  const currentPath = router.state.location.pathname;
+  const currentIndex = routes.findIndex(r => {
+    const routePath = r.path === "/" ? "/dashboard" : r.path;
+    return currentPath.startsWith(routePath) || currentPath === r.path;
+  });
+
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    setIsSwiping(true);
+    // Seulement si on est près du bord gauche (comme WhatsApp)
+    const touchX = e.touches[0].clientX;
+    if (touchX > 50) return; // Ignore si pas près du bord
+    
+    // Ignorer si on touche un élément interactif (boutons, liens, inputs)
+    const target = e.target as HTMLElement;
+    if (target.closest('button, a, input, select, textarea, [role="button"]')) {
+      return;
+    }
+    
+    // Ignorer si on touche un élément avec scroll horizontal (carousel, galerie)
+    if (target.closest('[data-swipe-ignore], .swiper-container, .carousel, [style*="overflow-x: auto"], [style*="overflow-x:auto"]')) {
+      return;
+    }
+    
+    // Vérifier si un parent a un scroll horizontal actif
+    let current = target.parentElement;
+    while (current && current !== document.body) {
+      const style = window.getComputedStyle(current);
+      if (style.overflowX === 'auto' || style.overflowX === 'scroll') {
+        return; // C'est un conteneur scrollable horizontalement
+      }
+      current = current.parentElement;
+    }
+    
+    touchStartX.current = touchX;
+    touchStartY.current = e.touches[0].clientY;
+    setIsDragging(true);
+    setDragOffset(0);
+    setTargetPage(null);
   }, []);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isSwiping) return;
-    touchEndX.current = e.touches[0].clientX;
-  }, [isSwiping]);
+    if (!isDragging) return;
+    
+    const touchX = e.touches[0].clientX;
+    const touchY = e.touches[0].clientY;
+    const deltaX = touchX - touchStartX.current;
+    const deltaY = touchY - touchStartY.current;
+    
+    // Ignore si mouvement principalement vertical
+    if (Math.abs(deltaY) > Math.abs(deltaX)) return;
+    
+    // Résistance élastique sur les bords (comme iOS)
+    const resistance = deltaX > 0 ? 0.5 : 0.8;
+    setDragOffset(deltaX * resistance);
+    
+    // Déterminer la page cible
+    if (deltaX > 30 && currentIndex > 0) {
+      setTargetPage("prev");
+    } else if (deltaX < -30 && currentIndex < routes.length - 1) {
+      setTargetPage("next");
+    } else {
+      setTargetPage(null);
+    }
+  }, [isDragging, currentIndex, routes.length]);
 
   const handleTouchEnd = useCallback(() => {
-    if (!isSwiping) return;
+    if (!isDragging) return;
     
-    const swipeDistance = touchEndX.current - touchStartX.current;
-    const threshold = 50; // Minimum swipe distance in px
+    const threshold = screenWidth * 0.3; // 30% de l'écran pour valider
     
-    if (Math.abs(swipeDistance) < threshold) {
-      setIsSwiping(false);
-      return;
-    }
-
-    const currentPath = router.state.location.pathname;
-    const currentIndex = routes.findIndex(r => {
-      const routePath = r.path === "/" ? "/dashboard" : r.path;
-      return currentPath.startsWith(routePath);
-    });
-
-    if (currentIndex === -1) {
-      setIsSwiping(false);
-      return;
-    }
-
-    // Swipe left (next page)
-    if (swipeDistance < -threshold && currentIndex < routes.length - 1) {
+    if (targetPage === "prev" && Math.abs(dragOffset) > threshold) {
+      const prevRoute = routes[currentIndex - 1];
+      router.navigate({ to: prevRoute.path === "/" ? "/dashboard" : prevRoute.path });
+    } else if (targetPage === "next" && Math.abs(dragOffset) > threshold) {
       const nextRoute = routes[currentIndex + 1];
       router.navigate({ to: nextRoute.path === "/" ? "/dashboard" : nextRoute.path });
     }
     
-    // Swipe right (previous page)
-    if (swipeDistance > threshold && currentIndex > 0) {
-      const prevRoute = routes[currentIndex - 1];
-      router.navigate({ to: prevRoute.path === "/" ? "/dashboard" : prevRoute.path });
-    }
+    // Reset
+    setIsDragging(false);
+    setDragOffset(0);
+    setTargetPage(null);
+  }, [isDragging, dragOffset, targetPage, currentIndex, routes, router, screenWidth]);
 
-    setIsSwiping(false);
-  }, [isSwiping, router, routes]);
+  // Empêcher le scroll horizontal pendant le drag
+  useEffect(() => {
+    if (isDragging) {
+      document.body.style.overflowX = "hidden";
+      return () => { document.body.style.overflowX = ""; };
+    }
+  }, [isDragging]);
 
   const isSuperAdmin = useQuery({
     queryKey: ["is-super-admin"],
@@ -123,14 +173,16 @@ function AuthedLayout() {
     router.navigate({ to: "/auth", replace: true });
   }
 
-  const cols = isSuperAdmin ? "grid-cols-7" : "grid-cols-6";
+  // Calcul de la transformation pour l'animation fluide
+  const mainContentStyle: React.CSSProperties = {
+    transform: isDragging ? `translateX(${dragOffset}px)` : undefined,
+    transition: isDragging ? "none" : "transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+    willChange: "transform",
+  };
 
   return (
     <div 
-      className="flex min-h-screen flex-col bg-background pb-20"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      className="flex min-h-screen flex-col bg-background pb-20 overflow-hidden"
     >
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/90 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
@@ -158,13 +210,19 @@ function AuthedLayout() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-5">
+      <main 
+        className="mx-auto w-full max-w-3xl flex-1 px-4 py-5"
+        style={mainContentStyle}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         <Outlet />
       </main>
 
       {/* Bottom nav avec Dashboard en premier onglet */}
       <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-background/95 backdrop-blur">
-        <div className={`mx-auto grid max-w-3xl ${cols}`}>
+        <div className={`mx-auto grid ${isSuperAdmin ? "grid-cols-7" : "grid-cols-6"}`}>
           <NavItem to="/" icon={<LayoutDashboard className="h-5 w-5" />} label="Accueil" />
           <NavItem to="/parcels" icon={<Sprout className="h-5 w-5" />} label="Parcelles" />
           <NavItem to="/diagnose" icon={<Camera className="h-5 w-5" />} label="Diagnostic" />

@@ -171,7 +171,7 @@ export function ProductDetailModal({
               </div>
             </div>
 
-            <div className="flex gap-2 p-3 overflow-x-auto af-scrollbar-hide">
+            <div className="flex gap-2 p-3 overflow-x-auto af-scrollbar-hide" data-swipe-ignore>
               {[0, 1, 2].map((i) => (
                 <button
                   key={i}
@@ -304,7 +304,7 @@ export function ProductDetailModal({
               {similar.length > 0 && (
                 <div>
                   <h4 className="af-display font-bold text-sm mb-2">Vous aimerez aussi</h4>
-                  <div className="flex gap-3 overflow-x-auto af-scrollbar-hide pb-1">
+                  <div className="flex gap-3 overflow-x-auto af-scrollbar-hide pb-1" data-swipe-ignore>
                     {similar.map((s) => (
                       <button
                         key={s.id}

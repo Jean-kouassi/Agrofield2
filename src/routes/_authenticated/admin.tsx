@@ -143,7 +143,7 @@ function AdminPage() {
     const rows: any[] = [];
     async function signed(path: string | null) {
       if (!path) return "";
-      const { data } = await supabase.storage.from("AgroSphere-media").createSignedUrl(path, 60 * 60 * 24 * 7);
+      const { data } = await supabase.storage.from("agrofield-media").createSignedUrl(path, 60 * 60 * 24 * 7);
       return data?.signedUrl ?? "";
     }
     for (const e of expensesQ.data ?? []) {

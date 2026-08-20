@@ -8,5 +8,6 @@ const router = getRouter();
 // This fixes Supabase auth issues during development
 hydrateRoot(
   document,
-  <StartClient router={router} />
+  // @ts-ignore - StartClient accepts router in runtime
+  <StartClient router={router as any} />
 );

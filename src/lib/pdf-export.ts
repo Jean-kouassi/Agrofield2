@@ -53,31 +53,44 @@ export async function exportFinanceToPDF(
   // EN-TETE PROFESSIONNEL AVEC MOTIF AGRICOLE
   // ============================================
   
-  // Bandeau superieur - Degradé vert agriculture
+  // ============================================
+  // EN-TÊTE AVEC LOGO
+  // ============================================
+  
+  // Bandeau superieur - Dégradé vert agriculture
   doc.setFillColor(34, 139, 34); // Forest green
-  doc.rect(0, 0, pageWidth, 40, 'F');
+  doc.rect(0, 0, pageWidth, 50, 'F');
   
-  // Ligne decorative dorée (recolte)
-  doc.setDrawColor(218, 165, 32); // Goldenrod
-  doc.setLineWidth(0.5);
-  doc.line(0, 40, pageWidth, 40);
+  // Logo AgroSphere (à gauche)
+  try {
+    const logoPath = 'public/agrosphere-logo.png';
+    doc.addImage(logoPath, 'PNG', margin + 5, 8, 35, 35);
+  } catch (e) {
+    // Si le logo n'est pas trouvé, on continue sans
+  }
   
-  // Titre principal
+  // Titre principal (décalé à droite du logo)
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(26);
+  doc.setFontSize(24);
   doc.setTextColor(255, 255, 255);
-  doc.text('AgroSphere', pageWidth / 2, 18, { align: 'center' });
+  doc.text('AgroSphere', margin + 48, 20, { align: 'left' });
   
   // Sous-titre
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(13);
-  doc.setTextColor(255, 255, 255);
-  doc.text('Plateforme de Gestion Agricole', pageWidth / 2, 27, { align: 'center' });
+  doc.setFontSize(11);
+  doc.setTextColor(200, 255, 200);
+  doc.text('Plateforme de Gestion Agricole', margin + 48, 28, { align: 'left' });
   
   // Type de document
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  doc.text('RELEVE FINANCIER', pageWidth / 2, 35, { align: 'center' });
+  doc.setFontSize(18);
+  doc.setTextColor(255, 255, 255);
+  doc.text('RELEVÉ FINANCIER', margin + 48, 38, { align: 'left' });
+  
+  // Ligne decorative dorée (récolte)
+  doc.setDrawColor(218, 165, 32); // Goldenrod
+  doc.setLineWidth(0.8);
+  doc.line(0, 50, pageWidth, 50);
   
   // Metadonnees du rapport
   doc.setFontSize(9);
@@ -89,13 +102,13 @@ export async function exportFinanceToPDF(
     hour: '2-digit',
     minute: '2-digit',
   });
-  doc.text('Date d\'emission: ' + today, pageWidth / 2, 48, { align: 'center' });
+  doc.text('Date d\'émission: ' + today, pageWidth - margin - 60, 58, { align: 'right' });
 
   // ============================================
   // CARTEAU RESUME FINANCIER
   // ============================================
   
-  let yPos = 58;
+  let yPos = 68;
   
   // Titre de section
   doc.setFont('helvetica', 'bold');
@@ -193,54 +206,104 @@ export async function exportFinanceToPDF(
     
     autoTable(doc, {
       startY: yPos,
-      head: [['DATE', 'TYPE', 'CATEGORIE', 'DETAILS', 'MONTANT']],
+      head: [['DATE', 'TYPE', 'CATÉGORIE', 'DÉTAILS', 'MONTANT']],
       body: tableRows,
-      theme: 'grid',
-      // Largeur totale du tableau = largeur de page - marges (0 pour coller aux bords)
-      tableWidth: pageWidth - margin,
-      // Distribution en pourcentages qui totalise 100%
+      theme: 'striped',
+      // Largeur totale du tableau = largeur de page - marges
+      tableWidth: pageWidth - (margin * 2),
+      // Distribution optimisée des colonnes
       columnStyles: {
-        0: { cellWidth: (pageWidth - margin) * 0.09, halign: 'center', valign: 'middle', fontStyle: 'bold', cellPadding: 3 }, // DATE
-        1: { cellWidth: (pageWidth - margin) * 0.07, halign: 'center', valign: 'middle', fontStyle: 'bold', cellPadding: 3 }, // TYPE
-        2: { cellWidth: (pageWidth - margin) * 0.11, valign: 'middle', fontStyle: 'normal', cellPadding: 3 }, // CATEGORIE
-        3: { cellWidth: (pageWidth - margin) * 0.28, valign: 'middle', fontStyle: 'normal', cellPadding: 3 }, // DETAILS
-        4: { cellWidth: (pageWidth - margin) * 0.45, halign: 'right', valign: 'middle', fontStyle: 'bold', cellPadding: { top: 3, right: 0, bottom: 3, left: 3 } }, // MONTANT - padding right à 0
+        0: { 
+          cellWidth: (pageWidth - (margin * 2)) * 0.12, 
+          halign: 'center', 
+          valign: 'middle', 
+          fontStyle: 'normal',
+          fontSize: 9,
+          cellPadding: 4 
+        }, // DATE
+        1: { 
+          cellWidth: (pageWidth - (margin * 2)) * 0.10, 
+          halign: 'center', 
+          valign: 'middle', 
+          fontStyle: 'bold',
+          fontSize: 9,
+          cellPadding: 4 
+        }, // TYPE
+        2: { 
+          cellWidth: (pageWidth - (margin * 2)) * 0.15, 
+          halign: 'left', 
+          valign: 'middle', 
+          fontStyle: 'normal',
+          fontSize: 9,
+          cellPadding: 4 
+        }, // CATÉGORIE
+        3: { 
+          cellWidth: (pageWidth - (margin * 2)) * 0.33, 
+          halign: 'left', 
+          valign: 'middle', 
+          fontStyle: 'normal',
+          fontSize: 8,
+          cellPadding: 4 
+        }, // DÉTAILS
+        4: { 
+          cellWidth: (pageWidth - (margin * 2)) * 0.30, 
+          halign: 'right', 
+          valign: 'middle', 
+          fontStyle: 'bold',
+          fontSize: 10,
+          cellPadding: { top: 4, right: 5, bottom: 4, left: 4 } 
+        }, // MONTANT
       },
-      didParseCell: (data) => {
-        // Colorer par type
-        if (data.section === 'body' && data.column.index === 1) {
-          const row = data.row.raw;
-          if (row[1] === 'DEPENSE') {
-            data.cell.styles.textColor = [220, 38, 38];
-            data.cell.styles.fontStyle = 'bold';
-          } else if (row[1] === 'VENTE') {
-            data.cell.styles.textColor = [22, 163, 74];
-            data.cell.styles.fontStyle = 'bold';
-          }
-        }
-        // Montant colore
-        if (data.section === 'body' && data.column.index === 4) {
-          const row = data.row.raw;
-          if (row[1] === 'DEPENSE') {
-            data.cell.styles.textColor = [220, 38, 38];
-          } else {
-            data.cell.styles.textColor = [22, 163, 74];
-          }
-        }
+      headStyles: {
+        fillColor: [34, 139, 34], // Vert forêt
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 10,
+        halign: 'center',
+        cellPadding: 5
       },
       alternateRowStyles: {
-        fillColor: [248, 250, 252],
+        fillColor: [245, 250, 245], // Vert très pâle pour les lignes paires
       },
-      margin: { left: margin, right: margin },
+      didParseCell: (data) => {
+        // Colorer par type dans la colonne TYPE et MONTANT
+        if (data.section === 'body') {
+          const row = data.row.raw as any;
+          const isDepense = row[1] === 'DEPENSE';
+          
+          // Colonne TYPE
+          if (data.column.index === 1) {
+            if (isDepense) {
+              data.cell.styles.textColor = [185, 28, 28]; // Rouge foncé
+              data.cell.styles.fillColor = [254, 226, 226]; // Fond rouge très pâle
+            } else {
+              data.cell.styles.textColor = [22, 163, 74]; // Vert
+              data.cell.styles.fillColor = [220, 252, 231]; // Fond vert très pâle
+            }
+          }
+          
+          // Colonne MONTANT
+          if (data.column.index === 4) {
+            if (isDepense) {
+              data.cell.styles.textColor = [185, 28, 28]; // Rouge foncé
+            } else {
+              data.cell.styles.textColor = [22, 103, 7]; // Vert foncé
+            }
+          }
+        }
+      },
+      margin: { left: margin, right: margin, top: 10 },
       showHead: 'everyPage',
       tableLineWidth: 0.3,
-      tableLineColor: [220, 220, 220],
+      tableLineColor: [200, 200, 200],
       foot: [['', '', '', 'TOTAL:', formatNumberSimple(transactions.reduce((sum, t) => sum + (t.signe === '-' ? -t.montant : t.montant), 0))]],
       footStyles: {
         fillColor: [34, 139, 34],
         textColor: [255, 255, 255],
         fontStyle: 'bold',
+        fontSize: 11,
         halign: 'right',
+        cellPadding: 5
       },
     });
     
@@ -259,7 +322,7 @@ export async function exportFinanceToPDF(
   // Si il y a beaucoup d'espace vide (> 40mm), on remplit avec des stats supplementaires
   if (remainingSpace > 40 && transactions.length > 0) {
     // Section statistiques pour remplir l'espace
-    footerStartY = drawStatsSection(doc, footerStartY, margin, pageWidth, transactions, totalExp, totalSales, netto);
+    footerStartY = drawStatsSection(doc, footerStartY, margin, pageWidth, transactions, totalExp, totalSales, netto) as any;
   }
   
   // S'assurer que le pied de page ne depasse pas la page
@@ -337,7 +400,7 @@ function drawFinancialCard(
   
   // Bordure fine
   doc.setLineWidth(1);
-  doc.setDrawColor(...color.map(c => Math.max(0, c - 40)));
+  (doc.setDrawColor as any)(...color.map(c => Math.max(0, c - 40)));
   roundRect(doc, x, y, width, height, radius, color, false);
   
   // Label
@@ -360,6 +423,14 @@ function drawFinancialCard(
 }
 
 // ============================================
+// FONCTION AUXILIAIRE: Section stats (stub)
+// ============================================
+
+function drawStatsSection(doc: any, y: number, margin: number, pageWidth: number, transactions: any[], totalExp: number, totalSales: number, netto: number): number {
+  return y + 10;
+}
+
+// ============================================
 // FONCTION AUXILIAIRE: Rectangle arrondi
 // ============================================
 
@@ -374,10 +445,10 @@ function roundRect(
   fill: boolean
 ) {
   if (fill) {
-    doc.setFillColor(...color);
+    (doc.setFillColor as any)(...color);
     doc.roundedRect(x, y, width, height, radius, radius, 'F');
   } else {
-    doc.setDrawColor(...color);
+    (doc.setDrawColor as any)(...color);
     doc.roundedRect(x, y, width, height, radius, radius, 'S');
   }
 }

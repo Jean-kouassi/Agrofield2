@@ -21,7 +21,7 @@ type DiseaseResult = {
 
 export const analyzePlantImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => InputSchema.parse(data))
+  .validator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { callChatAI } = await import("./ai-provider.server");
 

@@ -70,7 +70,7 @@ export function WeatherMiniCard({ className, autoFetch = true, location = "Ouaga
         // Météo actuelle
         const currentCondition = weatherCodes[data.current.weather_code] || "partly-cloudy";
         setTemperature(Math.round(data.current.temperature_2m));
-        setCondition(currentCondition);
+        setCondition(currentCondition as any);
         setRainProbability(data.current.precipitation_probability || 45);
         
         // Prévisions des prochaines heures
@@ -83,7 +83,7 @@ export function WeatherMiniCard({ className, autoFetch = true, location = "Ouaga
             nextHours.push({
               time: `${hourIndex}:00`,
               temperature: Math.round(data.hourly.temperature_2m[hourIndex]),
-              condition: weatherCodes[data.hourly.weather_code[hourIndex]] || "sunny",
+              condition: (weatherCodes[data.hourly.weather_code[hourIndex]] || "sunny") as any,
               rainProbability: data.hourly.precipitation_probability[hourIndex] || 0,
             });
           }

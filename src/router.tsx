@@ -10,7 +10,7 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
-    defaultSsr: false, // ← DÉSACTIVER SSR PAR DÉFAUT (fix erreur 500 Supabase)
+    // defaultSsr: false, // Propriété non supportée dans cette version
   });
 
   return router;

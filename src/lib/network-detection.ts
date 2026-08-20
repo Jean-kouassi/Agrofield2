@@ -12,7 +12,7 @@
  * - offline: < 0.5 Mbps ou hors ligne → Mode offline, file d'attente
  */
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export type ConnectionQuality = 'excellent' | 'good' | 'poor' | 'offline';
 
@@ -88,9 +88,11 @@ export function getNetworkStatus(): NetworkStatus {
     };
   }
   
-  // Fallback si Network Information API non supportée (Firefox, Safari)
-  // On fait un test de vitesse simplifié
-  return estimateConnectionQuality();
+  // Fallback: retourner un statut par défaut (la fonction async est appelée ailleurs)
+  return {
+    quality: navigator.onLine ? 'good' : 'offline',
+    isOnline: navigator.onLine,
+  };
 }
 
 /**

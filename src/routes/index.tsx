@@ -94,7 +94,7 @@ function Landing() {
   const myOffersQ = useQuery({
     queryKey: ["my-offers-home", userId],
     queryFn: async () => {
-      const { data } = await supabase.from("marketplace_listings").select("*").eq("seller_id", userId).eq("status", "available").order("created_at", { ascending: false });
+      const { data } = await supabase.from("marketplace_listings").select("*").eq("seller_id", userId as string).eq("status", "available").order("created_at", { ascending: false });
       return data ?? [];
     },
     enabled: isConnected,

@@ -10,7 +10,7 @@ import { Textarea } from "../../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
 import { BottomSheetMobile, useBottomSheet } from "../../components/ui/bottom-sheet-mobile";
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, type TransactionType } from "../../lib/finances";
+import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, type FinanceType } from "../../lib/finances";
 
 export const Route = createFileRoute("/_authenticated/finances/add")({
   component: AddTransactionPage,
@@ -21,7 +21,7 @@ function AddTransactionPage() {
   const { isOpen, open, close } = useBottomSheet();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    type: 'expense' as TransactionType,
+    type: 'expense' as FinanceType,
     amount: '',
     category: '',
     description: '',
@@ -38,23 +38,21 @@ function AddTransactionPage() {
       if (!user) throw new Error("Utilisateur non connecté");
 
       const { error } = await supabase
-        .from('finance_transactions')
+        .from('user_finances')
         .insert({
           user_id: user.id,
-          type: formData.type,
-          amount: parseInt(formData.amount),
+          kind: formData.type,
+          amount_fcfa: parseInt(formData.amount),
           category: formData.category,
-          description: formData.description || null,
-          date: formData.date,
-          location: formData.location || null,
-          created_at: new Date(),
-        });
+          transaction_date: formData.date,
+          created_at: new Date().toISOString(),
+        } as any);
 
       if (error) throw error;
 
       alert('✅ Transaction ajoutée avec succès !');
       close();
-      router.navigate({ to: '/finances' });
+      router.navigate({ to: '/finance' });
     } catch (error) {
       console.error('Erreur lors de l\'ajout:', error);
       alert('❌ Erreur lors de l\'ajout de la transaction');
@@ -70,7 +68,7 @@ function AddTransactionPage() {
       {/* Header */}
       <div className="max-w-2xl mx-auto mb-8">
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+          <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>

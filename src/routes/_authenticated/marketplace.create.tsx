@@ -8,8 +8,8 @@ export const Route = createFileRoute('/_authenticated/marketplace/create')({
 
 function CreateOfferPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-8">
-      <div className="container mx-auto px-4 max-w-3xl">
+    <div className="min-h-screen bg-background py-8">
+      <div className="container mx-auto max-w-3xl px-4">
         <CreateOfferForm />
       </div>
     </div>

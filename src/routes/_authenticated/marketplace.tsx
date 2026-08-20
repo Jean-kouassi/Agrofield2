@@ -167,7 +167,7 @@ function MarketplacePage() {
             </Button>
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" data-swipe-ignore>
             <button
               onClick={() => setActiveCategory("all")}
               className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${
@@ -222,7 +222,7 @@ function MarketplacePage() {
 
         {/* Tab: Mes offres — SellerDashboard sans props requises */}
         <TabsContent value="offers">
-          <SellerDashboard />
+          <SellerDashboard myListings={[]} onPublish={() => {}} onEdit={() => {}} onDelete={() => {}} />
         </TabsContent>
 
         {/* Tab: Commandes — OrdersView sans props requises */}

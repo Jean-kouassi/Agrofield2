@@ -34,19 +34,25 @@ export function EditOfferModal({ listing, open, onOpenChange, onSuccess }: EditO
     price: '',
     location: '',
     region: '',
+    latitude: null as number | null,
+    longitude: null as number | null,
+    location_address: '',
   })
 
   useEffect(() => {
     if (listing) {
       setFormData({
         title: listing.title || '',
-        description: listing.description || listing.desc || '',
+        description: (listing as any).description || listing.desc || '',
         category: listing.category || '',
-        quantity: listing.quantity?.toString() || listing.qty?.toString() || '',
+        quantity: (listing as any).quantity?.toString() || listing.qty?.toString() || '',
         unit: listing.unit || '',
         price: listing.price?.toString() || '',
-        location: listing.location || listing.city || '',
+        location: (listing as any).location || listing.city || '',
         region: listing.region || '',
+        latitude: (listing as any).latitude || null,
+        longitude: (listing as any).longitude || null,
+        location_address: (listing as any).location_address || '',
       })
     }
   }, [listing])
@@ -71,6 +77,9 @@ export function EditOfferModal({ listing, open, onOpenChange, onSuccess }: EditO
         location: formData.location.trim(),
         city: formData.location.trim(), // Alias pour compatibilité
         region: formData.region,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        location_address: formData.location_address || null,
         updated_at: new Date().toISOString(),
       }
 

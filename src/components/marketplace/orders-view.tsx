@@ -225,7 +225,7 @@ export function OrdersView({ orders: initialOrders, initialRole = 'buyer' }: Ord
       )}
 
       {/* Filtres de statut */}
-      <div className="flex gap-2 mb-5 overflow-x-auto af-scrollbar-hide">
+      <div className="flex gap-2 mb-5 overflow-x-auto af-scrollbar-hide" data-swipe-ignore>
         {([
           ['all', 'Toutes'],
           ['ongoing', 'En cours'],

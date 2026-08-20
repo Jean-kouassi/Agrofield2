@@ -61,12 +61,8 @@ export function DebugOrders() {
       }
 
       // 6. Structure de la table orders
-      const { data: tableSchema, error: schemaError } = await supabase.rpc('get_table_schema', { table_name: 'orders' })
-      if (schemaError) {
-        results.schemaError = schemaError.message
-      } else {
-        results.schema = tableSchema
-      }
+      // get_table_schema RPC non disponible - section désactivée
+      results.schema = 'N/A (RPC not available)'
 
     } catch (error: any) {
       results.error = error.message

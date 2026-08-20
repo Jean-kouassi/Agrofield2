@@ -5,8 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, Leaf, CheckCircle, Upload, Trash2 } from 'lucide-react'
+import {
+  ArrowLeft, Leaf, CheckCircle, Upload, Trash2, Image as ImageIcon,
+  AlertCircle, Save, X, MapPin, Tag, Scale, Banknote,
+} from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import type { ProductCategory, UnitType } from '@/types/marketplace'
@@ -16,15 +21,30 @@ export const Route = createFileRoute('/_authenticated/marketplace/$id/edit')({
   component: EditOfferPage,
 })
 
-const categories: ProductCategory[] = [
-  'tomates', 'oignons', 'mil', 'sorgho', 'mais', 'niebe', 'arachide', 'coton', 'mangue', 'autre'
+const categories: { value: ProductCategory; label: string }[] = [
+  { value: 'tomates', label: 'Tomates' },
+  { value: 'oignons', label: 'Oignons' },
+  { value: 'mil', label: 'Mil' },
+  { value: 'sorgho', label: 'Sorgho' },
+  { value: 'mais', label: 'Maïs' },
+  { value: 'niebe', label: 'Niébé' },
+  { value: 'arachide', label: 'Arachide' },
+  { value: 'coton', label: 'Coton' },
+  { value: 'mangue', label: 'Mangue' },
+  { value: 'autre', label: 'Autre' },
 ]
 
-const units: UnitType[] = ['kg', 'sac', 'panier', 'caisse', 'unite']
+const units: { value: UnitType; label: string }[] = [
+  { value: 'kg', label: 'Kilogramme (kg)' },
+  { value: 'sac', label: 'Sac' },
+  { value: 'panier', label: 'Panier' },
+  { value: 'caisse', label: 'Caisse' },
+  { value: 'unite', label: 'Unité' },
+]
 
 const regions = [
   'Centre', 'Boucle du Mouhoun', 'Cascades', 'Centre-Est', 'Centre-Nord', 'Centre-Ouest',
-  'Centre-Sud', 'Est', 'Hauts-Bassins', 'Nord', 'Plateau-Central', 'Sahel', 'Sud-Ouest'
+  'Centre-Sud', 'Est', 'Hauts-Bassins', 'Nord', 'Plateau-Central', 'Sahel', 'Sud-Ouest',
 ]
 
 function EditOfferPage() {
@@ -34,6 +54,7 @@ function EditOfferPage() {
   const [fetching, setFetching] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [isOwner, setIsOwner] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const [formData, setFormData] = useState({
     title: '',
@@ -48,8 +69,8 @@ function EditOfferPage() {
 
   const [selectedImages, setSelectedImages] = useState<File[]>([])
   const [existingImages, setExistingImages] = useState<string[]>([])
-  const [imagesToDelete, setImagesToDelete] = useState<string[]>([])
   const [uploadingImages, setUploadingImages] = useState(false)
+  const [imagePreviews, setImagePreviews] = useState<string[]>([])
 
   useEffect(() => {
     async function loadData() {
@@ -82,32 +103,49 @@ function EditOfferPage() {
 
       setIsOwner(true)
       setFormData({
-        title: offer.title,
-        description: offer.description,
+        title: offer.title || '',
+        description: offer.description || '',
         category: offer.category as ProductCategory,
-        quantity: offer.quantity.toString(),
+        quantity: offer.quantity?.toString() || '',
         unit: offer.unit as UnitType,
-        price: offer.price.toString(),
-        location: offer.location,
-        region: offer.region,
+        price: offer.price?.toString() || '',
+        location: offer.location || '',
+        region: offer.region || '',
       })
       setExistingImages(Array.isArray(offer.images) ? (offer.images as string[]) : [])
       setFetching(false)
     }
 
     loadData()
-  }, [id])
+  }, [id, router])
+
+  // Generate previews for newly selected images
+  useEffect(() => {
+    const previews = selectedImages.map((file) => URL.createObjectURL(file))
+    setImagePreviews(previews)
+    return () => previews.forEach((url) => URL.revokeObjectURL(url))
+  }, [selectedImages])
 
   function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || [])
-    setSelectedImages(files)
+    if (files.length === 0) return
+    // Limit total images to 8
+    const remaining = 8 - existingImages.length
+    if (remaining <= 0) {
+      toast.error('Maximum 8 images par offre')
+      return
+    }
+    setSelectedImages(files.slice(0, remaining))
+  }
+
+  function handleRemoveNewImage(idx: number) {
+    setSelectedImages((prev) => prev.filter((_, i) => i !== idx))
   }
 
   async function handleDeleteImage(imageUrl: string) {
     if (!confirm('Supprimer cette image ?')) return
 
     setExistingImages((prev) => prev.filter((url) => url !== imageUrl))
-    setImagesToDelete((prev) => [...prev, imageUrl])
 
     try {
       const path = imageUrl.split('/object/public/marketplace-images/')[1]
@@ -120,8 +158,33 @@ function EditOfferPage() {
     }
   }
 
+  function validate(): boolean {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.title.trim()) newErrors.title = 'Le titre est requis'
+    else if (formData.title.length < 5) newErrors.title = 'Titre trop court (min 5 caractères)'
+
+    if (!formData.description.trim()) newErrors.description = 'La description est requise'
+    else if (formData.description.length < 10) newErrors.description = 'Description trop courte (min 10 caractères)'
+
+    if (!formData.category) newErrors.category = 'Catégorie requise'
+    if (!formData.quantity || parseFloat(formData.quantity) <= 0) newErrors.quantity = 'Quantité invalide'
+    if (!formData.price || parseFloat(formData.price) <= 0) newErrors.price = 'Prix invalide'
+    if (!formData.location.trim()) newErrors.location = 'Ville requise'
+    if (!formData.region) newErrors.region = 'Région requise'
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
+    if (!validate()) {
+      toast.error('Veuillez corriger les erreurs avant de continuer')
+      return
+    }
+
     setLoading(true)
     setUploadingImages(true)
 
@@ -156,13 +219,13 @@ function EditOfferPage() {
       setUploadingImages(false)
 
       const updateData = {
-        title: formData.title,
-        description: formData.description,
+        title: formData.title.trim(),
+        description: formData.description.trim(),
         category: formData.category,
         quantity: parseFloat(formData.quantity),
         unit: formData.unit,
         price: parseFloat(formData.price),
-        location: formData.location,
+        location: formData.location.trim(),
         region: formData.region,
         images: finalImages,
         updated_at: new Date().toISOString(),
@@ -175,8 +238,8 @@ function EditOfferPage() {
 
       if (error) throw error
 
-      toast.success('Offre modifiée avec succès !')
-      setTimeout(() => router.navigate({ to: '/marketplace/$id', params: { id } }), 1500)
+      toast.success('✅ Offre modifiée avec succès !')
+      setTimeout(() => router.navigate({ to: '/marketplace/$id', params: { id } }), 1000)
     } catch (err: any) {
       console.error('Error:', err)
       setUploadingImages(false)
@@ -186,12 +249,13 @@ function EditOfferPage() {
     }
   }
 
+  // ─── Loading ───
   if (fetching) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/30">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Chargement...</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="text-muted-foreground">Chargement de l'offre...</p>
         </div>
       </div>
     )
@@ -199,46 +263,65 @@ function EditOfferPage() {
 
   if (!isOwner) return null
 
+  const totalImages = existingImages.length + selectedImages.length
+
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="bg-background border-b sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-3">
+    <div className="min-h-screen bg-background">
+      {/* ─── Header ─── */}
+      <header className="sticky top-0 z-20 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+        <div className="mx-auto max-w-3xl px-4 py-3">
           <button
             onClick={() => router.navigate({ to: '/marketplace/$id', params: { id } })}
-            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium text-sm"
+            className="inline-flex items-center gap-2 font-medium text-sm text-primary hover:text-primary/80 focus:outline-none focus:ring-2 focus:ring-ring rounded-md"
+            style={{ minHeight: 48 }}
+            aria-label="Retour à l'offre"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="h-5 w-5" />
             Retour à l'offre
           </button>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-6">
+      {/* ─── Main ─── */}
+      <main className="mx-auto max-w-3xl px-4 py-6">
         <Card className="shadow-lg">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <Leaf className="w-6 h-6 text-primary" />
+              <div className="rounded-lg bg-primary/10 p-2">
+                <Leaf className="h-6 w-6 text-primary" aria-hidden="true" />
+              </div>
               <div>
-                <CardTitle>Modifier l'offre</CardTitle>
+                <CardTitle className="text-xl">Modifier l'offre</CardTitle>
                 <CardDescription>Modifiez les informations de votre produit</CardDescription>
               </div>
             </div>
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <Label htmlFor="title">Titre *</Label>
+            <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+              {/* Titre */}
+              <div className="space-y-2">
+                <Label htmlFor="title" className="flex items-center gap-1.5">
+                  <Tag className="h-3.5 w-3.5 text-primary" /> Titre *
+                </Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
                   required
-                  className="mt-1.5"
+                  placeholder="Ex: Tomates fraîches - Récolte récente"
+                  className="h-12"
+                  aria-invalid={!!errors.title}
                 />
+                {errors.title && (
+                  <p className="flex items-center gap-1 text-xs text-destructive" role="alert">
+                    <AlertCircle className="h-3 w-3" /> {errors.title}
+                  </p>
+                )}
               </div>
 
-              <div>
+              {/* Description */}
+              <div className="space-y-2">
                 <Label htmlFor="description">Description *</Label>
                 <Textarea
                   id="description"
@@ -246,24 +329,34 @@ function EditOfferPage() {
                   onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                   required
                   rows={4}
-                  className="mt-1.5"
+                  placeholder="Décrivez votre produit : qualité, variété, mode de culture..."
+                  aria-invalid={!!errors.description}
                 />
+                {errors.description && (
+                  <p className="flex items-center gap-1 text-xs text-destructive" role="alert">
+                    <AlertCircle className="h-3 w-3" /> {errors.description}
+                  </p>
+                )}
               </div>
+
+              <Separator />
 
               {/* Images existantes */}
               {existingImages.length > 0 && (
-                <div>
-                  <Label>Images actuelles</Label>
-                  <div className="grid grid-cols-3 gap-3 mt-2">
+                <div className="space-y-2">
+                  <Label>Images actuelles ({existingImages.length})</Label>
+                  <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                     {existingImages.map((url, idx) => (
-                      <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border">
-                        <img src={url} alt={`Image ${idx + 1}`} className="w-full h-full object-cover" />
+                      <div key={idx} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
+                        <img src={url} alt={`Image ${idx + 1}`} className="h-full w-full object-cover" />
                         <button
                           type="button"
                           onClick={() => handleDeleteImage(url)}
-                          className="absolute top-1 right-1 p-1.5 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute right-1 top-1 rounded-full bg-destructive p-1.5 text-destructive-foreground opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring"
+                          style={{ minHeight: 36, minWidth: 36 }}
+                          aria-label={`Supprimer image ${idx + 1}`}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     ))}
@@ -272,49 +365,86 @@ function EditOfferPage() {
               )}
 
               {/* Nouvelles images */}
-              <div>
-                <Label>Ajouter des photos</Label>
-                <div className="mt-2 border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors bg-muted/30">
-                  <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground mb-2">Cliquez pour sélectionner des images</p>
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1.5">
+                  <ImageIcon className="h-3.5 w-3.5 text-primary" />
+                  Ajouter des photos ({totalImages}/8)
+                </Label>
+                <div className="cursor-pointer rounded-lg border-2 border-dashed border-border p-6 text-center transition-colors hover:border-primary/50 hover:bg-muted/30">
+                  <Upload className="mx-auto mb-2 h-8 w-8 text-muted-foreground" aria-hidden="true" />
+                  <p className="mb-2 text-sm text-muted-foreground">Cliquez pour sélectionner des images</p>
                   <Input
                     type="file"
                     accept="image/*"
                     multiple
                     onChange={handleImageSelect}
+                    className="cursor-pointer"
+                    aria-label="Sélectionner des images"
                   />
-                  {selectedImages.length > 0 && (
-                    <p className="mt-2 text-sm text-primary">{selectedImages.length} image(s) sélectionnée(s)</p>
-                  )}
                 </div>
+
+                {/* Preview new images */}
+                {imagePreviews.length > 0 && (
+                  <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                    {imagePreviews.map((preview, idx) => (
+                      <div key={idx} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
+                        <img src={preview} alt={`Nouvelle image ${idx + 1}`} className="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveNewImage(idx)}
+                          className="absolute right-1 top-1 rounded-full bg-destructive p-1.5 text-destructive-foreground opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring"
+                          style={{ minHeight: 36, minWidth: 36 }}
+                          aria-label={`Retirer nouvelle image ${idx + 1}`}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                        <Badge variant="secondary" className="absolute bottom-1 left-1 text-[8px]">
+                          Nouveau
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
+              <Separator />
+
               {/* Catégorie + Unité */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
                   <Label>Catégorie *</Label>
                   <Select
                     value={formData.category}
                     onValueChange={(v) => setFormData((prev) => ({ ...prev, category: v as ProductCategory }))}
                   >
-                    <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="h-12" aria-invalid={!!errors.category}>
+                      <SelectValue placeholder="Choisir une catégorie" />
+                    </SelectTrigger>
                     <SelectContent>
                       {categories.map((cat) => (
-                        <SelectItem key={cat} value={cat} className="capitalize">{cat}</SelectItem>
+                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {errors.category && (
+                    <p className="flex items-center gap-1 text-xs text-destructive" role="alert">
+                      <AlertCircle className="h-3 w-3" /> {errors.category}
+                    </p>
+                  )}
                 </div>
-                <div>
+
+                <div className="space-y-2">
                   <Label>Unité *</Label>
                   <Select
                     value={formData.unit}
                     onValueChange={(v) => setFormData((prev) => ({ ...prev, unit: v as UnitType }))}
                   >
-                    <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="h-12">
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       {units.map((u) => (
-                        <SelectItem key={u} value={u}>{u}</SelectItem>
+                        <SelectItem key={u.value} value={u.value}>{u.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -322,76 +452,129 @@ function EditOfferPage() {
               </div>
 
               {/* Quantité + Prix */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="quantity">Quantité *</Label>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="quantity" className="flex items-center gap-1.5">
+                    <Scale className="h-3.5 w-3.5 text-primary" /> Quantité *
+                  </Label>
                   <Input
                     id="quantity"
                     type="number"
                     step="0.01"
+                    min="0"
                     value={formData.quantity}
                     onChange={(e) => setFormData((prev) => ({ ...prev, quantity: e.target.value }))}
                     required
-                    className="mt-1.5"
+                    className="h-12"
+                    placeholder="Ex: 100"
+                    aria-invalid={!!errors.quantity}
                   />
+                  {errors.quantity && (
+                    <p className="flex items-center gap-1 text-xs text-destructive" role="alert">
+                      <AlertCircle className="h-3 w-3" /> {errors.quantity}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <Label htmlFor="price">Prix / unité (FCFA) *</Label>
+
+                <div className="space-y-2">
+                  <Label htmlFor="price" className="flex items-center gap-1.5">
+                    <Banknote className="h-3.5 w-3.5 text-primary" /> Prix / unité (FCFA) *
+                  </Label>
                   <Input
                     id="price"
                     type="number"
+                    min="0"
                     value={formData.price}
                     onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
                     required
-                    className="mt-1.5"
+                    className="h-12"
+                    placeholder="Ex: 500"
+                    aria-invalid={!!errors.price}
                   />
+                  {errors.price && (
+                    <p className="flex items-center gap-1 text-xs text-destructive" role="alert">
+                      <AlertCircle className="h-3 w-3" /> {errors.price}
+                    </p>
+                  )}
                 </div>
               </div>
 
+              <Separator />
+
               {/* Localisation + Région */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="location">Ville *</Label>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="location" className="flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5 text-primary" /> Ville *
+                  </Label>
                   <Input
                     id="location"
                     value={formData.location}
                     onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
                     required
-                    className="mt-1.5"
+                    className="h-12"
+                    placeholder="Ex: Ouagadougou"
+                    aria-invalid={!!errors.location}
                   />
+                  {errors.location && (
+                    <p className="flex items-center gap-1 text-xs text-destructive" role="alert">
+                      <AlertCircle className="h-3 w-3" /> {errors.location}
+                    </p>
+                  )}
                 </div>
-                <div>
+
+                <div className="space-y-2">
                   <Label>Région *</Label>
                   <Select
                     value={formData.region}
                     onValueChange={(v) => setFormData((prev) => ({ ...prev, region: v }))}
                   >
-                    <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="h-12" aria-invalid={!!errors.region}>
+                      <SelectValue placeholder="Choisir une région" />
+                    </SelectTrigger>
                     <SelectContent>
                       {regions.map((r) => (
                         <SelectItem key={r} value={r}>{r}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {errors.region && (
+                    <p className="flex items-center gap-1 text-xs text-destructive" role="alert">
+                      <AlertCircle className="h-3 w-3" /> {errors.region}
+                    </p>
+                  )}
                 </div>
               </div>
 
+              <Separator />
+
               {/* Boutons */}
-              <div className="flex gap-3 pt-2">
-                <Button type="submit" className="flex-1" disabled={loading || uploadingImages}>
-                  {uploadingImages ? 'Upload en cours...' : loading ? 'Enregistrement...' : (
-                    <>
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Enregistrer
-                    </>
-                  )}
-                </Button>
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => router.navigate({ to: '/marketplace/$id', params: { id } })}
+                  style={{ minHeight: 48 }}
+                  className="sm:flex-1"
                 >
-                  Annuler
+                  <X className="mr-2 h-4 w-4" /> Annuler
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={loading || uploadingImages}
+                  style={{ minHeight: 48 }}
+                  className="sm:flex-[2]"
+                >
+                  {uploadingImages ? (
+                    'Upload des images...'
+                  ) : loading ? (
+                    'Enregistrement...'
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Enregistrer les modifications
+                    </>
+                  )}
                 </Button>
               </div>
             </form>

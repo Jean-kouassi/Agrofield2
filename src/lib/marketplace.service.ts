@@ -87,9 +87,44 @@ export async function fetchMyListings() {
 }
 
 /**
- * Create a new marketplace listing
+ * Upload image to Supabase Storage and return public URL
+ * Uses marketplace-images bucket for new uploads
  */
-export async function createListing(listing: Omit<MarketplaceListingInsert, 'seller_id' | 'seller_name'>): Promise<MarketplaceListing> {
+async function uploadImage(file: File, userId: string, listingId?: string): Promise<string> {
+  const fileExt = file.name.split('.').pop()
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`
+  const filePath = listingId 
+    ? `${listingId}/${fileName}` 
+    : `offers/${userId}/${fileName}`
+
+  const { data, error } = await supabase.storage
+    .from('marketplace-images')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+    })
+
+  if (error) {
+    console.error('Error uploading image:', error)
+    throw error
+  }
+
+  // Get public URL
+  const { data: { publicUrl } } = supabase.storage
+    .from('marketplace-images')
+    .getPublicUrl(filePath)
+
+  return publicUrl
+}
+
+/**
+ * Create a new marketplace listing with image upload
+ */
+export async function createListing(
+  listing: Omit<MarketplaceListingInsert, 'seller_id' | 'seller_name'> & {
+    imageFiles?: File[]
+  }
+): Promise<MarketplaceListing> {
   const user = await getCurrentUser()
   if (!user) {
     throw new Error('You must be logged in to publish an offer')
@@ -98,14 +133,37 @@ export async function createListing(listing: Omit<MarketplaceListingInsert, 'sel
   // Get user's name from metadata or email
   const sellerName = user.user_metadata?.name || user.email?.split('@')[0] || 'Vendeur'
 
+  // Upload images first if provided
+  let imageUrls: string[] = []
+  if (listing.imageFiles && listing.imageFiles.length > 0) {
+    try {
+      const uploadPromises = listing.imageFiles.map(file => 
+        uploadImage(file, user.id)
+      )
+      imageUrls = await Promise.all(uploadPromises)
+      console.log('Images uploaded successfully:', imageUrls)
+    } catch (uploadError) {
+      console.error('Failed to upload images:', uploadError)
+      // Continue without images rather than failing completely
+    }
+  }
+
+  // Prepare the listing data
+  const listingData = {
+    ...listing,
+    seller_id: user.id,
+    seller_name: sellerName,
+    expires_at: listing.expires_at || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    // Use uploaded image URLs, fallback to existing images array if any
+    images: imageUrls.length > 0 ? imageUrls : (listing.images as any),
+  }
+
+  // Remove imageFiles from the data before inserting
+  delete (listingData as any).imageFiles
+
   const { data, error } = await supabase
     .from('marketplace_listings')
-    .insert({
-      ...listing,
-      seller_id: user.id,
-      seller_name: sellerName,
-      expires_at: listing.expires_at || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days default
-    })
+    .insert(listingData)
     .select()
     .single()
 

@@ -109,7 +109,7 @@ function FinancePage() {
     if (!file) return null;
     const ext = file.name.split(".").pop() || "jpg";
     const path = `receipts/${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const { error } = await supabase.storage.from("AgroSphere-media").upload(path, file, {
+    const { error } = await supabase.storage.from("agrofield-media").upload(path, file, {
       cacheControl: "3600", upsert: false,
     });
     if (error) {
@@ -178,7 +178,7 @@ function FinancePage() {
 
     async function signed(path: string | null) {
       if (!path) return "";
-      const { data } = await supabase.storage.from("AgroSphere-media").createSignedUrl(path, 60 * 60 * 24 * 7);
+      const { data } = await supabase.storage.from("agrofield-media").createSignedUrl(path, 60 * 60 * 24 * 7);
       return data?.signedUrl ?? "";
     }
 
@@ -366,7 +366,7 @@ function Row({ title, subtitle, amount, tone, hash, record }: {
   async function viewReceipt() {
     if (!record.receipt_path) return;
     const { data, error } = await supabase.storage
-      .from("AgroSphere-media")
+      .from("agrofield-media")
       .createSignedUrl(record.receipt_path, 300);
     if (error || !data?.signedUrl) { toast.error("Reçu introuvable"); return; }
     window.open(data.signedUrl, "_blank", "noopener,noreferrer");

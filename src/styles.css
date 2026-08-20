@@ -70,6 +70,18 @@
   --color-agro-soil: #92400e;       /* Terre - agriculture */
   --color-agro-sky: #0ea5e9;        /* Bleu irrigation/ciel */
   --color-agro-danger: #dc2626;     /* Rouge alerte */
+
+  /* Crop calendar phase colors */
+  --color-phase-seeding: oklch(0.7 0.12 145);
+  --color-phase-growing: oklch(0.55 0.14 145);
+  --color-phase-flowering: oklch(0.75 0.15 75);
+  --color-phase-maturation: oklch(0.65 0.12 50);
+  --color-phase-harvest: oklch(0.55 0.18 27);
+
+  /* Weather alert severities */
+  --color-weather-info: var(--accent);
+  --color-weather-warning: var(--primary);
+  --color-weather-critical: var(--destructive);
 }
 
 /* Scrollbar personnalisée pour la timeline des activités */
@@ -129,5 +141,17 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* ── Small screens (iPhone SE etc.) ── */
+@media (max-width: 375px) {
+  .text-display {
+    font-size: 1.25rem;
+  }
+  .touch-target,
+  button,
+  a.button {
+    min-height: 48px;
   }
 }

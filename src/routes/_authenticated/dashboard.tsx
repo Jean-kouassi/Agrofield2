@@ -2,9 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { formatFcfa, harvestAlert } from "@/lib/agrosphere";
-import { Sprout, TrendingUp, TrendingDown, AlertTriangle, Camera, Plus, ShoppingCart, Calendar, Droplets, SprayCan, Pickaxe, Wheat, Paperclip, ArrowUp } from "lucide-react";
+import { Sprout, TrendingUp, TrendingDown, AlertTriangle, Camera, Plus, ShoppingCart, Calendar, Droplets, SprayCan, Pickaxe, Wheat, Paperclip, ArrowUp, CloudSun } from "lucide-react";
 import { ActivityTimeline } from "@/components/ui/activity-timeline";
-import { WeatherMiniCard } from "@/components/ui/weather-mini-card";
+import { WeatherAlertBanner } from "@/components/weather/WeatherAlertBanner";
+import { CropCalendarStrip } from "@/components/agriculture/CropCalendarStrip";
+import { MarketPriceTicker } from "@/components/marketplace/MarketPriceTicker";
 
 import { useState, useEffect } from "react";
 
@@ -45,6 +47,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function Dashboard() {
   const { user } = Route.useRouteContext();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showWeather, setShowWeather] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -98,7 +101,7 @@ function Dashboard() {
   const activitiesQ = useQuery({
     queryKey: ["dashboard-activities", user.id],
     queryFn: async () => {
-      const activities = [];
+      const activities: any[] = [];
       
       // 1. Ventes récentes (max 3)
       const { data: sales, error: salesError } = await supabase
@@ -115,7 +118,7 @@ function Dashboard() {
         sales.forEach((sale) => {
           const parcelName = (sale.parcel as any)?.name || "Sans parcelle";
           const totalRevenue = Number(sale.quantity_kg || 0) * Number(sale.unit_price_fcfa || 0);
-          const proofCount = (sale.proof_photos as any[])?.length || 0;
+          const proofCount = (sale as any).proof_photos?.length || 0;
           
           activities.push({
             id: `sale-${sale.id}`,
@@ -143,7 +146,7 @@ function Dashboard() {
       if (expenses && !expensesError) {
         expenses.forEach((expense) => {
           const parcelName = (expense.parcel as any)?.name || "Sans parcelle";
-          const proofCount = (expense.proof_photos as any[])?.length || 0;
+          const proofCount = (expense as any).proof_photos?.length || 0;
           
           activities.push({
             id: `expense-${expense.id}`,
@@ -225,7 +228,7 @@ function Dashboard() {
     type: a!.level === "critical" ? "alert" : "warning" as const,
     title: `${p.name} — ${p.crop_type}`,
     description: a!.label,
-    timestamp: `Récolte dans ${a!.daysUntilHarvest} jours`,
+    timestamp: `Récolte dans ${(a as any).daysUntilHarvest} jours`,
     icon: a!.level === "critical" ? <AlertTriangle className="h-5 w-5" /> : <Calendar className="h-5 w-5" />,
     sortDate: new Date()
   }));
@@ -241,9 +244,9 @@ function Dashboard() {
     queryKey: ["my-market-offers", user.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("market_offers")
+        .from("marketplace_listings")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("seller_id", user.id as string)
         .eq("status", "active")
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -278,13 +281,41 @@ function Dashboard() {
         </Link>
       </div>
 
-      {/* Weather Mini Card - Météo locale */}
-      <WeatherMiniCard
-        temperature={32}
-        condition="partly-cloudy"
-        rainProbability={45}
-        location="Ouagadougou"
-      />
+      {/* Weather Alert Banner - Météo agricole + alertes */}
+      {showWeather && (
+        <WeatherAlertBanner
+          location="Ouagadougou"
+          onDismiss={() => setShowWeather(false)}
+        />
+      )}
+
+      {/* Bouton pour réafficher la météo si dismissée */}
+      {!showWeather && (
+        <button
+          onClick={() => {
+            localStorage.removeItem("weather-banner-dismissed");
+            setShowWeather(true);
+          }}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-card p-3 text-sm font-medium text-foreground hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+          style={{ minHeight: 48 }}
+          aria-label="Réafficher la météo"
+        >
+          <CloudSun className="h-4 w-4 text-primary" />
+          Afficher la météo
+        </button>
+      )}
+
+      {/* Calendrier cultural - Cycle de la parcelle la plus récente */}
+      {parcelsQ.data && parcelsQ.data.length > 0 && (() => {
+        const parcel = parcelsQ.data[0] as any;
+        const cropMap: Record<string, string> = {
+          "Mil": "mil", "Sorgho": "sorgho", "Maïs": "mais", "Riz": "riz",
+          "Coton": "coton", "Arachide": "arachide", "Niébé": "niebe",
+        };
+        const cropType = (cropMap[parcel?.crop_type] || "mais") as any;
+        const plantingDate = parcel?.sowing_date || new Date().toISOString().split("T")[0];
+        return <CropCalendarStrip cropType={cropType} plantingDate={plantingDate} />;
+      })()}
 
       {/* Statistiques financières */}
       <div className="grid grid-cols-2 gap-3">
@@ -330,30 +361,40 @@ function Dashboard() {
           <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground">
             Activités récentes
           </h2>
-          {allEvents.length > 4 && (
+          {allEvents.length > 3 && (
             <span className="text-xs text-muted-foreground">
               {allEvents.length} activités
             </span>
           )}
         </div>
-        <div className="relative max-h-[420px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-rounded-lg scrollbar-thumb-border hover:scrollbar-thumb-primary">
+        <div className="relative max-h-[200px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-rounded-lg scrollbar-thumb-border hover:scrollbar-thumb-primary">
           <ActivityTimeline
-            events={allEvents}
+            events={allEvents.slice(0, 5)}
             title=""
           />
         </div>
+      </section>
+
+      {/* Prix marchés locaux */}
+      <section>
+        <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-muted-foreground">
+          Prix Marchés
+        </h2>
+        <MarketPriceTicker />
       </section>
 
       <section className="grid grid-cols-2 gap-3">
         <Link
           to="/parcels"
           className="flex items-center justify-center gap-2 rounded-2xl bg-primary p-4 text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90"
+          style={{ minHeight: 48 }}
         >
           <Plus className="h-4 w-4" /> Nouvelle parcelle
         </Link>
         <Link
           to="/diagnose"
           className="flex items-center justify-center gap-2 rounded-2xl bg-accent p-4 text-sm font-semibold text-accent-foreground shadow-sm hover:bg-accent/90"
+          style={{ minHeight: 48 }}
         >
           <Camera className="h-4 w-4" /> Diagnostic IA
         </Link>

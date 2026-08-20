@@ -105,8 +105,8 @@ function CropEventsPage() {
       p_parcel_id: selectedParcel,
       p_event_type: eventType,
       p_event_date: eventDate || new Date().toISOString().split("T")[0],
-      p_notes: notes || null,
-      p_yield_kg: yieldKg ? Number(yieldKg) : null,
+      p_notes: notes || undefined,
+      p_yield_kg: yieldKg ? Number(yieldKg) : undefined,
       p_input_cost: inputCost ? Number(inputCost) : 0,
       p_labor_cost: laborCost ? Number(laborCost) : 0,
     });

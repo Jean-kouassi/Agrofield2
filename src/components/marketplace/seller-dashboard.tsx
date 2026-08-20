@@ -172,7 +172,7 @@ export function SellerDashboard({
         <span>2 offres ont un stock faible et 3 commandes sont en attente de validation.</span>
       </Card>
 
-      <div className="flex gap-2 mb-4 overflow-x-auto af-scrollbar-hide">
+      <div className="flex gap-2 mb-4 overflow-x-auto af-scrollbar-hide" data-swipe-ignore>
         {[
           ['active', 'Actives'],
           ['reserved', 'Réservées'],

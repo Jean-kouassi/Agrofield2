@@ -1,4 +1,4 @@
-export { MarketplaceShell, type MarketplaceTab } from './marketplace-shell'
+// export { MarketplaceShell, type MarketplaceTab } from './marketplace-shell' // Module manquant
 export { ProductCard, ProductSkeleton, EmptyState } from './product-card'
 export { ProductDetailModal } from './product-detail-modal'
 export { PublishModal } from './publish-modal'

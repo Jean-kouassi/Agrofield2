@@ -47,6 +47,7 @@ export interface MarketplaceListing {
   saleType: SaleType
   desc: string
   days: number
+  images?: string[]  // URLs des images du bucket marketplace-images
 }
 
 export const REGIONS = [
@@ -459,7 +460,8 @@ export interface FilterValues {
  * Map Supabase marketplace_listings row to frontend MarketplaceListing
  */
 export function mapSupabaseListing(row: any): MarketplaceListing {
-  return {
+  console.log('[mapSupabaseListing] Raw row images:', row.images);
+  const result = {
     id: row.id,
     title: row.title,
     category: row.category,
@@ -475,7 +477,11 @@ export function mapSupabaseListing(row: any): MarketplaceListing {
     saleType: 'gros', // Default, can be added to schema later
     desc: row.description,
     days: row.created_at ? Math.floor((Date.now() - new Date(row.created_at).getTime()) / (1000 * 60 * 60 * 24)) : 0,
-  }
+    // Include images array from database
+    images: row.images || [],
+  } as MarketplaceListing;
+  console.log('[mapSupabaseListing] Mapped images:', result.images);
+  return result;
 }
 
 /**

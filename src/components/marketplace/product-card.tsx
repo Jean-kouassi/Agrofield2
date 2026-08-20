@@ -23,9 +23,24 @@ export function ProductCard({
   onDelete,
 }: ProductCardProps) {
   // Utiliser la première image du listing ou une image par défaut
-  const imageUrl = listing.images && listing.images.length > 0 
-    ? listing.images[0] 
-    : `https://picsum.photos/seed/AgroSphere-${listing.id}/640/480`
+  const images = listing.images || [];
+  console.log('[ProductCard] Listing:', listing.id, 'Images:', images);
+  
+  // Gérer les anciens formats d'URL (agrofield-media) et nouveaux (marketplace-images)
+  let imageUrl = `https://picsum.photos/seed/AgroSphere-${listing.id}/640/480`;
+  
+  if (images.length > 0 && images[0]) {
+    const firstImage = images[0];
+    // Si c'est une URL complète, l'utiliser directement
+    if (firstImage.startsWith('http')) {
+      imageUrl = firstImage;
+    } else {
+      // Sinon construire l'URL (cas théorique, normalement on stocke des URLs complètes)
+      imageUrl = firstImage;
+    }
+  }
+  
+  console.log('[ProductCard] Using imageUrl:', imageUrl);
   return (
     <Card
       className="af-card rounded-2xl overflow-hidden cursor-pointer flex flex-col"
@@ -38,6 +53,7 @@ export function ProductCard({
           className="w-full h-full object-cover"
           loading="lazy"
           onError={(e) => {
+            console.error('[ProductCard] Image failed to load:', imageUrl);
             // Fallback si l'image échoue
             e.currentTarget.src = `https://picsum.photos/seed/AgroSphere-${listing.id}/640/480`
           }}
