@@ -149,21 +149,27 @@ export async function createListing(
   }
 
   // Prepare the listing data
-  const listingData = {
-    ...listing,
+  const listingData: any = {
     seller_id: user.id,
     seller_name: sellerName,
+    title: listing.title?.trim() || '',
+    description: listing.description?.trim() || '',
+    category: listing.category,
+    quantity: parseFloat((listing.quantity || 0).toString()),
+    unit: listing.unit,
+    price: parseFloat((listing.price || 0).toString()),
+    location: listing.location?.trim() || '',
+    region: listing.region,
+    min_order: (listing as any).minOrder || 1,
+    status: 'available' as const,
+    available_from: new Date().toISOString(),
     expires_at: listing.expires_at || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    // Use uploaded image URLs, fallback to existing images array if any
-    images: imageUrls.length > 0 ? imageUrls : (listing.images as any),
+    images: imageUrls.length > 0 ? imageUrls : [],
   }
-
-  // Remove imageFiles from the data before inserting
-  delete (listingData as any).imageFiles
 
   const { data, error } = await supabase
     .from('marketplace_listings')
-    .insert(listingData)
+    .insert([listingData])
     .select()
     .single()
 

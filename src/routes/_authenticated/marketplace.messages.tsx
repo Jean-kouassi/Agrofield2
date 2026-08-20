@@ -66,7 +66,7 @@ function MessagesPage() {
         }
         throw error
       }
-      setConversations(data || [])
+      setConversations((data as any) || [])
     } catch (err: any) {
       console.error('Failed to load conversations:', err)
       // Don't show error toast if table doesn't exist

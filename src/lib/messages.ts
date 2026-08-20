@@ -50,14 +50,15 @@ export interface Notification {
 export async function getOrCreateConversation(
   participant2Id: string,
   listingId?: string
-): Promise<string> {
+): Promise<string | undefined> {
   const { data, error } = await supabase.rpc('get_or_create_conversation', {
     p_participant_2_id: participant2Id,
     p_listing_id: listingId || null,
   });
 
   if (error) throw error;
-  return data as string;
+  // eslint-disable-next-line @typescript-eslint/return-await
+  return data as unknown as string | undefined;
 }
 
 /**
@@ -270,7 +271,7 @@ export async function deleteMessage(
   
   await supabase
     .from('messages')
-    .update({ [field]: true })
+    .update({ [field]: true } as any)
     .eq('id', messageId);
 }
 

@@ -97,7 +97,7 @@ function OrdersPage() {
     if (status === 'cancelled') updates.cancelled_at = new Date().toISOString()
 
     try {
-      const { error } = await supabase.from('orders').update(updates).eq('id', orderId)
+      const { error } = await supabase.from('orders').update(updates as any).eq('id', orderId)
       if (error) throw error
       toast.success('Statut mis a jour')
       if (user) loadOrders(user.id)
